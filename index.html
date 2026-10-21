@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <meta
+      name="description"
+      content="CloudPrep is an unofficial practice exam simulator for the AWS Certified Cloud Practitioner (CLF-C02) exam."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>CloudPrep</title>
+    <script>
+      // Apply the saved theme before first paint, so light-theme users don't see a dark flash.
+      // The app applies the same setting again once it loads (src/lib/theme.ts).
+      try {
+        var saved = JSON.parse(localStorage.getItem('cloudprep:preferences') || 'null');
+        var theme = saved && saved.data && saved.data.theme;
+        if (theme === 'system') {
+          theme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      } catch (e) {
+        // Storage unavailable or unreadable: keep the default dark theme.
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

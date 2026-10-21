@@ -1,0 +1,93 @@
+# CLAUDE.md — CloudPrep
+
+CloudPrep is an unofficial, frontend-only AWS Certified Cloud Practitioner (CLF-C02) exam simulator. It is built with React + TypeScript (strict) + Vite + Tailwind v4 + React Router, and user data is stored in localStorage. It is for personal use and is shared with friends as a static site.
+
+**Read first:** `docs/PRODUCT_SPEC.md`, `docs/ARCHITECTURE.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/TEST_PLAN.md`, `docs/DECISIONS.md`.
+
+## Current status
+
+All user phases are built: Phases 1–6, the QA pass and release preparation (static deployment on Vercel). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
+
+## Commands
+
+```
+npm run dev                 # local dev server
+npm run build / preview     # production build / serve it
+npm run typecheck           # tsc --noEmit
+npm run lint                # eslint
+npm test                    # vitest (unit + component + question-bank validation)
+npm run test:e2e            # playwright
+npm run validate:questions  # validate the question bank + coverage report
+npm run check               # typecheck, lint, format, validate, test, build, e2e — must pass
+
+# First-time E2E setup: npx playwright install chromium webkit
+```
+
+Deployment: static build in `dist/`; `vercel.json` sets the build, output, SPA fallback (everything except `/assets/*`) and asset caching. `index.html` has a tiny inline script that applies the saved theme before first paint. Keep it in sync with `src/lib/theme.ts` and the preferences storage key.
+
+## Hard rules
+
+- **No** backend, database, auth, SSR, paid AI APIs, global state library or UI component library.
+- **No `any`** unless justified in a comment next to it. Strict TS flags stay on.
+- **Layering:** `src/domain/` is pure TS with no React, no storage and no `features/` imports. Components never touch `localStorage`; use `src/storage/` repositories and hooks in `src/state/`.
+- **Exam integrity in the UI:** Exam Mode components receive question views **without** correct answers or explanations. Never pass the full `Question` into exam-mode rendering.
+- **Time:** exam time is always calculated from `endsAt - Date.now()`. Intervals only trigger re-renders.
+- **Randomness:** always use the seeded PRNG in `src/domain/lib/random.ts`, never `Math.random()` in domain code.
+- **Persistence:** every persisted shape has a versioned envelope, a hand-written parser (D-005) and a migration path. Never overwrite a value you failed to parse without making a backup copy first.
+- **Native elements first:** radio/checkbox inputs, `<dialog>`, `<button>`, `<a>`. Every interactive element needs a visible focus style and an accessible name.
+- **Design system:** use tokens from `src/styles/index.css` and primitives from `src/components/ui/`. No one-off colours, radii or shadows in feature code.
+
+## Question content rules
+
+- Original questions only, written from public AWS docs and the CLF-C02 exam guide. Never use real, leaked or "dump" questions.
+- Use the **current** AWS service names from the exam guide (for example, Business Support+, Unified Operations, SageMaker AI, Quick Sight).
+- Each question: stable never-reused ID (`clf-d<n>-<nnnn>`), at least one https AWS reference, an overall explanation, and an explanation for every incorrect option.
+- Single answer = exactly 4 options; multiple response = 5 or more options with 2 or more correct. No "all/none of the above".
+- Review statuses: `draft` → `checked` (verified against the cited AWS pages) → `approved` (human sign-off) → `retired` (ID never reused). Only the user may set `approved`. Learning Mode shows `checked` + `approved` (D-016).
+- Every option needs an explanation, correct ones included (D-022). Questions live in `src/content/questions/d<n>-*.ts`; bump `BANK_VERSION` when they change.
+- Note AWS's 2026–27 Support plan changes (Developer, Business and Enterprise On-Ramp end on 1 January 2027).
+- Never pad the bank with unverified questions.
+
+## Definition of done (per phase)
+
+1. The phase's acceptance criteria in IMPLEMENTATION_PLAN.md are met, with `AC-x.y` tagged in test names.
+2. `npm run check` passes. Report the commands you ran and their results, including any failures.
+3. Separate "implemented" from "verified" in the report. Never claim something works without running it.
+4. Never skip, delete or loosen a test to get a green build.
+5. Update `docs/DECISIONS.md` if a decision was made or changed.
+
+## Exam engine
+
+- Pure logic in `src/domain/exam/`: `blueprint` (allocation), `select` (question choice), `session` (state machine reducer), `timer`, `attempt` (build + score).
+- Exam state lives in the store (`activeExam`) and is saved on every action via `store.dispatchExam`. Submit only through `useExamActions().submit`, which is idempotent.
+- Exam UI receives `ExamQuestionView` (no correct answers or explanations). `OptionList` takes `type` + `options`, never a whole `Question`.
+- `ExamWatcher` (root layout) auto-submits expired exams on any page. `ExamLayout` redirects to results once the exam is recorded.
+
+## Storage
+
+- All persistence goes through `src/storage/`: one store (`store.ts`), one area definition per key, and `decodeArea` (version check, migrations, parse), used by both storage and imports.
+- Never write question text into attempts; use the question archive (D-031).
+- Settings: read `data.preferences` (effective values) and write with `store.setPreferences`. Defaults live in `DEFAULT_PREFERENCES` (D-034).
+- Record parsers must skip unsafe keys (`isSafeKey`).
+
+## Practice integrity
+
+- Monitoring is opt-in and lives in `src/features/exam/integrity/`. Store only `{type, at}`. Never compute a score or verdict from events. Always stop media tracks on cleanup.
+
+## Statistics
+
+Learning-mode stats are question-level: "answered" = unique questions; accuracy uses each question's latest answer. Attempt counts are stored but not used for accuracy. Recording is idempotent per session (D-019, D-023).
+
+## Conventions
+
+- Feature folders in `src/features/<area>/`; shared question rendering in `src/features/shared/`.
+- Filenames: components `PascalCase.tsx`, everything else `camelCase.ts`; tests next to the code as `*.test.ts(x)`; E2E tests in `tests/e2e/`.
+- Import alias `@/` → `src/`.
+- Test queries by role or label (RTL). No snapshot tests for UI.
+- Keep code comments short and useful.
+
+## Platform notes
+
+Windows 11 dev machine; PowerShell is the default shell (Git Bash is also available). Node 24, npm 11.
+Versions: React 19.3, React Router 8 (`RouterProvider` from `react-router/dom`), Vite 8, Tailwind 4.3, TypeScript 6.0, ESLint 9, Vitest 5, Playwright 1.64 (see D-020).
+In accessible names, avoid `<span className="sr-only"> text</span>` with a leading space; the space is dropped. Use `aria-label` instead.

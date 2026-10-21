@@ -1,0 +1,240 @@
+@import 'tailwindcss';
+
+/*
+ * CloudPrep design tokens.
+ *
+ * Raw values live in --cp-* custom properties, one set per theme. Tailwind utilities
+ * (bg-surface, text-fg-muted, border-border, rounded-lg, …) reference them through
+ * `@theme inline`, so switching `data-theme` on <html> restyles everything with
+ * no per-component theme code.
+ */
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Surfaces, from page background up to raised layers */
+  --cp-bg: #0b0d10;
+  --cp-surface: #12151a;
+  --cp-surface-2: #181c22;
+  --cp-surface-3: #20252d;
+
+  /* Borders and separators */
+  --cp-border: #262c35;
+  --cp-border-strong: #343b46;
+  --cp-border-control: #6b7482; /* form control outlines: ≥3:1 vs surfaces */
+
+  /* Text */
+  --cp-fg: #e6e9ee;
+  --cp-fg-muted: #a3abb8;
+  --cp-fg-subtle: #8a93a1;
+
+  /* Accent (restrained blue) */
+  --cp-accent: #4c8dff;
+  --cp-accent-hover: #6ba1ff;
+  --cp-accent-fg: #7fadff; /* accent used as text on dark surfaces */
+  --cp-on-accent: #0b0d10;
+
+  /* Status */
+  --cp-success: #3fb27f;
+  --cp-warning: #e0a43a;
+  --cp-danger: #e5604d;
+  --cp-info: #4c8dff;
+  --cp-danger-hover: #ec7a69;
+  --cp-on-danger: #0b0d10;
+
+  /* Focus */
+  --cp-focus: #7fadff;
+
+  /* Elevation (overlays only — cards use borders) */
+  --cp-shadow-overlay: 0 16px 48px -12px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.04);
+  --cp-backdrop: rgb(5 6 8 / 0.7);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --cp-bg: #f5f6f8;
+  --cp-surface: #ffffff;
+  --cp-surface-2: #f0f2f5;
+  --cp-surface-3: #e6e9ee;
+
+  --cp-border: #dde1e7;
+  --cp-border-strong: #c5cbd4;
+  --cp-border-control: #7a8391;
+
+  --cp-fg: #14171c;
+  --cp-fg-muted: #4a5260;
+  --cp-fg-subtle: #5b6370;
+
+  --cp-accent: #2563eb;
+  --cp-accent-hover: #1d4ed8;
+  --cp-accent-fg: #1d4ed8;
+  --cp-on-accent: #ffffff;
+
+  --cp-success: #166534;
+  --cp-warning: #8a4b08;
+  --cp-danger: #c02626;
+  --cp-info: #2563eb;
+  --cp-danger-hover: #a51f1f;
+  --cp-on-danger: #ffffff;
+
+  --cp-focus: #2563eb;
+
+  --cp-shadow-overlay: 0 16px 48px -12px rgb(15 23 42 / 0.25), 0 0 0 1px rgb(15 23 42 / 0.06);
+  --cp-backdrop: rgb(15 23 42 / 0.45);
+}
+
+:root {
+  /* Theme-independent tokens */
+  --cp-duration-fast: 120ms;
+  --cp-duration-base: 180ms;
+  --cp-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --cp-duration-fast: 0ms;
+    --cp-duration-base: 0ms;
+  }
+}
+
+/* The "Reduce motion" setting forces the same behaviour regardless of the OS. */
+[data-motion='reduce'] {
+  --cp-duration-fast: 0ms;
+  --cp-duration-base: 0ms;
+}
+
+@theme inline {
+  /* Remove Tailwind's default palette so only design-system colours exist. */
+  --color-*: initial;
+
+  --color-bg: var(--cp-bg);
+  --color-surface: var(--cp-surface);
+  --color-surface-2: var(--cp-surface-2);
+  --color-surface-3: var(--cp-surface-3);
+  --color-border: var(--cp-border);
+  --color-border-strong: var(--cp-border-strong);
+  --color-border-control: var(--cp-border-control);
+  --color-fg: var(--cp-fg);
+  --color-fg-muted: var(--cp-fg-muted);
+  --color-fg-subtle: var(--cp-fg-subtle);
+  --color-accent: var(--cp-accent);
+  --color-accent-hover: var(--cp-accent-hover);
+  --color-accent-fg: var(--cp-accent-fg);
+  --color-accent-subtle: color-mix(in oklab, var(--cp-accent) 14%, transparent);
+  --color-on-accent: var(--cp-on-accent);
+  --color-success: var(--cp-success);
+  --color-success-subtle: color-mix(in oklab, var(--cp-success) 14%, transparent);
+  --color-warning: var(--cp-warning);
+  --color-warning-subtle: color-mix(in oklab, var(--cp-warning) 14%, transparent);
+  --color-danger: var(--cp-danger);
+  --color-danger-hover: var(--cp-danger-hover);
+  --color-danger-subtle: color-mix(in oklab, var(--cp-danger) 14%, transparent);
+  --color-on-danger: var(--cp-on-danger);
+  --color-info: var(--cp-info);
+  --color-info-subtle: color-mix(in oklab, var(--cp-info) 14%, transparent);
+  --color-focus: var(--cp-focus);
+  --color-backdrop: var(--cp-backdrop);
+
+  /* Typography — Tailwind's default type scale (12/14/16/18/20/24/30px) is kept. */
+  --font-sans:
+    'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Radii: sm = inputs/badges, md = buttons, lg = cards/dialogs */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* Shadows */
+  --shadow-overlay: var(--cp-shadow-overlay);
+
+  /* Spacing: Tailwind's 4px scale, plus layout tokens */
+  --spacing-sidebar: 15.5rem;
+  --spacing-topbar: 3.5rem;
+  --container-content: 70rem;
+  --container-prose: 47.5rem;
+
+  /* Motion */
+  --default-transition-duration: var(--cp-duration-fast);
+  --default-transition-timing-function: var(--cp-ease);
+}
+
+@utility duration-fast {
+  transition-duration: var(--cp-duration-fast);
+}
+
+@utility duration-base {
+  transition-duration: var(--cp-duration-base);
+}
+
+@layer base {
+  html {
+    background-color: var(--cp-bg);
+    -webkit-text-size-adjust: 100%;
+    /* Keep scrolled-to and focused elements clear of the sticky mobile top bar. */
+    scroll-padding-top: calc(var(--spacing-topbar) + 0.5rem);
+  }
+
+  @media (width >= 64rem) {
+    html {
+      scroll-padding-top: 0;
+    }
+  }
+
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    min-height: 100dvh;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--cp-accent) 35%, transparent);
+  }
+
+  /* One focus style everywhere. Components must not remove it. */
+  :focus-visible {
+    outline: 2px solid var(--cp-focus);
+    outline-offset: 2px;
+  }
+
+  /* Programmatic focus targets (e.g. <main> after navigation) don't need a ring. */
+  [tabindex='-1']:focus {
+    outline: none;
+  }
+
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+
+  /* Lock page scroll while a modal dialog is open. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  dialog::backdrop {
+    background-color: var(--cp-backdrop);
+  }
+
+  [data-motion='reduce'] *,
+  [data-motion='reduce'] *::before,
+  [data-motion='reduce'] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
