@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Menu } from 'lucide-react';
 import { IconButton } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
@@ -7,7 +7,14 @@ import { Brand, UnofficialNote } from './Brand';
 import { NavList } from './NavList';
 
 /** Top bar with a menu button that opens the navigation drawer (<1024px). */
-export function MobileNav({ className }: { className?: string }) {
+export function MobileNav({
+  className,
+  renderAccount,
+}: {
+  className?: string;
+  /** Account block for the drawer; receives a callback that closes the drawer. */
+  renderAccount?: (close: () => void) => ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   const close = () => {
     setOpen(false);
@@ -37,6 +44,7 @@ export function MobileNav({ className }: { className?: string }) {
             <Brand onNavigate={close} />
           </div>
           <NavList onNavigate={close} />
+          {renderAccount?.(close)}
           <div className="px-2">
             <UnofficialNote />
           </div>

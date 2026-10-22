@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { createBrowserRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
+import { createAuthClient } from '@/backend/createAuthClient';
 import { ToastProvider } from '@/components/ui/Toast';
+import { AuthProvider } from '@/state/AuthProvider';
 import { StoreProvider } from '@/state/StoreProvider';
 import { createLocalStorageDriver, createMemoryDriver } from '@/storage/driver';
 import { createAppStore } from '@/storage/store';
@@ -15,6 +17,7 @@ import { routes } from './routes';
  */
 export function App() {
   const [router] = useState(() => createBrowserRouter(routes));
+  const [auth] = useState(createAuthClient);
   const [store] = useState(() => {
     const local = createLocalStorageDriver();
     const created = createAppStore({
@@ -29,9 +32,11 @@ export function App() {
   });
   return (
     <StoreProvider store={store}>
-      <ToastProvider>
-        <RouterProvider router={router} />
-      </ToastProvider>
+      <AuthProvider client={auth}>
+        <ToastProvider>
+          <RouterProvider router={router} />
+        </ToastProvider>
+      </AuthProvider>
     </StoreProvider>
   );
 }

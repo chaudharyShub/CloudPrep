@@ -11,6 +11,7 @@ import type { MotionPreference, ThemePreference } from '@/lib/theme';
 import { useAppStore } from '@/state/StoreProvider';
 import { usePreferences, useUserData } from '@/state/hooks';
 import { PRACTICE_LENGTHS, type PracticeLength } from '@/storage/preferencesArea';
+import { AccountCard } from '@/features/auth/AccountCard';
 import { DataManagement } from './DataManagement';
 
 const THEME_OPTIONS = [
@@ -51,6 +52,7 @@ export function SettingsPage() {
       />
 
       <div className="flex max-w-prose flex-col gap-6">
+        <AccountCard />
         <Card>
           <CardHeader title="Appearance" />
           <CardBody className="flex flex-col gap-6">

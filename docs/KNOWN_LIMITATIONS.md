@@ -17,6 +17,12 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 - The question bank is bundled into the main script (about 1.6 MB, 430 KB compressed), so the first load is slower than before.
 - AWS services and support plans change. Each question records the date it was checked. AWS Support plan changes taking effect on 1 January 2027 will need a content review.
 
+## Accounts
+
+- Sign-in links work once, expire after an hour, and only in the browser that asked for them. Opening the email on another device won't sign you in there; request a link on that device instead, or use Google.
+- Signing in doesn't move your data yet: progress, exam history and settings stay in this browser and are shared by everyone who uses it, signed in or not. Saving them to your account is the next step.
+- Mock exams, the dashboard, exam history and progress need an account; Learning mode, bookmarks and settings don't.
+
 ## Your data
 
 - Everything is stored in **this browser on this device** (`localStorage`). It isn't synced between devices or browsers.

@@ -1,7 +1,9 @@
 dist
+dist-e2e
 coverage
 playwright-report
 test-results
 package-lock.json
 docs
 public/proctor
+supabase/.temp

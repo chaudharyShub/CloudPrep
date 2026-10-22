@@ -7,9 +7,11 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     title: 'Where your data lives',
     body: (
       <>
-        CloudPrep has no account and no server. Your progress, exam history, settings and any
-        integrity logs are stored only in this browser on this device. Nothing is sent anywhere.
-        Clearing your browsing data removes them.
+        Your progress, exam history, settings and any integrity logs are currently stored only in
+        this browser on this device, and clearing your browsing data removes them. If you sign in,
+        your email address (and your name, with Google) is stored by Supabase, the service that runs
+        CloudPrep&apos;s accounts, so you can sign in again. Saving progress to your account is
+        planned; this page will say so when it happens.
       </>
     ),
   },

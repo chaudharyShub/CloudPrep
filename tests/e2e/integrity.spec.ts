@@ -1,6 +1,7 @@
 import path from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './support/fixtures';
 
 // Chromium's fake camera and a silent fake microphone (its default fake audio beeps).
 const silence = path.resolve('tests/e2e/fixtures/silence.wav');

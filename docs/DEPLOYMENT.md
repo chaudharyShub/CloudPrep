@@ -53,13 +53,21 @@ If someone has CloudPrep open during a deployment, opening a page that hasn't lo
 
 ## Supabase (backend, D-044)
 
-The app doesn't use Supabase yet (step 1 only creates the database). To set up the database:
+The app uses Supabase for sign-in (D-045); questions and progress move there in later steps. To set up the database:
 
 1. **Keys:** copy `.env.example` to `.env.local` and fill in the project URL and keys from the Supabase dashboard (*Project Settings → API keys*). `.env.local` is git-ignored. Never commit the secret key or give it a `VITE_` prefix.
 2. **Link the project:** `npx supabase login`, then `npx supabase link --project-ref <project-ref>` (it asks for the database password).
 3. **Create the tables:** `npm run db:push` applies `supabase/migrations/`.
 4. **Publish the questions:** `npm run publish:questions -- --dry-run` to check, then `npm run publish:questions`. Run it again whenever questions change (after bumping `BANK_VERSION`).
 5. **Check:** in the dashboard's Table Editor, `exams` has one row (`clf-c02`, `is_published` true, `bank_version` set) and `questions` has every non-draft question.
+
+### Sign-in setup
+
+1. **Vercel environment variables** (*Settings → Environment Variables*, Production and Preview): `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. They're built into the app, so **redeploy** after adding or changing them. Never add the secret key. Without them the site still works for guests and says sign-in isn't set up.
+2. **Redirect URLs** (Supabase: *Authentication → URL Configuration*): Site URL = your live URL (e.g. `https://<app>.vercel.app`). Redirect URLs: `https://<app>.vercel.app/**`, `http://localhost:5173/**` and `http://localhost:4173/**`. Add preview URLs too if you sign in on preview deployments.
+3. **Google** (optional): in Google Cloud Console create an OAuth client (*Web application*) with the authorised redirect URI `https://<project-ref>.supabase.co/auth/v1/callback`. Enter its client ID and secret in Supabase under *Authentication → Sign In / Providers → Google* and enable it.
+4. **Email for magic links:** Supabase's built-in email only reaches your project team's addresses, a few per hour. For friends, set up custom SMTP under *Authentication → Emails → SMTP Settings* (for example a free Resend or Brevo account with a verified sender). Until then, use Google sign-in.
+5. **Check:** on the live site, sign in with Google and with an email link; you return to the page you came from, and your name or email shows in the navigation.
 
 Note: free-tier projects pause after about a week without activity; resume them from the dashboard.
 

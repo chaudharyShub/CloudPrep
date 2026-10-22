@@ -1,12 +1,12 @@
 # CLAUDE.md — CloudPrep
 
-CloudPrep is an unofficial AWS Certified Cloud Practitioner (CLF-C02) exam simulator. It is built with React + TypeScript (strict) + Vite + Tailwind v4 + React Router. It is moving to a Supabase backend (D-044); until steps 2–4 land, the app still bundles the questions and stores user data in localStorage. It is for personal use and is shared with friends as a static site.
+CloudPrep is an unofficial AWS Certified Cloud Practitioner (CLF-C02) exam simulator. It is built with React + TypeScript (strict) + Vite + Tailwind v4 + React Router. It is moving to a Supabase backend (D-044). Sign-in works (D-045); until steps 3–4 land, the app still bundles the questions and stores user data in localStorage. It is for personal use and is shared with friends as a static site.
 
 **Read first:** `docs/PRODUCT_SPEC.md`, `docs/ARCHITECTURE.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/TEST_PLAN.md`, `docs/DECISIONS.md`.
 
 ## Current status
 
-All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring, awaiting review) and step 1 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
+All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring, awaiting review) and steps 1–2 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script; D-045: sign-in). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
 
 ## Commands
 
@@ -16,7 +16,7 @@ npm run build / preview     # production build / serve it
 npm run typecheck           # tsc --noEmit
 npm run lint                # eslint
 npm test                    # vitest (unit + component + question-bank validation)
-npm run test:e2e            # playwright
+npm run test:e2e            # playwright (builds dist-e2e/ via build:e2e, with a fake sign-in)
 npm run validate:questions  # validate the question bank + coverage report
 npm run publish:questions   # publish the bank to Supabase (-- --dry-run to only validate/count)
 npm run db:push             # apply supabase/migrations to the linked project (supabase link first)
@@ -71,6 +71,8 @@ Deployment: static build in `dist/`; `vercel.json` sets the build, output, SPA f
 - `supabase/migrations/` is the schema; add a new timestamped migration for every change, never edit an applied one. Every table has RLS; user tables limit rows to `auth.uid()`; content is written only by `publish:questions`.
 - Questions are authored in the repo and published; never edit them in the database. Answers live in `question_keys`, apart from `questions`, so they can be locked for server scoring.
 - Every table carries `exam_id` for future exams; the app is still CLF-C02 only (`EXAM_ID`).
+- Sign-in (D-045): the app uses `AuthClient` (`src/backend/auth.ts`) through `useAuth()` from `src/state/AuthProvider.tsx`; never import `@supabase/supabase-js` in features. Signed-in-only routes sit under `RequireAuth` in `src/app/routes.tsx`; guests keep Learning mode, bookmarks, settings and privacy. Redirect targets go through `safeNextPath`.
+- Tests: `renderApp(path, { auth })` is signed in by default (pass `createFakeAuthClient()` for a guest). E2E specs import `test`/`expect` from `tests/e2e/support/fixtures.ts` (signed in by default; `test.use({ signedIn: false })` for guests).
 - Row types and mappers: `src/backend/`. `src/backend/schema.test.ts` checks the migrations in PGlite; extend it with every schema change.
 
 ## Storage

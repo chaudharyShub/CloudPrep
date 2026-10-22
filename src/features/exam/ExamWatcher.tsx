@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { useLocation } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { proctorStatus } from '@/domain/exam/proctor';
 import { isExpired } from '@/domain/exam/timer';
 import { useToast } from '@/components/ui/Toast';
 import { useNow } from '@/hooks/useNow';
+import { useAuth } from '@/state/AuthProvider';
 import { useActiveExam } from '@/state/hooks';
 import { useAppStore } from '@/state/StoreProvider';
 import { useExamActions } from './useExamActions';
@@ -12,7 +13,8 @@ import { useExamActions } from './useExamActions';
  * Mounted once at the app root. Submits the active exam when its time runs out or the AI
  * proctor ends it, on any page, including when the app loads with an exam that expired while
  * it was closed.
- * Exam pages redirect to the results themselves; elsewhere a notification is shown.
+ * On exam pages it opens the results (the exam layout may mount only after the submission,
+ * e.g. while sign-in is still loading); elsewhere a notification is shown.
  */
 export function ExamWatcher() {
   const exam = useActiveExam();
@@ -20,10 +22,15 @@ export function ExamWatcher() {
   const { submit } = useExamActions();
   const { showToast } = useToast();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const now = useNow(1000, exam !== null);
   const isFirstCheck = useRef(true);
+  // Wait until sign-in is known, so the exam pages (which need sign-in) are on screen first and
+  // can show the results themselves.
+  const authLoading = useAuth().state.status === 'loading';
 
   useEffect(() => {
+    if (authLoading) return;
     const firstCheck = isFirstCheck.current;
     isFirstCheck.current = false;
     if (!exam) return;
@@ -51,7 +58,9 @@ export function ExamWatcher() {
             ? 'expired_while_away'
             : 'time_expired';
     const attempt = submit(reason);
-    if (attempt && !pathname.startsWith('/exam')) {
+    if (attempt && (pathname === '/exam/session' || pathname === '/exam/review')) {
+      void navigate(`/results/${attempt.id}`, { replace: true });
+    } else if (attempt && !pathname.startsWith('/exam')) {
       showToast({
         tone: 'warning',
         title:
@@ -60,7 +69,7 @@ export function ExamWatcher() {
         durationMs: null,
       });
     }
-  }, [exam, now, submit, showToast, pathname, store]);
+  }, [exam, now, submit, showToast, pathname, store, navigate, authLoading]);
 
   return null;
 }

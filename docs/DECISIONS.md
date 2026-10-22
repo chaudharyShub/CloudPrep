@@ -1,7 +1,7 @@
 # CloudPrep — Decision Log
 
 > Lightweight ADRs. Status: **Proposed** (awaiting approval) · **Accepted** · **Superseded**.
-> Last updated: 2026-10-22 (backend step 1)
+> Last updated: 2026-10-23 (backend step 2)
 
 | ID | Decision | Status |
 |---|---|---|
@@ -49,6 +49,7 @@
 | D-042 | No imported question sets | Accepted |
 | D-043 | Strict AI proctoring replaces the webcam option | Accepted |
 | D-044 | Supabase backend: one repo, questions authored in the repo and published to Postgres | Accepted |
+| D-045 | Sign-in: magic link + Google via an auth interface; guests keep Learning mode; fake sign-in for E2E builds | Accepted |
 
 ---
 
@@ -253,3 +254,13 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Access:** guests can use Learning mode (stored locally, as now). Exams, history and the dashboard need sign-in. Sign-in uses email magic links and Google.
 - **Testing:** `src/backend/schema.test.ts` applies the migrations to PGlite (in-process Postgres) with the Supabase roles and `auth.uid()` stubbed, and checks RLS, grants and constraints. Docker isn't installed on the dev machine, so the Supabase local stack isn't used.
 - **Plan:** step 1 (schema, RLS, publish script) is done; then auth, loading questions from the database, moving progress to the database with a one-time import of local data, and later server scoring and multi-exam UI.
+
+### D-045 Sign-in (Phase 8, step 2)
+- **Methods:** email magic link and Google, through Supabase Auth. No passwords. PKCE flow: a sign-in link only works in the browser that asked for it; the page says so, and the callback page explains failed or expired links.
+- **Interface:** the app depends on `AuthClient` (`src/backend/auth.ts`), not on Supabase. `createAuthClient` picks Supabase (`VITE_SUPABASE_URL` + `VITE_SUPABASE_PUBLISHABLE_KEY`), a fake in `e2e` builds, or "unavailable" when the settings are missing (the site still works for guests and says sign-in isn't set up). The Supabase library is in its own chunk, loaded right after start-up rather than in the main bundle. `AuthProvider` (`src/state/`) exposes `loading` / `signed-out` / `signed-in`.
+- **What needs sign-in:** dashboard, mock exams (entry, check-in, session, review), results, history and progress, via the `RequireAuth` route guard, which sends visitors to `/sign-in?next=…` and back afterwards. Open to guests: Learning mode, bookmarks, settings, privacy. `next` only accepts paths on this site (`safeNextPath`), so sign-in links can't redirect elsewhere. `/` still goes to the dashboard, so guests land on sign-in, which offers "Continue as a guest".
+- **Data is unchanged in this step:** progress, attempts and settings stay in this browser and are shared by everyone using it, signed in or not, until step 4.
+- **E2E:** Playwright runs against `vite build --mode e2e` (`dist-e2e/`). In that mode the fake sign-in reads a session from localStorage (`cloudprep-e2e-auth`), which the shared fixture (`tests/e2e/support/fixtures.ts`) seeds by default; `test.use({ signedIn: false })` tests as a guest. Production builds don't contain the fake (the `MODE === 'e2e'` branch is removed at build time; checked by searching `dist/`). Component tests pass a fake through `renderApp(path, { auth })`, signed in by default.
+- **Exam auto-submit fix:** the guard renders a skeleton while sign-in loads, so an exam that expired while the app was closed could be submitted before the exam layout mounted, and the layout then sent the learner to the exam start page instead of the results. `ExamWatcher` now waits until sign-in has loaded before submitting (so the exam layout is mounted first and redirects to the results as before), and also opens the results itself when a submission happens on an exam page.
+- **Known flaky tests (not caused by this step):** in WebKit on the dev machine, the two Learning mode E2E journeys take 18–31 s against Playwright's 30 s limit and sometimes time out. The same happens on the step 1 commit (checked 2026-10-23). The tests were not changed.
+- **Email delivery:** Supabase's built-in email service only sends to the project team's addresses and has a low hourly limit, so magic links for friends need custom SMTP (DEPLOYMENT.md). Google sign-in doesn't.

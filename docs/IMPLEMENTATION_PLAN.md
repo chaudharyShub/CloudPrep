@@ -17,7 +17,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | QA pass | Journeys A–G, responsive and accessibility checks, defect fixes | Done |
 | Release preparation | P9: visual clean-up, Vercel configuration, performance review, README / DEPLOYMENT / KNOWN_LIMITATIONS | Done (deployment itself is a manual step) |
 | Phase 7: AI proctoring | Strict AI-proctored exam mode replacing the built-in FaceDetector webcam option (D-043); acceptance criteria below | Done (awaiting review) |
-| Phase 8: backend (Supabase, D-044) | Step 1: schema, RLS, publish script (acceptance criteria below). Steps 2–5 (auth, questions from the database, progress in the database, server scoring) not started | Step 1 done (awaiting review) |
+| Phase 8: backend (Supabase, D-044, D-045) | Step 1: schema, RLS, publish script. Step 2: sign-in (magic link + Google) and signed-in-only pages. Steps 3–5 (questions from the database, progress in the database, server scoring) not started | Steps 1–2 done (awaiting review) |
 | Not started | P4 (welcome/onboarding), attempt-to-attempt comparison view, C2–C3 content (more questions) | — |
 
 Changes from the original plan so far:
@@ -277,7 +277,7 @@ Acceptance criteria (tests are tagged with these IDs):
 
 Decision: D-044. Steps:
 1. **Foundation (done):** Supabase CLI and `supabase/` folder, schema migration with RLS and grants, `npm run publish:questions`.
-2. **Auth:** email magic link and Google sign-in, profile, protected routes. Guests keep Learning mode only.
+2. **Auth (done):** email magic link and Google sign-in, account in the navigation and Settings, signed-in-only pages. Guests keep Learning mode, bookmarks and settings.
 3. **Questions from the database:** the app loads one exam's bank from Supabase and caches it by `bank_version`; the bank leaves the bundle.
 4. **Progress in the database:** remote repositories behind `src/storage/`, a local copy of the exam in progress, and a one-time import of local data on first sign-in.
 5. **Later:** server scoring (lock `question_keys`), then the multi-exam UI.
@@ -288,6 +288,14 @@ Step 1 acceptance criteria (tests are tagged `AC-B.x`, because AC-8.x belongs to
 - AC-B.3 Guests and users read only published exams and questions with a visible status (not retired); revisions need sign-in and include retired questions; only the service role writes content.
 - AC-B.4 Every publishable question converts to rows and back without loss; content rows hold no answers or explanations; drafts are never published.
 - AC-B.5 Signing up creates a profile.
+
+Step 2 acceptance criteria:
+- AC-B.6 Guests can use Learning mode, bookmarks, settings and the privacy page. The dashboard, every mock-exam page, results, history and progress send them to sign-in, which returns them to the requested page afterwards.
+- AC-B.7 "Email me a sign-in link" requires a plausible email address, sends a link that returns through `/auth/callback` to the requested page, confirms where it was sent and says to open it in the same browser, and shows errors (including rate limits).
+- AC-B.8 "Continue with Google" starts Google sign-in with the same return address and shows any failure.
+- AC-B.9 The callback page finishes sign-in and opens the requested page; only paths on this site are accepted; a failed or expired link is explained with a way to try again.
+- AC-B.10 The signed-in account is shown in the navigation and in Settings. Signing out works from both, and signed-in-only pages then need sign-in again. A signed-in visitor to `/sign-in` goes straight on.
+- AC-B.11 Without Supabase settings the site works for guests and says sign-in isn't set up. The Supabase library is loaded once, in its own chunk; production builds contain no fake sign-in.
 
 ## P10 — Optional features (v1.x, pick à la carte)
 

@@ -25,9 +25,10 @@ export default defineConfig({
       dependencies: ['chromium', 'webkit', 'mobile'],
     },
   ],
-  // Tests run against the production build, served by `vite preview`.
+  // Tests run against a production build made in `e2e` mode (fake sign-in instead of
+  // Supabase, see tests/e2e/support/fixtures.ts), served by `vite preview`.
   webServer: {
-    command: 'npm run build && npm run preview',
+    command: 'npm run build:e2e && npm run preview:e2e',
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env['CI'],
     timeout: 180_000,

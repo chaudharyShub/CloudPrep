@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { PageSkeleton } from '@/components/ui/Skeleton';
+import { AccountNav } from '@/features/auth/AccountNav';
 import { StorageNotices } from '@/features/shared/StorageNotices';
 
 export function AppLayout() {
@@ -28,8 +29,11 @@ export function AppLayout() {
       >
         Skip to main content
       </a>
-      <Sidebar className="hidden lg:flex" />
-      <MobileNav className="lg:hidden" />
+      <Sidebar className="hidden lg:flex" account={<AccountNav />} />
+      <MobileNav
+        className="lg:hidden"
+        renderAccount={(close) => <AccountNav onNavigate={close} />}
+      />
       <main id="main" ref={mainRef} tabIndex={-1}>
         <div className="mx-auto w-full max-w-content px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
           <StorageNotices />

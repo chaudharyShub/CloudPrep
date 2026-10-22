@@ -45,6 +45,12 @@ export const BookmarksPage = lazy(() =>
 export const SettingsPage = lazy(() =>
   import('@/features/settings/SettingsPage').then((m) => ({ default: m.SettingsPage })),
 );
+export const SignInPage = lazy(() =>
+  import('@/features/auth/SignInPage').then((m) => ({ default: m.SignInPage })),
+);
+export const AuthCallbackPage = lazy(() =>
+  import('@/features/auth/AuthCallbackPage').then((m) => ({ default: m.AuthCallbackPage })),
+);
 export const NotFoundPage = lazy(() =>
   import('@/features/errors/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 );
