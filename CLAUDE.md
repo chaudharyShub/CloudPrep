@@ -1,12 +1,12 @@
 # CLAUDE.md — CloudPrep
 
-CloudPrep is an unofficial, frontend-only AWS Certified Cloud Practitioner (CLF-C02) exam simulator. It is built with React + TypeScript (strict) + Vite + Tailwind v4 + React Router, and user data is stored in localStorage. It is for personal use and is shared with friends as a static site.
+CloudPrep is an unofficial AWS Certified Cloud Practitioner (CLF-C02) exam simulator. It is built with React + TypeScript (strict) + Vite + Tailwind v4 + React Router. It is moving to a Supabase backend (D-044); until steps 2–4 land, the app still bundles the questions and stores user data in localStorage. It is for personal use and is shared with friends as a static site.
 
 **Read first:** `docs/PRODUCT_SPEC.md`, `docs/ARCHITECTURE.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/TEST_PLAN.md`, `docs/DECISIONS.md`.
 
 ## Current status
 
-All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel) and Phase 7 (AI proctoring, awaiting review). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
+All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring, awaiting review) and step 1 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
 
 ## Commands
 
@@ -18,6 +18,8 @@ npm run lint                # eslint
 npm test                    # vitest (unit + component + question-bank validation)
 npm run test:e2e            # playwright
 npm run validate:questions  # validate the question bank + coverage report
+npm run publish:questions   # publish the bank to Supabase (-- --dry-run to only validate/count)
+npm run db:push             # apply supabase/migrations to the linked project (supabase link first)
 npm run check               # typecheck, lint, format, validate, test, build, e2e — must pass
 
 # First-time E2E setup: npx playwright install chromium webkit
@@ -27,7 +29,8 @@ Deployment: static build in `dist/`; `vercel.json` sets the build, output, SPA f
 
 ## Hard rules
 
-- **No** backend, database, auth, SSR, paid AI APIs, global state library or UI component library.
+- **Backend = Supabase only** (D-044): Postgres + Auth + RLS, called directly from the app with the publishable key. **No** separate API server, SSR, paid AI APIs, global state library or UI component library. Edge Functions only when server code is required.
+- **The secret (service-role) key** is used only by scripts (`.env.local`), never with a `VITE_` prefix and never in app code.
 - **No `any`** unless justified in a comment next to it. Strict TS flags stay on.
 - **Layering:** `src/domain/` is pure TS with no React, no storage and no `features/` imports. Components never touch `localStorage`; use `src/storage/` repositories and hooks in `src/state/`.
 - **Exam integrity in the UI:** Exam Mode components receive question views **without** correct answers or explanations. Never pass the full `Question` into exam-mode rendering.
@@ -62,6 +65,13 @@ Deployment: static build in `dist/`; `vercel.json` sets the build, output, SPA f
 - Exam state lives in the store (`activeExam`) and is saved on every action via `store.dispatchExam`. Submit only through `useExamActions().submit`, which is idempotent.
 - Exam UI receives `ExamQuestionView` (no correct answers or explanations). `OptionList` takes `type` + `options`, never a whole `Question`.
 - `ExamWatcher` (root layout) auto-submits expired exams on any page. `ExamLayout` redirects to results once the exam is recorded.
+
+## Backend (Supabase)
+
+- `supabase/migrations/` is the schema; add a new timestamped migration for every change, never edit an applied one. Every table has RLS; user tables limit rows to `auth.uid()`; content is written only by `publish:questions`.
+- Questions are authored in the repo and published; never edit them in the database. Answers live in `question_keys`, apart from `questions`, so they can be locked for server scoring.
+- Every table carries `exam_id` for future exams; the app is still CLF-C02 only (`EXAM_ID`).
+- Row types and mappers: `src/backend/`. `src/backend/schema.test.ts` checks the migrations in PGlite; extend it with every schema change.
 
 ## Storage
 

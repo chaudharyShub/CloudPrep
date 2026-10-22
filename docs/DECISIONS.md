@@ -1,13 +1,13 @@
 # CloudPrep — Decision Log
 
 > Lightweight ADRs. Status: **Proposed** (awaiting approval) · **Accepted** · **Superseded**.
-> Last updated: 2026-10-21 (release preparation)
+> Last updated: 2026-10-22 (backend step 1)
 
 | ID | Decision | Status |
 |---|---|---|
 | D-001 | Greenfield project; no migration needed | Accepted |
 | D-002 | npm as package manager | Proposed |
-| D-003 | Static SPA, no backend; data in localStorage | Accepted (requirement) |
+| D-003 | Static SPA, no backend; data in localStorage | Superseded by D-044 (being replaced step by step) |
 | D-004 | BrowserRouter + SPA-fallback host: Vercel | Accepted |
 | D-005 | Runtime validation of stored data and imports: hand-written parsers, no Zod | Accepted |
 | D-006 | Questions as typed TypeScript modules + build-time validator | Proposed |
@@ -45,6 +45,10 @@
 | D-038 | Vercel configuration: SPA fallback except /assets, immutable asset caching | Accepted |
 | D-039 | Apply the saved theme before first paint with a small inline script | Accepted |
 | D-040 | Full 65-question exam journey tested with a generated bank | Accepted |
+| D-041 | Large generated bank with an `unverified` status | Accepted |
+| D-042 | No imported question sets | Accepted |
+| D-043 | Strict AI proctoring replaces the webcam option | Accepted |
+| D-044 | Supabase backend: one repo, questions authored in the repo and published to Postgres | Accepted |
 
 ---
 
@@ -235,3 +239,17 @@ The user asked (2026-10-22) for exams proctored "as strictly as possible", more 
 - **Testing:** the rules and engine are unit-tested with fake readings and devices. E2E tests use a scripted analyzer (`window.__cloudprepProctorAnalyzer`), Chromium's fake camera and a silent fake microphone, and one E2E test checks that the real models load and analyse the camera. Real-world accuracy hasn't been measured.
 - **Storage:** the new event types, the `proctored` mode and the `proctor_ended` reason are additive, so no migration is needed. `webcam` stays a valid mode for old logs. The event cap went from 500 to 1,000.
 - **Fix (2026-10-22):** in development, React mounts the exam layout twice, and the first cleanup left the fullscreen the exam had just entered, which counted as a violation. Leaving fullscreen now waits until after the render pass and is cancelled if the layout remounts (`useIntegrityMonitor`).
+
+### D-044 Supabase backend (replaces D-003)
+The user asked (2026-10-22) for questions to come from a backend, for sign-in so progress follows the user, for data to stop living only in the browser, and for the app to support more exams later.
+
+- **Platform:** Supabase (Postgres, Auth, Row Level Security). The app talks to Supabase directly with the publishable key; RLS protects the data. No separate API server. Edge Functions are added only when server code is needed (server scoring).
+- **Repository:** one repo. `supabase/` holds `config.toml`, `migrations/` and later `functions/`, versioned with the frontend, which still deploys to Vercel. A workspaces monorepo is postponed until code must be shared with a second deployable (for example, domain scoring in a Deno Edge Function, which can't resolve the `@/` alias).
+- **Questions:** the repo stays the source of truth (validation, duplicate check, git history). `npm run publish:questions` validates the bank and upserts it with the secret key: exam catalogue, then `questions` (no answers), `question_keys` (answers, explanations, sources) and `question_revisions` (full content per revision, the server-side question archive of D-031). Drafts are never published. It refuses to run if a published question is missing from the repo (retire, never delete). `exams.bank_version` is set last, so clients can cache by it. Edits made directly in the database are overwritten.
+- **Answers:** for now `question_keys` is readable like `questions`, because scoring is still client-side. Keeping answers in their own table lets a later step lock it and score on the server without a schema change.
+- **Multiple exams:** the schema is ready (`exams`, `exam_domains`, `exam_topics`, `exam_id` on every table). The app itself stays CLF-C02-only: no exam picker, and the domain types are unchanged. CLF-C02's id is `clf-c02` (`EXAM_ID`).
+- **User data:** `profiles` (created by a trigger on sign-up), `user_preferences` (only changed settings, D-034), `question_progress`, `bookmarks`, `practice_sessions`, `exam_attempts` + `exam_attempt_questions`, and `active_exams` (the exam in progress). Every table is limited to `auth.uid()` by RLS, and deleting an account deletes its data. User tables don't reference `questions(id)`, so history survives content changes and local data imports. The integrity log stays a JSON `{mode, events}` on the attempt (only `{type, at}`, as before).
+- **Grants:** table privileges are set explicitly on top of RLS: guests may only read content, signed-in users read content and revisions and write only their own data, and nobody but the service role writes content.
+- **Access:** guests can use Learning mode (stored locally, as now). Exams, history and the dashboard need sign-in. Sign-in uses email magic links and Google.
+- **Testing:** `src/backend/schema.test.ts` applies the migrations to PGlite (in-process Postgres) with the Supabase roles and `auth.uid()` stubbed, and checks RLS, grants and constraints. Docker isn't installed on the dev machine, so the Supabase local stack isn't used.
+- **Plan:** step 1 (schema, RLS, publish script) is done; then auth, loading questions from the database, moving progress to the database with a one-time import of local data, and later server scoring and multi-exam UI.

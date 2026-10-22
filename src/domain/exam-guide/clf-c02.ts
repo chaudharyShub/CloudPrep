@@ -7,6 +7,8 @@
 export const EXAM_GUIDE_URL =
   'https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/';
 
+/** Database id of this exam (`exams.id`). */
+export const EXAM_ID = 'clf-c02';
 export const EXAM_CODE = 'CLF-C02';
 export const EXAM_NAME = 'AWS Certified Cloud Practitioner';
 

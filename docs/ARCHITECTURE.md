@@ -4,6 +4,8 @@
 
 ## 1. Overview
 
+> **Backend (D-044, in progress):** a Supabase project (Postgres, Auth, RLS) is replacing browser-only storage step by step. Schema: `supabase/migrations/`. Row types and mappers: `src/backend/`. Questions are authored in `src/content/questions/` and published with `npm run publish:questions`. Until steps 2–4 of Phase 8 are done, the sections below still describe the running app.
+
 CloudPrep is a **static single-page app**. All logic runs in the browser and all user data lives in `localStorage`. The production build is a folder of static files that can be hosted on any static host.
 
 ```
@@ -409,7 +411,7 @@ All text/background pairs are checked against WCAG 2.2 AA (4.5:1 body, 3:1 large
 
 ## 12. Security & privacy
 
-- No network calls at runtime other than loading the static assets. No analytics.
+- No network calls at runtime other than loading the static assets. No analytics. (This changes with Phase 8: the app will call Supabase, protected by RLS, D-044.)
 - External source links use `rel="noopener noreferrer"`.
 - Imported JSON is treated as untrusted: it is schema-validated and its text is rendered as text, never with `dangerouslySetInnerHTML`.
 - Question content is plain text with a small, safe formatting subset (paragraphs, inline code), rendered by our own components.

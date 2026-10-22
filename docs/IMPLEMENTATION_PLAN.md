@@ -17,6 +17,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | QA pass | Journeys A–G, responsive and accessibility checks, defect fixes | Done |
 | Release preparation | P9: visual clean-up, Vercel configuration, performance review, README / DEPLOYMENT / KNOWN_LIMITATIONS | Done (deployment itself is a manual step) |
 | Phase 7: AI proctoring | Strict AI-proctored exam mode replacing the built-in FaceDetector webcam option (D-043); acceptance criteria below | Done (awaiting review) |
+| Phase 8: backend (Supabase, D-044) | Step 1: schema, RLS, publish script (acceptance criteria below). Steps 2–5 (auth, questions from the database, progress in the database, server scoring) not started | Step 1 done (awaiting review) |
 | Not started | P4 (welcome/onboarding), attempt-to-attempt comparison view, C2–C3 content (more questions) | — |
 
 Changes from the original plan so far:
@@ -271,6 +272,22 @@ Acceptance criteria (tests are tagged with these IDs):
 - **AC-7.6 Results.** A proctor-ended attempt is void: it never meets the benchmark, is marked "Ended by proctor" in history, is left out of readiness, and its results page explains why. The proctor report shows each event and what the proctor did (warning, final warning, same incident, exam ended).
 - **AC-7.7 Privacy.** Only `{type, at}` is stored. Frames and audio are analysed in memory. Every camera and microphone track, timer and model is released when the exam ends, check-in is left, or loading fails. The privacy page describes the proctor.
 - **AC-7.8 Retired webcam option.** The built-in-FaceDetector webcam mode is no longer offered. Logs saved with it still load and display, and an exam in progress with it continues with focus monitoring.
+
+## Phase 8 — Backend (Supabase)
+
+Decision: D-044. Steps:
+1. **Foundation (done):** Supabase CLI and `supabase/` folder, schema migration with RLS and grants, `npm run publish:questions`.
+2. **Auth:** email magic link and Google sign-in, profile, protected routes. Guests keep Learning mode only.
+3. **Questions from the database:** the app loads one exam's bank from Supabase and caches it by `bank_version`; the bank leaves the bundle.
+4. **Progress in the database:** remote repositories behind `src/storage/`, a local copy of the exam in progress, and a one-time import of local data on first sign-in.
+5. **Later:** server scoring (lock `question_keys`), then the multi-exam UI.
+
+Step 1 acceptance criteria (tests are tagged `AC-B.x`, because AC-8.x belongs to P8):
+- AC-B.1 The migrations apply to a fresh Postgres and store the exam catalogue and published questions.
+- AC-B.2 Each user can read and change only their own rows in every user table; guests can't read user data; a user can't attach rows to another user's attempt; constraints reject inconsistent progress; deleting an account deletes its data.
+- AC-B.3 Guests and users read only published exams and questions with a visible status (not retired); revisions need sign-in and include retired questions; only the service role writes content.
+- AC-B.4 Every publishable question converts to rows and back without loss; content rows hold no answers or explanations; drafts are never published.
+- AC-B.5 Signing up creates a profile.
 
 ## P10 — Optional features (v1.x, pick à la carte)
 

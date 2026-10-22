@@ -51,6 +51,18 @@ Push to the repository's main branch; Vercel rebuilds and deploys automatically.
 
 If someone has CloudPrep open during a deployment, opening a page that hasn't loaded yet may show "Something went wrong". **Reload** fixes it, and no data is lost.
 
+## Supabase (backend, D-044)
+
+The app doesn't use Supabase yet (step 1 only creates the database). To set up the database:
+
+1. **Keys:** copy `.env.example` to `.env.local` and fill in the project URL and keys from the Supabase dashboard (*Project Settings → API keys*). `.env.local` is git-ignored. Never commit the secret key or give it a `VITE_` prefix.
+2. **Link the project:** `npx supabase login`, then `npx supabase link --project-ref <project-ref>` (it asks for the database password).
+3. **Create the tables:** `npm run db:push` applies `supabase/migrations/`.
+4. **Publish the questions:** `npm run publish:questions -- --dry-run` to check, then `npm run publish:questions`. Run it again whenever questions change (after bumping `BANK_VERSION`).
+5. **Check:** in the dashboard's Table Editor, `exams` has one row (`clf-c02`, `is_published` true, `bank_version` set) and `questions` has every non-draft question.
+
+Note: free-tier projects pause after about a week without activity; resume them from the dashboard.
+
 ## Other static hosts
 
 Any static host works if it can serve `index.html` for unknown paths:

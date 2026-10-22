@@ -23,11 +23,14 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run lint && npm run format:check && npm run validate:questions && npm run test && npm run build && npm run test:e2e",
-    "validate:questions": "node scripts/validate-questions.mjs"
+    "validate:questions": "node scripts/validate-questions.mjs",
+    "publish:questions": "node --env-file-if-exists=.env.local scripts/publish-questions.mjs",
+    "db:push": "supabase db push"
   },
   "dependencies": {
     "@fontsource-variable/inter": "5.3.0",
     "@mediapipe/tasks-vision": "1.1.0",
+    "@supabase/supabase-js": "2.117.3",
     "lucide-react": "1.61.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
@@ -35,6 +38,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
+    "@electric-sql/pglite": "0.5.8",
     "@eslint/js": "9.39.5",
     "@playwright/test": "1.64.1",
     "@tailwindcss/vite": "4.3.3",
@@ -55,6 +59,7 @@
     "jsdom": "30.1.3",
     "prettier": "3.9.10",
     "prettier-plugin-tailwindcss": "0.8.1",
+    "supabase": "2.120.0",
     "tailwindcss": "4.3.3",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.0",

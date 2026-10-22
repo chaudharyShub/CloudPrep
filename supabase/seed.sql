@@ -1,0 +1,2 @@
+-- Local development only (supabase db reset). Questions aren't seeded here:
+-- run `npm run publish:questions` against the local or hosted database instead.

@@ -1,0 +1,264 @@
+// @vitest-environment node
+import { PGlite } from '@electric-sql/pglite';
+import { beforeAll, describe, expect, it } from 'vitest';
+import { QUESTION_BANK } from '@/content/questions';
+import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
+import type { Question } from '@/domain/questions/types';
+import { clfExamRows, isPublishable, questionToRows } from './contentRows';
+
+/**
+ * Applies supabase/migrations to an in-process Postgres (PGlite) and checks constraints and
+ * Row Level Security. The Supabase pieces the migrations rely on (roles, auth.users,
+ * auth.uid()) are stubbed the way Supabase defines them.
+ */
+
+/** Migration SQL by path, applied in file-name (timestamp) order. */
+const MIGRATIONS = import.meta.glob<string>('/supabase/migrations/*.sql', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+});
+
+const SUPABASE_STUB = `
+  create role anon nologin;
+  create role authenticated nologin;
+  create role service_role nologin bypassrls;
+  grant usage on schema public to anon, authenticated, service_role;
+  create schema auth;
+  grant usage on schema auth to anon, authenticated, service_role;
+  create table auth.users (
+    id uuid primary key,
+    raw_user_meta_data jsonb not null default '{}'
+  );
+  create function auth.uid() returns uuid language sql stable as $$
+    select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
+  $$;
+  grant execute on function auth.uid() to anon, authenticated, service_role;
+`;
+
+const ALICE = '00000000-0000-4000-8000-00000000000a';
+const BOB = '00000000-0000-4000-8000-00000000000b';
+
+let db: PGlite;
+
+async function asAdmin(): Promise<void> {
+  await db.exec(`reset role; select set_config('request.jwt.claim.sub', '', false);`);
+}
+async function asAnon(): Promise<void> {
+  await asAdmin();
+  await db.exec('set role anon;');
+}
+async function asUser(id: string): Promise<void> {
+  await asAdmin();
+  await db.exec(
+    `set role authenticated; select set_config('request.jwt.claim.sub', '${id}', false);`,
+  );
+}
+async function count(sql: string, params: unknown[] = []): Promise<number> {
+  const result = await db.query<{ n: number }>(`select count(*)::int as n from ${sql}`, params);
+  return result.rows[0]?.n ?? -1;
+}
+
+function insertRow(table: string, row: Record<string, unknown>) {
+  const keys = Object.keys(row);
+  const values = keys.map((key) => {
+    const value = row[key];
+    return value !== null && typeof value === 'object' && !Array.isArray(value)
+      ? JSON.stringify(value)
+      : Array.isArray(value) && value.some((item) => typeof item === 'object')
+        ? JSON.stringify(value)
+        : value;
+  });
+  const columns = keys.map((key) => `"${key}"`).join(', ');
+  const placeholders = keys.map((_, i) => `$${i + 1}`).join(', ');
+  return db.query(`insert into public.${table} (${columns}) values (${placeholders})`, values);
+}
+
+async function publish(questions: readonly Question[]): Promise<void> {
+  const { exam, domains, topics } = clfExamRows();
+  await insertRow('exams', { ...exam });
+  for (const domain of domains) await insertRow('exam_domains', { ...domain });
+  for (const topic of topics) await insertRow('exam_topics', { ...topic });
+  for (const question of questions) {
+    const rows = questionToRows(question, EXAM_ID);
+    await insertRow('questions', { ...rows.question });
+    await insertRow('question_keys', { ...rows.key });
+    await insertRow('question_revisions', { ...rows.revision });
+  }
+}
+
+const publishable = QUESTION_BANK.filter(isPublishable);
+const visible = publishable.slice(0, 3);
+const retired = {
+  ...publishable[3],
+  review: { ...publishable[3]?.review, status: 'retired' },
+} as Question;
+
+beforeAll(async () => {
+  db = new PGlite();
+  await db.exec(SUPABASE_STUB);
+  const paths = Object.keys(MIGRATIONS).sort();
+  expect(paths.length).toBeGreaterThan(0);
+  for (const path of paths) await db.exec(MIGRATIONS[path] ?? '');
+  await publish([...visible, retired]);
+  await db.query(
+    `insert into auth.users (id, raw_user_meta_data) values ($1, '{"full_name": "Alice"}'), ($2, '{}')`,
+    [ALICE, BOB],
+  );
+}, 60_000);
+
+describe('database schema', () => {
+  it('AC-B.1 migrations apply and store a published question set', async () => {
+    await asAdmin();
+    expect(await count('public.questions')).toBe(4);
+    expect(await count('public.question_keys')).toBe(4);
+    expect(await count('public.exam_topics')).toBe(clfExamRows().topics.length);
+  });
+
+  it('AC-B.5 signing up creates a profile', async () => {
+    await asAdmin();
+    const { rows } = await db.query<{ id: string; display_name: string | null }>(
+      'select id, display_name from public.profiles order by id',
+    );
+    expect(rows).toEqual([
+      { id: ALICE, display_name: 'Alice' },
+      { id: BOB, display_name: null },
+    ]);
+  });
+
+  it('AC-B.3 guests and users read published, visible questions only', async () => {
+    for (const as of [asAnon, () => asUser(ALICE)]) {
+      await as();
+      expect(await count('public.exams')).toBe(1);
+      expect(await count('public.questions')).toBe(3);
+      expect(await count('public.question_keys')).toBe(3);
+      expect(await count('public.questions where id = $1', [retired.id])).toBe(0);
+    }
+
+    await asAdmin();
+    await db.exec(`update public.exams set is_published = false`);
+    await asAnon();
+    expect(await count('public.exams')).toBe(0);
+    expect(await count('public.questions')).toBe(0);
+    await asAdmin();
+    await db.exec(`update public.exams set is_published = true`);
+  });
+
+  it('AC-B.3 revisions (for reviewing past attempts) need sign-in and include retired questions', async () => {
+    await asAnon();
+    await expect(count('public.question_revisions')).rejects.toThrow(/permission denied/);
+    await asUser(ALICE);
+    expect(await count('public.question_revisions')).toBe(4);
+  });
+
+  it('AC-B.3 nobody but the service role writes content', async () => {
+    for (const as of [asAnon, () => asUser(ALICE)]) {
+      await as();
+      await expect(db.exec(`update public.questions set stem = 'x'`)).rejects.toThrow(
+        /permission denied/,
+      );
+      await expect(db.exec(`delete from public.question_keys`)).rejects.toThrow(
+        /permission denied/,
+      );
+    }
+  });
+
+  it('AC-B.2 users only see and change their own data', async () => {
+    await asUser(ALICE);
+    await db.query(
+      `insert into public.question_progress (exam_id, question_id, attempts, correct, last_result,
+         first_answered_at, last_answered_at, last_incorrect_at, last_session_id)
+       values ($1, 'clf-d1-0001', 2, 1, 'correct', now(), now(), now(), 's1')`,
+      [EXAM_ID],
+    );
+    await db.query(
+      `insert into public.bookmarks (exam_id, question_id) values ($1, 'clf-d1-0001')`,
+      [EXAM_ID],
+    );
+    await db.query(
+      `insert into public.user_preferences (preferences) values ('{"theme": "light"}')`,
+    );
+    await db.query(
+      `insert into public.active_exams (exam_id, session) values ($1, '{"id": "e1"}')`,
+      [EXAM_ID],
+    );
+    expect(await count('public.question_progress')).toBe(1);
+
+    await asUser(BOB);
+    for (const table of ['question_progress', 'bookmarks', 'user_preferences', 'active_exams']) {
+      expect(await count(`public.${table}`)).toBe(0);
+    }
+    expect(await count('public.profiles')).toBe(1);
+    // Writing a row for someone else is refused; updating or deleting theirs changes nothing.
+    await expect(
+      db.query(
+        `insert into public.bookmarks (user_id, exam_id, question_id) values ($1, $2, 'x')`,
+        [ALICE, EXAM_ID],
+      ),
+    ).rejects.toThrow(/row-level security/);
+    const updated = await db.query(`update public.user_preferences set preferences = '{}'`);
+    expect(updated.affectedRows).toBe(0);
+    const deleted = await db.query(`delete from public.question_progress`);
+    expect(deleted.affectedRows).toBe(0);
+
+    await asAnon();
+    await expect(count('public.question_progress')).rejects.toThrow(/permission denied/);
+    await expect(count('public.profiles')).rejects.toThrow(/permission denied/);
+  });
+
+  it('AC-B.2 exam attempts and their questions stay private and are deleted together', async () => {
+    await asUser(ALICE);
+    await db.query(
+      `insert into public.exam_attempts (id, exam_id, kind, bank_version, started_at, ends_at,
+         duration_ms, submitted_at, submit_reason, time_used_ms, benchmark_percent, benchmark_met,
+         summary)
+       values ('a1', $1, 'short', 'v1', now() - interval '10 min', now(), 600000, now(), 'manual',
+         600000, 70, true, '{"total": 1}')`,
+      [EXAM_ID],
+    );
+    await db.query(
+      `insert into public.exam_attempt_questions (attempt_id, position, question_id, revision,
+         domain_id, topic_id, selected_option_ids, option_order, outcome)
+       values ('a1', 0, 'clf-d1-0001', 1, 'D1', '1.1', '{a}', '{a,b,c,d}', 'correct')`,
+    );
+    await asUser(BOB);
+    expect(await count('public.exam_attempts')).toBe(0);
+    expect(await count('public.exam_attempt_questions')).toBe(0);
+    // Bob can't attach questions to Alice's attempt.
+    await expect(
+      db.query(
+        `insert into public.exam_attempt_questions (user_id, attempt_id, position, question_id,
+           revision, domain_id, topic_id, option_order, outcome)
+         values ($1, 'a1', 1, 'q', 1, 'D1', '1.1', '{a}', 'unanswered')`,
+        [ALICE],
+      ),
+    ).rejects.toThrow(/row-level security/);
+
+    await asUser(ALICE);
+    await db.exec(`delete from public.exam_attempts where id = 'a1'`);
+    expect(await count('public.exam_attempt_questions')).toBe(0);
+  });
+
+  it('AC-B.2 constraints reject inconsistent progress', async () => {
+    await asUser(ALICE);
+    const insert = (attempts: number, correct: number, result: string, lastIncorrect: string) =>
+      db.query(
+        `insert into public.question_progress (exam_id, question_id, attempts, correct,
+           last_result, first_answered_at, last_answered_at, last_incorrect_at, last_session_id)
+         values ($1, 'bad', $2, $3, $4, now(), now(), ${lastIncorrect}, 's')`,
+        [EXAM_ID, attempts, correct, result],
+      );
+    await expect(insert(1, 2, 'correct', 'null')).rejects.toThrow(/check constraint/);
+    await expect(insert(1, 0, 'correct', 'null')).rejects.toThrow(/check constraint/);
+    await expect(insert(1, 0, 'incorrect', 'null')).rejects.toThrow(/check constraint/);
+    await expect(insert(1, 1, 'unknown', 'null')).rejects.toThrow(/check constraint/);
+  });
+
+  it('AC-B.2 deleting an account removes all of its data', async () => {
+    await asAdmin();
+    await db.query('delete from auth.users where id = $1', [ALICE]);
+    for (const table of ['profiles', 'question_progress', 'bookmarks', 'user_preferences']) {
+      expect(await count(`public.${table}`)).toBe(table === 'profiles' ? 1 : 0);
+    }
+  });
+});
