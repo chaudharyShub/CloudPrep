@@ -20,7 +20,13 @@ export function bankCoverage(questions: readonly Question[]): BankCoverage {
   ) as Record<TaskStatementId, number>;
   const byType: Record<QuestionType, number> = { single: 0, multiple: 0 };
   const byDifficulty: Record<Difficulty, number> = { easy: 0, medium: 0, hard: 0 };
-  const byStatus: Record<ReviewStatus, number> = { draft: 0, checked: 0, approved: 0, retired: 0 };
+  const byStatus: Record<ReviewStatus, number> = {
+    draft: 0,
+    unverified: 0,
+    checked: 0,
+    approved: 0,
+    retired: 0,
+  };
 
   for (const question of questions) {
     byDomain[question.domain]++;

@@ -111,7 +111,8 @@ export function parseExamAttempt(
 
   const summary = summarizeAttemptQuestions(parsedQuestions);
   const used = timeUsed(startedAt, endsAt, submittedAt);
-  const met = meetsBenchmark(summary, benchmarkPercent);
+  // Same rule as buildAttempt: an exam ended by the proctor never meets the benchmark.
+  const met = submitReason !== 'proctor_ended' && meetsBenchmark(summary, benchmarkPercent);
   const stored = value['summary'];
   const integrity = parseIntegrityLog(value['integrity']);
   const repaired =

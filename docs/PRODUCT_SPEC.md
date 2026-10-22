@@ -92,10 +92,10 @@ Priority: **Core** = required for v1 · **Optional** = v1.x if time allows · **
 - Custom-length timed quizzes, for example 20 questions in 28 minutes, scaled to the real pace.
 - Analytics by task statement.
 - **Proctoring-lite** (opt-in): fullscreen reminder, logging when the tab is hidden or loses focus, and an integrity-event timeline on the results page.
+- **AI-proctored exams** (opt-in, added in Phase 7, D-043): check-in, then a strict on-device AI proctor (camera and microphone) that warns twice and then ends the exam. Nothing is recorded or stored except event types and times.
 
 ### 4.3 Deferred
 
-- Optional webcam face-presence check, run locally and never recorded or stored.
 - Merging imported data into existing data (v1 import replaces it).
 - Installable PWA / offline use.
 - Spaced-repetition scheduling.

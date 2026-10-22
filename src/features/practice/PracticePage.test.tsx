@@ -3,8 +3,12 @@ import { describe, expect, it } from 'vitest';
 import { QUESTION_BANK } from '@/content/questions';
 import { renderApp, createTestStore } from '@/test/renderApp';
 
+// Counts come from the bank itself, so these tests keep working as questions are added.
 const TOTAL = QUESTION_BANK.length;
-const D4_TOTAL = QUESTION_BANK.filter((q) => q.domain === 'D4').length;
+const D4 = QUESTION_BANK.filter((q) => q.domain === 'D4');
+const D4_TOPIC = D4.filter((q) => q.taskStatement === '4.3');
+const D4_TOPIC_HARD = D4_TOPIC.filter((q) => q.difficulty === 'hard');
+const matches = (n: number) => (n === 1 ? '1 question matches.' : `${n} questions match.`);
 
 describe('PracticePage', () => {
   it('shows how many questions match and narrows by domain, topic and difficulty', async () => {
@@ -18,26 +22,31 @@ describe('PracticePage', () => {
     expect(topic).toBeDisabled();
 
     await user.selectOptions(screen.getByRole('combobox', { name: 'Domain' }), 'D4');
-    expect(screen.getByText(`${D4_TOTAL} questions match.`)).toBeVisible();
+    expect(screen.getByText(new RegExp(`^${D4.length} questions match`))).toBeVisible();
     expect(topic).toBeEnabled();
 
     await user.selectOptions(topic, '4.3');
-    expect(screen.getByText('1 question matches.')).toBeVisible();
+    expect(screen.getByText(new RegExp(`^${D4_TOPIC.length} questions? match`))).toBeVisible();
+    expect(D4_TOPIC.length).toBeLessThan(D4.length);
 
     await user.click(screen.getByRole('radio', { name: 'Hard' }));
-    expect(screen.getByText(/No questions match these choices/)).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Start practice' })).toBeDisabled();
+    expect(
+      screen.getByText(new RegExp(`^${matches(D4_TOPIC_HARD.length).replace('.', '')}`)),
+    ).toBeVisible();
   });
 
-  it('can exclude questions already answered', async () => {
+  it('can exclude questions already answered, and disables Start when nothing matches', async () => {
     const store = createTestStore();
-    store.recordAnswer({ questionId: 'clf-d4-0007', isCorrect: true, at: 1, sessionId: 's' });
+    for (const question of D4_TOPIC) {
+      store.recordAnswer({ questionId: question.id, isCorrect: true, at: 1, sessionId: 's' });
+    }
     const { user } = renderApp('/practice', { store });
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
     await user.selectOptions(screen.getByRole('combobox', { name: 'Domain' }), 'D4');
     await user.selectOptions(screen.getByRole('combobox', { name: 'Topic' }), '4.3');
     await user.click(screen.getByRole('switch', { name: "Only questions I haven't answered" }));
     expect(screen.getByText(/No questions match/)).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Start practice' })).toBeDisabled();
   });
 
   it('starts a session from the setup form', async () => {
@@ -74,7 +83,7 @@ describe('PracticePage', () => {
 
     const card = screen.getByRole('heading', { level: 3, name: 'Billing, Pricing, and Support' })
       .parentElement as HTMLElement;
-    expect(within(card).getByText(`2 of ${D4_TOTAL}`)).toBeVisible();
+    expect(within(card).getByText(`2 of ${D4.length}`)).toBeVisible();
     expect(within(card).getByText('50%')).toBeVisible();
   });
 

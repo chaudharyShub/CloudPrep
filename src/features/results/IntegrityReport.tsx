@@ -6,6 +6,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import type { ExamAttempt } from '@/domain/exam/attempt';
 import { EVENT_DESCRIPTIONS, summarizeLog } from '@/domain/exam/integrity';
+import { MAX_STRIKES, proctorStatus, type ProctorRole } from '@/domain/exam/proctor';
 import { useAppStore } from '@/state/StoreProvider';
 
 function elapsed(ms: number): string {
@@ -19,9 +20,26 @@ const timeFormat = new Intl.DateTimeFormat(undefined, {
   second: '2-digit',
 });
 
+const ROLE_TEXT: Record<ProctorRole, string> = {
+  info: 'Logged',
+  warning: 'Warning',
+  'final-warning': 'Final warning',
+  merged: 'Same incident',
+  ended: 'Exam ended',
+};
+
+const DESCRIPTIONS = {
+  focus:
+    'Strict practice with focus monitoring. Events are browser signals, not evidence: each one can have an innocent cause.',
+  webcam:
+    'Strict practice with webcam checks (a retired mode). Events are browser signals, not evidence: each one can have an innocent cause.',
+  proctored:
+    'AI-proctored exam. The proctor applied strict rules to these events; its detection is approximate.',
+} as const;
+
 /**
- * Plain timeline of practice-integrity events. Deliberately no score, percentage or verdict:
- * browser events are imperfect signals with many innocent causes.
+ * Timeline of integrity events. Strict practice shows no verdict: browser events are
+ * imperfect signals. Proctored exams also show what the proctor did about each event.
  */
 export function IntegrityReport({ attempt }: { attempt: ExamAttempt }) {
   const store = useAppStore();
@@ -32,16 +50,14 @@ export function IntegrityReport({ attempt }: { attempt: ExamAttempt }) {
   const hidden = counts['tab-hidden'] ?? 0;
   const blurred = counts['window-blur'] ?? 0;
   const exits = counts['fullscreen-exited'] ?? 0;
+  const proctored = mode === 'proctored';
+  const verdict = proctored ? proctorStatus(attempt.integrity) : null;
 
   return (
     <Card className="mt-6">
       <CardHeader
-        title="Practice integrity report"
-        description={
-          mode === 'webcam'
-            ? 'Strict practice with webcam checks. Events are browser signals, not evidence: each one can have an innocent cause.'
-            : 'Strict practice with focus monitoring. Events are browser signals, not evidence: each one can have an innocent cause.'
-        }
+        title={proctored ? 'Proctor report' : 'Practice integrity report'}
+        description={DESCRIPTIONS[mode]}
         action={
           events.length > 0 && (
             <Button
@@ -62,11 +78,19 @@ export function IntegrityReport({ attempt }: { attempt: ExamAttempt }) {
           <p className="text-sm text-fg-muted">No events are stored for this exam.</p>
         ) : (
           <>
-            <p className="mb-4 text-sm text-fg-muted">
-              Tab hidden {hidden} time{hidden === 1 ? '' : 's'} · window lost focus {blurred} time
-              {blurred === 1 ? '' : 's'} · fullscreen exited {exits} time{exits === 1 ? '' : 's'}.
-              CloudPrep doesn&apos;t judge what these mean.
-            </p>
+            {verdict ? (
+              <p className="mb-4 text-sm text-fg-muted">
+                {verdict.endedBy
+                  ? `The proctor ended the exam: ${EVENT_DESCRIPTIONS[verdict.endedBy.type].label}.`
+                  : `Warnings: ${String(verdict.strikeCount)} of ${String(MAX_STRIKES - 1)}. The exam wasn’t ended.`}
+              </p>
+            ) : (
+              <p className="mb-4 text-sm text-fg-muted">
+                Tab hidden {hidden} time{hidden === 1 ? '' : 's'} · window lost focus {blurred} time
+                {blurred === 1 ? '' : 's'} · fullscreen exited {exits} time{exits === 1 ? '' : 's'}.
+                CloudPrep doesn&apos;t judge what these mean.
+              </p>
+            )}
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <caption className="sr-only">Integrity events in time order</caption>
@@ -82,7 +106,7 @@ export function IntegrityReport({ attempt }: { attempt: ExamAttempt }) {
                       Event
                     </th>
                     <th scope="col" className="pb-2 font-medium">
-                      Action needed
+                      {proctored ? 'Proctor' : 'Action needed'}
                     </th>
                   </tr>
                 </thead>
@@ -105,7 +129,18 @@ export function IntegrityReport({ attempt }: { attempt: ExamAttempt }) {
                           <span className="font-medium text-fg">{info.label}</span>
                           <span className="block text-fg-muted">{info.explanation}</span>
                         </td>
-                        <td className="py-2 text-fg-muted">{info.action ?? 'None'}</td>
+                        <td className="py-2 text-fg-muted">
+                          {verdict ? (
+                            <>
+                              <span className="font-medium text-fg">
+                                {ROLE_TEXT[verdict.roles[index] ?? 'info']}
+                              </span>
+                              {info.action && <span className="block">{info.action}</span>}
+                            </>
+                          ) : (
+                            (info.action ?? 'None')
+                          )}
+                        </td>
                       </tr>
                     );
                   })}

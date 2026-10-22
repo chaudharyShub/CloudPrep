@@ -1,17 +1,19 @@
 /**
- * Optional practice-integrity logging (docs/DECISIONS.md D-036).
+ * Optional practice-integrity logging (docs/DECISIONS.md D-036, D-043).
  *
- * This is a self-discipline aid for a personal practice tool, not proctoring. Events are
- * imperfect browser signals: switching tabs can be accidental, and a browser can't see other
- * devices, screens or people. Nothing here judges or scores honesty. Only the event type and
- * a timestamp are kept: no video, images, URLs, window titles or keystrokes.
+ * `focus` mode is a self-discipline aid that never judges. `proctored` mode is a strict AI
+ * proctor the learner opts into: its rules (in `proctor.ts`) give warnings and can end the
+ * exam. Either way only the event type and a timestamp are kept: no video, audio, images,
+ * URLs, window titles or keystrokes.
  */
 
-export const INTEGRITY_MODES = ['standard', 'focus', 'webcam'] as const;
+export const INTEGRITY_MODES = ['standard', 'focus', 'proctored', 'webcam'] as const;
 /**
  * - `standard`: nothing is monitored.
  * - `focus`: tab visibility, window focus and fullscreen are logged; fullscreen is requested.
- * - `webcam`: as `focus`, plus local face-presence checks from the camera (where supported).
+ * - `proctored`: strict AI proctoring with camera and microphone (see `proctor.ts`).
+ * - `webcam`: retired (it relied on the browser's built-in face detector). Kept only so
+ *   exams saved with it still load and show their log.
  */
 export type IntegrityMode = (typeof INTEGRITY_MODES)[number];
 
@@ -32,6 +34,24 @@ export const INTEGRITY_EVENT_TYPES = [
   'face-not-detected',
   'multiple-faces',
   'monitoring-stopped',
+  // Proctored mode
+  'proctor-started',
+  'proctor-resumed',
+  'microphone-lost',
+  'camera-lost',
+  'camera-covered',
+  'looking-away',
+  'eyes-off-screen',
+  'eyes-closed',
+  'mouth-moving',
+  'voice-detected',
+  'phone-detected',
+  'person-detected',
+  'item-detected',
+  'pointer-left',
+  'blocked-shortcut',
+  'extra-display',
+  'exam-ended-by-proctor',
 ] as const;
 export type IntegrityEventType = (typeof INTEGRITY_EVENT_TYPES)[number];
 
@@ -46,11 +66,19 @@ export interface IntegrityLog {
 }
 
 /** Keeps the log small: at most this many events per exam (oldest kept, later ones dropped). */
-export const MAX_INTEGRITY_EVENTS = 500;
+export const MAX_INTEGRITY_EVENTS = 1000;
 
 export const STANDARD_LOG: IntegrityLog = { mode: 'standard', events: [] };
 
-export type IntegrityCategory = 'Session' | 'Focus' | 'Fullscreen' | 'Camera';
+export type IntegrityCategory =
+  | 'Session'
+  | 'Focus'
+  | 'Fullscreen'
+  | 'Camera'
+  | 'Microphone'
+  | 'Face and eyes'
+  | 'Objects'
+  | 'Screen and keyboard';
 
 export interface EventDescription {
   category: IntegrityCategory;
@@ -162,6 +190,112 @@ export const EVENT_DESCRIPTIONS: Record<IntegrityEventType, EventDescription> = 
     category: 'Session',
     label: 'Monitoring stopped',
     explanation: 'You turned monitoring off. The exam continued without it.',
+    action: null,
+  },
+  'proctor-started': {
+    category: 'Session',
+    label: 'AI proctor started',
+    explanation:
+      'Check-in passed and the AI proctor began watching the camera and listening to the microphone. Nothing was recorded.',
+    action: null,
+  },
+  'proctor-resumed': {
+    category: 'Session',
+    label: 'Exam interrupted',
+    explanation:
+      'The exam page was reloaded, or closed and opened again, so the proctor had to restart.',
+    action: 'Stay on the exam page from start to finish.',
+  },
+  'microphone-lost': {
+    category: 'Microphone',
+    label: 'Microphone lost',
+    explanation: 'The microphone stopped, was muted or disconnected, or permission was removed.',
+    action: 'Keep the microphone connected and on for the whole exam.',
+  },
+  'camera-lost': {
+    category: 'Camera',
+    label: 'Camera lost',
+    explanation: 'The camera stopped, disconnected, or permission was removed.',
+    action: 'Keep the camera connected and on for the whole exam.',
+  },
+  'camera-covered': {
+    category: 'Camera',
+    label: 'Camera covered or too dark',
+    explanation: 'The camera image was almost completely dark.',
+    action: 'Keep the camera uncovered and your room lit.',
+  },
+  'looking-away': {
+    category: 'Face and eyes',
+    label: 'Head turned away',
+    explanation: 'Your head turned away from the screen for more than 2 seconds.',
+    action: 'Keep facing the screen.',
+  },
+  'eyes-off-screen': {
+    category: 'Face and eyes',
+    label: 'Eyes off the screen',
+    explanation: 'Your eyes looked away from the screen for more than 2 seconds.',
+    action: 'Keep your eyes on the screen.',
+  },
+  'eyes-closed': {
+    category: 'Face and eyes',
+    label: 'Eyes closed',
+    explanation: 'Your eyes stayed closed for more than 3 seconds.',
+    action: 'Keep your eyes open and on the screen.',
+  },
+  'mouth-moving': {
+    category: 'Face and eyes',
+    label: 'Lips moving',
+    explanation:
+      'Your mouth kept moving, as when talking, whispering, reading aloud or chewing. None of these is allowed.',
+    action: 'Read silently and keep your mouth still.',
+  },
+  'voice-detected': {
+    category: 'Microphone',
+    label: 'Voice or noise detected',
+    explanation: 'The microphone picked up speech or noise above the level measured at check-in.',
+    action: 'Stay silent and take the exam in a quiet room.',
+  },
+  'phone-detected': {
+    category: 'Objects',
+    label: 'Phone detected',
+    explanation: 'A mobile phone was visible to the camera.',
+    action: 'Keep phones out of the room, or at least out of reach.',
+  },
+  'person-detected': {
+    category: 'Objects',
+    label: 'Another person detected',
+    explanation: 'Another person was visible to the camera.',
+    action: 'Take the exam alone in a closed room.',
+  },
+  'item-detected': {
+    category: 'Objects',
+    label: 'Unauthorised item detected',
+    explanation: 'A book, notebook, laptop or other screen was visible to the camera.',
+    action: 'Clear your desk and remove extra devices.',
+  },
+  'pointer-left': {
+    category: 'Screen and keyboard',
+    label: 'Mouse left the exam',
+    explanation: 'The mouse pointer left the exam page, for example to move to another monitor.',
+    action: 'Keep the pointer on the exam screen.',
+  },
+  'blocked-shortcut': {
+    category: 'Screen and keyboard',
+    label: 'Blocked action',
+    explanation:
+      'Copy, paste, printing, screenshots, developer tools, the context menu or another blocked shortcut was used.',
+    action: 'Use only the exam controls.',
+  },
+  'extra-display': {
+    category: 'Screen and keyboard',
+    label: 'Second display detected',
+    explanation: 'The browser reported that more than one display is connected.',
+    action: 'Disconnect extra monitors before the exam.',
+  },
+  'exam-ended-by-proctor': {
+    category: 'Session',
+    label: 'Exam ended by the proctor',
+    explanation: 'The proctor ended the exam under the strict rules.',
     action: null,
   },
 };

@@ -9,12 +9,14 @@ export type Difficulty = (typeof DIFFICULTIES)[number];
 
 /**
  * Review workflow (docs/DECISIONS.md D-016):
- * - `draft`: written, not yet checked; never shown outside development.
+ * - `draft`: work in progress; never shown outside development.
+ * - `unverified`: complete and validated, cited pages confirmed to exist, but the content has
+ *   not been checked line by line against them (D-041). Shown, with a note saying so.
  * - `checked`: checked by the author against the cited AWS documentation.
  * - `approved`: additionally reviewed and signed off by a human reviewer.
  * - `retired`: kept so its ID is never reused; never shown.
  */
-export const REVIEW_STATUSES = ['draft', 'checked', 'approved', 'retired'] as const;
+export const REVIEW_STATUSES = ['draft', 'unverified', 'checked', 'approved', 'retired'] as const;
 export type ReviewStatus = (typeof REVIEW_STATUSES)[number];
 
 export interface AnswerOption {
@@ -58,4 +60,8 @@ export interface Question {
 }
 
 /** Statuses that may appear in Learning Mode. */
-export const PRACTICE_VISIBLE_STATUSES: readonly ReviewStatus[] = ['checked', 'approved'];
+export const PRACTICE_VISIBLE_STATUSES: readonly ReviewStatus[] = [
+  'unverified',
+  'checked',
+  'approved',
+];

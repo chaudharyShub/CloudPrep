@@ -46,7 +46,14 @@ export function FeedbackPanel({ question, result, headingRef }: FeedbackPanelPro
             </li>
           ))}
         </ul>
-        {question.review.status !== 'approved' && (
+        {question.review.status === 'unverified' && (
+          <p className="mt-3 text-xs text-fg-subtle">
+            Written from the AWS pages above on {question.review.lastVerified}, but not yet checked
+            line by line against them. If anything here disagrees with AWS documentation, trust the
+            documentation.
+          </p>
+        )}
+        {question.review.status === 'checked' && (
           <p className="mt-3 text-xs text-fg-subtle">
             Checked against the sources above on {question.review.lastVerified}. Not yet reviewed by
             a second person.

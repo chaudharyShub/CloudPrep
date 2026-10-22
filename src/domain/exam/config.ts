@@ -31,10 +31,13 @@ export function shortExamConfig(questionCount: number): ExamConfig {
 }
 
 /**
- * Review statuses allowed in exams. Interim (docs/DECISIONS.md D-016): `checked` questions
- * are allowed until questions are human-approved; tighten to ['approved'] once they are.
+ * Review statuses allowed in exams (docs/DECISIONS.md D-016, D-041): the same as Learning Mode.
  */
-export const EXAM_ELIGIBLE_STATUSES: readonly ReviewStatus[] = ['checked', 'approved'];
+export const EXAM_ELIGIBLE_STATUSES: readonly ReviewStatus[] = [
+  'unverified',
+  'checked',
+  'approved',
+];
 
 /** Practice score needed to count as a pass (unofficial; see PRODUCT_SPEC §6). */
 export const DEFAULT_BENCHMARK_PERCENT = 70;

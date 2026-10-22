@@ -85,11 +85,16 @@ test('finish a session and see the summary', async ({ page }) => {
   await page.goto('/practice');
   await page.getByRole('combobox', { name: 'Domain' }).selectOption('D4');
   await page.getByRole('combobox', { name: 'Topic' }).selectOption('4.3');
-  await expect(page.getByText('1 question matches.')).toBeVisible();
+  await expect(page.getByText(/^\d+ questions? match/)).toBeVisible();
+  await page.getByRole('radio', { name: '5', exact: true }).check();
   await page.getByRole('button', { name: 'Start practice' }).click();
 
-  await answerCurrentQuestion(page);
-  await page.getByRole('button', { name: 'Check answer' }).click();
+  // Work through the 5-question session; "Finish session" appears after the last check.
+  for (let i = 0; i < 5; i++) {
+    await answerCurrentQuestion(page);
+    await page.getByRole('button', { name: 'Check answer' }).click();
+    if (i < 4) await page.getByRole('button', { name: 'Next question' }).click();
+  }
   await page.getByRole('button', { name: 'Finish session' }).click();
 
   await expect(page.getByRole('heading', { level: 1, name: 'Session complete' })).toBeFocused();
@@ -106,6 +111,12 @@ test('answer options work with the keyboard only', async ({ page, browserName })
   await page.getByRole('combobox', { name: 'Topic' }).selectOption('1.4');
   await page.getByRole('button', { name: 'Start practice' }).click();
   await expect(page.getByText(/Question 1 of/)).toBeVisible();
+  // Questions are random: skip multiple-response ones (checkboxes) to reach a radio group.
+  for (let i = 0; i < 9; i++) {
+    await page.getByText(/^Select (one answer|\w+ answers)\./).waitFor();
+    if ((await page.getByRole('radio').count()) > 0) break;
+    await page.getByRole('button', { name: 'Skip' }).click();
+  }
 
   // Focus the first option and choose with the keyboard.
   await page.getByRole('radio').first().focus();

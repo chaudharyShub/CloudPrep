@@ -15,6 +15,9 @@ export const PracticeSessionPage = lazy(() =>
     default: m.PracticeSessionPage,
   })),
 );
+export const CheckInPage = lazy(() =>
+  import('@/features/exam/proctor/CheckInPage').then((m) => ({ default: m.CheckInPage })),
+);
 export const ExamSessionPage = lazy(() =>
   import('@/features/exam/ExamSessionPage').then((m) => ({ default: m.ExamSessionPage })),
 );

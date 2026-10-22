@@ -6,7 +6,12 @@ import { isCount, isNonEmptyString, isRecord, isTimestamp, isUniqueStringArray }
 
 export const KINDS: readonly ExamKind[] = ['full', 'short'];
 const STATUSES: readonly ExamStatus[] = ['in_progress', 'confirming', 'submitted'];
-export const REASONS: readonly SubmitReason[] = ['manual', 'time_expired', 'expired_while_away'];
+export const REASONS: readonly SubmitReason[] = [
+  'manual',
+  'time_expired',
+  'expired_while_away',
+  'proctor_ended',
+];
 
 export const includes = <T>(list: readonly T[], value: unknown): value is T =>
   (list as readonly unknown[]).includes(value);

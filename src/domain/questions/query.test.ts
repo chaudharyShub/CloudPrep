@@ -43,6 +43,14 @@ describe('practiceableQuestions', () => {
       'clf-d1-0005',
     ]);
   });
+
+  it('keeps unverified questions (D-041)', () => {
+    const unverified = makeQuestion({
+      id: 'clf-d1-0006',
+      review: { status: 'unverified', lastVerified: '2026-10-21' },
+    });
+    expect(ids(practiceableQuestions([unverified, draft]))).toEqual(['clf-d1-0006']);
+  });
 });
 
 describe('filterQuestions', () => {

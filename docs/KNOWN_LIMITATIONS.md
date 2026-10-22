@@ -11,9 +11,10 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 
 ## Question bank
 
-- The bank currently has **44 questions** (10 / 12 / 15 / 7 across the four domains).
-- The **full 65-question exam is unavailable** until there are at least 16 / 19 / 22 / 8 questions. Until then, a shorter balanced exam (currently 41 questions in 57 minutes) is offered at the same pace. Because the bank is small, repeated exams reuse questions.
-- All questions are `checked` against the cited AWS pages, but **none is `approved`** (signed off by a second person). See `docs/CONTENT_REVIEW.md`.
+- The bank has **2,000 questions** (400 / 600 / 753 / 247 across the four domains), so the full 65-question, 90-minute exam is available. The shorter exam only appears if the bank is ever too small.
+- **1,956 questions are `unverified`** (D-041): written from the cited AWS pages but not yet re-checked one by one. Only the original 44 are `checked`, and none is `approved`. Learning mode labels unverified questions; treat their facts with care. See `docs/CONTENT_REVIEW.md`.
+- Some questions overlap in topic. An automated check (`node scripts/check-duplicates.mjs 0.3`) flags about 15 pairs with similar wording; these were reviewed and test different points, but the bank was not deduplicated by hand.
+- The question bank is bundled into the main script (about 1.6 MB, 430 KB compressed), so the first load is slower than before.
 - AWS services and support plans change. Each question records the date it was checked. AWS Support plan changes taking effect on 1 January 2027 will need a content review.
 
 ## Your data
@@ -31,11 +32,19 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 
 ## Practice integrity ("strict mode")
 
-- It's **opt-in, local and imperfect.** It can't see phones, second screens, notes, other people, or other devices.
+- It's **opt-in, local and imperfect.** Strict mode can't see phones, second screens, notes, other people, or other devices.
 - **Fullscreen doesn't block other apps** or prevent switching windows. Browsers may refuse fullscreen (some phones and iPhones don't support it for web pages), and CloudPrep says so when that happens.
 - Tab and focus events have innocent causes: notifications, system dialogs, or clicking the browser's address bar. CloudPrep never labels an event as cheating and never produces a verdict or score from them.
-- **Webcam checks need the browser's built-in face detector** (the Shape Detection API), which standard Chrome, Edge, Firefox and Safari **don't enable by default**. Where it's missing, the webcam option is shown as unavailable with the reason. No face-detection library is bundled (see D-037). Webcam checks only detect face presence (none / one / more than one). They don't identify anyone or analyse expressions, and nothing is recorded or uploaded.
 - It isn't remote proctoring and doesn't reproduce AWS's exam security.
+
+## AI-proctored exams
+
+- **Detection is approximate.** The MediaPipe models can miss a phone held at an angle or partly out of view, and can react to innocent things: poor lighting, glare on glasses, a low camera, a poster or reflection that looks like a face or person, or a TV behind you. The thresholds are deliberately strict (D-043), so false warnings will happen, and two warnings plus one more violation end the exam.
+- **A browser can't see everything.** It can't see other apps, a phone below the camera's view, notes behind the screen, or someone outside the frame. Only Chromium-based browsers report a second display (`screen.isExtended`); Firefox and Safari don't. Fullscreen doesn't block other apps, and Esc always leaves fullscreen (a violation).
+- **Sound is loudness only.** Any noise above the check-in level counts, not just speech: a dog, traffic or a fan turning on can trigger it.
+- **You're both the candidate and the proctor.** Someone determined to cheat can bypass a browser-based proctor (for example with developer tools before the exam). It trains you for exam conditions; it doesn't prove honesty.
+- **Download and performance.** The first proctored exam downloads about 25 MB (runtime and models); after that the browser cache is used. The face model runs 4 times a second and the object model once a second, which uses noticeable CPU or GPU and battery on older laptops.
+- **Tested with scripted model output and Chromium's fake camera.** The rules, warnings, ending, reload handling and cleanup are tested end to end, and the real models are tested to load and analyse a camera feed. Their accuracy on real people hasn't been measured.
 
 ## Browser support
 

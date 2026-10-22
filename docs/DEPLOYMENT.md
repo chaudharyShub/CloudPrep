@@ -17,6 +17,10 @@ The repository includes `vercel.json`:
 
 Vercel serves real files first, so `/favicon.svg` and the files in `/assets/` are never rewritten. A missing `/assets/` file returns a 404 instead of the HTML page.
 
+### AI proctor files
+
+`npm run build` (and `npm run dev`) first runs `scripts/setup-proctor-assets.mjs`. It copies the MediaPipe WebAssembly runtime from `node_modules` and downloads the two models, checked against pinned SHA-256 hashes, into `public/proctor/`. They end up in `dist/proctor/` (about 36 MB; a browser downloads about 25 MB of it). The first build therefore needs internet access to download the models. `public/proctor/` is git-ignored because it is recreated on every build. These files keep the default caching (revalidated on each visit), because their names don't change when MediaPipe is upgraded.
+
 ### Steps you need to do
 
 1. **Put the code in a Git repository.** This folder isn't one yet:

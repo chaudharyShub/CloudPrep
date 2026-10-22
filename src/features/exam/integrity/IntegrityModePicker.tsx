@@ -1,19 +1,22 @@
 import { useId } from 'react';
 import { Link } from 'react-router';
 import type { IntegrityMode } from '@/domain/exam/integrity';
+import { MAX_STRIKES } from '@/domain/exam/proctor';
 import { cn } from '@/lib/cn';
-import { browserEnvironment, webcamChecksSupported } from './monitor';
+
+type SelectableMode = Exclude<IntegrityMode, 'webcam'>;
 
 // eslint-disable-next-line react-refresh/only-export-components -- copy shared with the start dialog
 export const MODE_SUMMARY: Record<IntegrityMode, string> = {
   standard: 'Standard practice: nothing is monitored.',
   focus:
     'Strict practice: CloudPrep asks for fullscreen and logs when the tab is hidden, the window loses focus, or fullscreen is exited.',
-  webcam:
-    'Strict practice with webcam: as above, plus local checks for whether a face is visible. Your browser will ask for camera permission. Nothing is recorded or uploaded.',
+  proctored:
+    'AI-proctored exam: a strict AI proctor watches through your camera and microphone, gives warnings and can end the exam.',
+  webcam: 'Strict practice with webcam (retired).',
 };
 
-const OPTIONS: { value: IntegrityMode; title: string; detail: string }[] = [
+const OPTIONS: { value: SelectableMode; title: string; detail: string }[] = [
   {
     value: 'standard',
     title: 'Standard practice',
@@ -23,25 +26,37 @@ const OPTIONS: { value: IntegrityMode; title: string; detail: string }[] = [
     value: 'focus',
     title: 'Strict practice',
     detail:
-      'Asks for fullscreen to reduce distractions, like a real exam room, and logs tab switches, focus changes and fullscreen exits (type and time only). Fullscreen doesn’t block other apps.',
+      'Asks for fullscreen to reduce distractions, like a real exam room, and logs tab switches, focus changes and fullscreen exits (type and time only). Never ends the exam.',
   },
   {
-    value: 'webcam',
-    title: 'Strict practice with webcam',
-    detail:
-      'Adds local face-presence checks (face visible, no face, more than one face) every few seconds. No video or images are stored or sent anywhere.',
+    value: 'proctored',
+    title: 'AI-proctored exam (strictest)',
+    detail: `Like an online proctored exam, but stricter. After a check-in, an AI proctor on this device watches your face, eyes, mouth and room (phones, other people, books, screens), listens for voices, and blocks shortcuts. ${String(MAX_STRIKES - 1)} warnings, then the exam ends; a phone or another person ends it at once. Needs a camera, microphone and fullscreen. Nothing is recorded or uploaded.`,
   },
 ];
+
+/** Whether this browser can run a proctored exam (camera, microphone and fullscreen). */
+// eslint-disable-next-line react-refresh/only-export-components -- small check shared with tests
+export function proctoringSupported(): boolean {
+  return (
+    typeof navigator !== 'undefined' &&
+    // Older browsers lack mediaDevices entirely.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    typeof navigator.mediaDevices?.getUserMedia === 'function' &&
+    document.fullscreenEnabled &&
+    typeof WebAssembly === 'object'
+  );
+}
 
 /** Pre-exam choice of practice-integrity mode, with what each one monitors. */
 export function IntegrityModePicker({
   value,
   onChange,
-  webcamSupported = webcamChecksSupported(browserEnvironment()),
+  proctoringAvailable = proctoringSupported(),
 }: {
   value: IntegrityMode;
   onChange: (mode: IntegrityMode) => void;
-  webcamSupported?: boolean;
+  proctoringAvailable?: boolean;
 }) {
   const name = useId();
   return (
@@ -49,7 +64,7 @@ export function IntegrityModePicker({
       <legend className="mb-2 text-sm font-medium text-fg">Practice mode</legend>
       <div className="flex flex-col gap-2">
         {OPTIONS.map((option) => {
-          const disabled = option.value === 'webcam' && !webcamSupported;
+          const disabled = option.value === 'proctored' && !proctoringAvailable;
           const id = `${name}-${option.value}`;
           return (
             // The label's text is in the nested spans below.
@@ -85,7 +100,7 @@ export function IntegrityModePicker({
                 <span className="sr-only">.</span>
                 <span className="mt-0.5 block text-fg-muted">
                   {disabled
-                    ? 'Not available in this browser: it doesn’t provide built-in face detection, and CloudPrep doesn’t download a large AI library for this optional feature.'
+                    ? 'Not available in this browser: it needs camera and microphone access and fullscreen. Use a recent browser on a computer.'
                     : option.detail}
                 </span>
               </span>
@@ -94,8 +109,8 @@ export function IntegrityModePicker({
         })}
       </div>
       <p className="mt-2 text-xs text-fg-subtle">
-        Practice aid only, not proctoring: browser signals are imperfect and nothing here judges
-        honesty. You can stop monitoring at any time.{' '}
+        Strict practice never judges; the AI proctor does, and its detection is approximate. A
+        browser can&apos;t see other apps or devices out of view.{' '}
         <Link
           to="/privacy"
           className="font-medium text-accent-fg underline-offset-4 hover:underline"

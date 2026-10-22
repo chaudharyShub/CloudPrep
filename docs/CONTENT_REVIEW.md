@@ -1,6 +1,8 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-21.1` · 44 questions · all `checked`, none `approved` yet.
+> Bank version `2026-10-22.1` · 2,000 questions · 44 `checked`, 1,956 `unverified`, none `approved` yet.
+>
+> Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
 
 Each question was written for CloudPrep from the AWS pages it cites, and every cited URL was confirmed to load (HTTP 200) on 2026-10-21. Key facts were checked against the live pages (six advantages, Well-Architected pillars, CAF perspectives, 7 Rs, root-user tasks, shared responsibility, AZ definition, security groups vs network ACLs, S3 storage classes and Glacier, instance store persistence, Spot, Savings Plans, consolidated billing, Budgets, Artifact, Shield Standard, Trusted Advisor, Support plans).
 

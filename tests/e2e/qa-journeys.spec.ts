@@ -13,9 +13,9 @@ async function expectNoSeriousA11yViolations(page: Page) {
   expect(serious.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
 }
 
-async function startShortExam(page: Page) {
+async function startFullExam(page: Page) {
   await page.goto('/exam');
-  await page.getByRole('button', { name: 'Start shorter exam' }).click();
+  await page.getByRole('button', { name: 'Start full exam' }).click();
   await page.getByRole('button', { name: 'Start exam' }).click();
   await expect(page.getByRole('heading', { level: 1, name: /^Question 1 of \d+$/ })).toBeVisible();
 }
@@ -127,19 +127,19 @@ test('E. results: a previous attempt still opens correctly after a new attempt',
   page,
 }) => {
   test.setTimeout(90_000);
-  await startShortExam(page);
+  await startFullExam(page);
   await answerCurrent(page);
   await submitExam(page);
   const firstUrl = page.url();
-  const firstScore = await page.getByText(/of 41 questions correct/).textContent();
+  const firstScore = await page.getByText(/of 65 questions correct/).textContent();
 
-  await startShortExam(page);
+  await startFullExam(page);
   await submitExam(page);
-  await expect(page.getByText('0 of 41 questions correct')).toBeVisible();
+  await expect(page.getByText('0 of 65 questions correct')).toBeVisible();
   expect(page.url()).not.toBe(firstUrl);
 
   await page.goto('/history');
-  const links = page.getByRole('link', { name: /Shorter exam · 41 questions/ });
+  const links = page.getByRole('link', { name: /Full exam · 65 questions/ });
   await expect(links).toHaveCount(2);
   await links.last().click(); // newest first, so the last link is the first attempt
   await expect(page).toHaveURL(firstUrl);
@@ -152,10 +152,10 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
   page,
 }) => {
   test.setTimeout(90_000);
-  await startShortExam(page);
+  await startFullExam(page);
   await answerCurrent(page);
   await submitExam(page);
-  const score = await page.getByText(/of 41 questions correct/).textContent();
+  const score = await page.getByText(/of 65 questions correct/).textContent();
   await page.goto('/practice');
   await page.getByRole('button', { name: 'Start practice' }).click();
   await page.getByRole('button', { name: 'Bookmark' }).click();
@@ -200,7 +200,7 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
 
   await page.goto('/history');
   await page
-    .getByRole('link', { name: /Shorter exam · 41 questions/ })
+    .getByRole('link', { name: /Full exam · 65 questions/ })
     .first()
     .click();
   await expect(page.getByText(score ?? '')).toBeVisible();
@@ -215,7 +215,7 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
     .getByRole('button', { name: 'Clear history' })
     .click();
   await page.goto('/history');
-  await expect(page.getByRole('link', { name: /Shorter exam/ })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: /Full exam/ })).toHaveCount(0);
   await page.goto('/bookmarks');
   await expect(page.getByRole('button', { name: /^Remove bookmark:/ })).toHaveCount(1);
 });
@@ -225,38 +225,43 @@ test.describe('G. practice integrity', () => {
     test.skip(browserName !== 'chromium', 'Uses Chromium fullscreen and media behaviour');
   });
 
-  test('camera permission declined: the exam continues and the report explains it', async ({
+  test('camera permission declined at proctored check-in: explained, nothing starts', async ({
     page,
   }) => {
     await page.addInitScript(() => {
-      (window as unknown as { FaceDetector: unknown }).FaceDetector = class {
-        detect() {
-          return Promise.resolve([{}]);
-        }
-      };
       navigator.mediaDevices.getUserMedia = () =>
         Promise.reject(new DOMException('Permission denied', 'NotAllowedError'));
     });
     await page.goto('/exam');
-    await page.getByRole('radio', { name: /^Strict practice with webcam/ }).check();
-    await page.getByRole('button', { name: 'Start shorter exam' }).click();
+    await page.getByRole('radio', { name: /AI-proctored exam/ }).check();
+    await page.getByRole('button', { name: 'Start full exam' }).click();
+    // The check-in page loads on demand: wait for its six rules.
+    await expect(page.getByRole('checkbox')).toHaveCount(6);
+    for (const box of await page.getByRole('checkbox').all()) await box.check();
+    await page.getByRole('button', { name: 'Agree and allow camera and microphone' }).click();
+    await expect(page.getByText(/Camera or microphone access was blocked/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Try again' })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Look at the screen and calibrate' }),
+    ).toBeDisabled();
+    // No exam was started.
+    await page.getByRole('link', { name: 'Cancel' }).click();
+    await expect(page.getByText('You have an exam in progress')).toHaveCount(0);
+  });
+
+  test('strict practice logs focus changes in a neutral report', async ({ page }) => {
+    await page.goto('/exam');
+    await page.getByRole('radio', { name: /^Strict practice/ }).check();
+    await page.getByRole('button', { name: 'Start full exam' }).click();
     await page.getByRole('button', { name: 'Start exam' }).click();
     await expect(page.getByRole('heading', { level: 1, name: /^Question 1 of/ })).toBeVisible();
-    await expect(page.getByText('Camera permission denied').first()).toBeVisible();
-
-    // The exam still works.
     await answerCurrent(page);
-    await page.getByRole('button', { name: 'Next', exact: true }).first().click();
-    await expect(page.getByRole('heading', { level: 1, name: /^Question 2 of/ })).toBeVisible();
-
-    // Simulated focus changes are logged.
     await page.evaluate(() => {
       window.dispatchEvent(new Event('blur'));
       window.dispatchEvent(new Event('focus'));
     });
     await submitExam(page);
     const table = page.getByRole('table', { name: 'Integrity events in time order' });
-    await expect(table.getByText('Camera permission denied')).toBeVisible();
     await expect(table.getByText('Window lost focus')).toBeVisible();
     await expect(table.getByText('Window focused again')).toBeVisible();
     await expect(page.getByText(/cheat/i)).toHaveCount(0);
@@ -281,7 +286,7 @@ test.describe('accessibility and motion', () => {
     browserName,
   }) => {
     test.skip(browserName === 'webkit', 'WebKit skips some controls on Tab by default');
-    await startShortExam(page);
+    await startFullExam(page);
     // The first question may be single answer (radios) or multiple response (checkboxes).
     const firstOption = page
       .locator('main input[type="radio"], main input[type="checkbox"]')
@@ -313,7 +318,7 @@ test.describe('accessibility and motion', () => {
   }) => {
     test.setTimeout(90_000);
     await page.setViewportSize({ width: 768, height: 1024 });
-    await startShortExam(page);
+    await startFullExam(page);
     const overflow = () =>
       page.evaluate(
         () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

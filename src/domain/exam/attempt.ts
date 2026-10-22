@@ -106,7 +106,9 @@ export function buildAttempt(
     submitReason: session.submitReason,
     timeUsedMs: timeUsed(session.startedAt, session.endsAt, session.submittedAt),
     benchmarkPercent,
-    benchmarkMet: meetsBenchmark(summary, benchmarkPercent),
+    // An exam ended by the proctor is void, whatever the score.
+    benchmarkMet:
+      session.submitReason !== 'proctor_ended' && meetsBenchmark(summary, benchmarkPercent),
     summary,
     questions,
     unavailableQuestionIds,

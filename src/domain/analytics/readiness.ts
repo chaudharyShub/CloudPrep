@@ -12,6 +12,14 @@ export const MIN_DOMAIN_SAMPLE = 10;
 /** Score changes smaller than this (percentage points) count as "steady". */
 export const TREND_THRESHOLD = 3;
 
+/**
+ * Attempts that count as evidence. Exams ended by the AI proctor are void: they stay in
+ * history but are left out of scores, trends and readiness.
+ */
+export function countedAttempts(attempts: readonly ExamAttempt[]): readonly ExamAttempt[] {
+  return attempts.filter((a) => a.submitReason !== 'proctor_ended');
+}
+
 export interface RecentScore {
   id: string;
   submittedAt: number;
@@ -25,7 +33,7 @@ export function recentScores(
   attempts: readonly ExamAttempt[],
   window = RECENT_WINDOW,
 ): RecentScore[] {
-  return attempts
+  return countedAttempts(attempts)
     .slice(0, window)
     .map((a) => ({
       id: a.id,
@@ -83,7 +91,7 @@ export function domainEvidence(
   benchmarkPercent: number,
   window = RECENT_WINDOW,
 ): DomainEvidence[] {
-  const recent = attempts.slice(0, window);
+  const recent = countedAttempts(attempts).slice(0, window);
   return DOMAINS.map((domain) => {
     let correct = 0;
     let total = 0;
@@ -192,7 +200,7 @@ export function assessReadiness(
   benchmarkPercent: number,
 ): ReadinessAssessment {
   const window = MIN_ATTEMPTS_FOR_GUIDANCE;
-  const recent = attempts.slice(0, window);
+  const recent = countedAttempts(attempts).slice(0, window);
   const enough = recent.length >= window;
   const average =
     recent.length === 0 ? 0 : recent.reduce((sum, a) => sum + a.summary.ratio, 0) / recent.length;

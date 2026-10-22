@@ -8,7 +8,7 @@ export function Card({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
 export interface CardHeaderProps {
   title: string;
   /** Heading level for the title; keep the page outline correct (page h1 → card h2). */
-  as?: 'h2' | 'h3';
+  as?: 'h1' | 'h2' | 'h3';
   description?: ReactNode;
   action?: ReactNode;
   id?: string;

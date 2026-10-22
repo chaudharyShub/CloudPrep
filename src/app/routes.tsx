@@ -5,6 +5,7 @@ import { ExamLayout } from './layouts/ExamLayout';
 import { RootLayout } from './layouts/RootLayout';
 import {
   BookmarksPage,
+  CheckInPage,
   DashboardPage,
   DesignSystemPage,
   ExamEntryPage,
@@ -34,6 +35,7 @@ export const routes: RouteObject[] = [
           { path: 'practice', element: <PracticePage /> },
           { path: 'practice/session', element: <PracticeSessionPage /> },
           { path: 'exam', element: <ExamEntryPage /> },
+          { path: 'exam/check-in', element: <CheckInPage /> },
           { path: 'results/:attemptId', element: <ResultsPage /> },
           { path: 'results/:attemptId/review', element: <AnswerReviewPage /> },
           { path: 'progress', element: <ProgressPage /> },

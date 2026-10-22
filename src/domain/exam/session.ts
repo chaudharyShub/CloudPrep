@@ -21,8 +21,11 @@ import {
  */
 export type ExamStatus = 'in_progress' | 'confirming' | 'submitted';
 
-/** `time_expired`: ran out while open. `expired_while_away`: found expired when the app loaded. */
-export type SubmitReason = 'manual' | 'time_expired' | 'expired_while_away';
+/**
+ * `time_expired`: ran out while open. `expired_while_away`: found expired when the app loaded.
+ * `proctor_ended`: the AI proctor ended the exam (proctored mode only).
+ */
+export type SubmitReason = 'manual' | 'time_expired' | 'expired_while_away' | 'proctor_ended';
 
 export interface ExamSession {
   readonly id: string;

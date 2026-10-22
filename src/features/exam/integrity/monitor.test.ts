@@ -1,47 +1,41 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { IntegrityEventType } from '@/domain/exam/integrity';
-import {
-  IntegrityMonitor,
-  webcamChecksSupported,
-  type FaceDetectorLike,
-  type MonitorEnvironment,
-} from './monitor';
+import { IntegrityMonitor, isBlockedShortcut, type MonitorEnvironment } from './monitor';
 
-/** A fake browser: event targets we can fire, a controllable camera and face detector. */
-function fakeEnv(
-  options: {
-    camera?: 'ok' | 'denied' | 'missing' | 'none';
-    detector?: boolean;
-    fullscreen?: 'ok' | 'reject' | 'missing';
-  } = {},
-) {
-  const { camera = 'ok', detector = true, fullscreen = 'ok' } = options;
+type Handler = (event: Event) => void;
+
+/** A fake browser: event targets we can fire. */
+function fakeEnv(options: { fullscreen?: 'ok' | 'reject' | 'missing'; extended?: boolean } = {}) {
+  const { fullscreen = 'ok', extended = false } = options;
   const listeners = {
-    window: new Map<string, Set<() => void>>(),
-    document: new Map<string, Set<() => void>>(),
+    window: new Map<string, Set<Handler>>(),
+    document: new Map<string, Set<Handler>>(),
+    screen: new Map<string, Set<Handler>>(),
   };
-  const target = (kind: 'window' | 'document') => ({
-    addEventListener: vi.fn((name: string, fn: () => void) => {
+  type Kind = keyof typeof listeners;
+  const target = (kind: Kind) => ({
+    addEventListener: vi.fn((name: string, fn: Handler) => {
       const set = listeners[kind].get(name) ?? new Set();
       set.add(fn);
       listeners[kind].set(name, set);
     }),
-    removeEventListener: vi.fn((name: string, fn: () => void) => {
+    removeEventListener: vi.fn((name: string, fn: Handler) => {
       listeners[kind].get(name)?.delete(fn);
     }),
   });
-  const fire = (kind: 'window' | 'document', name: string) => {
-    for (const fn of listeners[kind].get(name) ?? []) fn();
+  /** Fires an event; returns whether a listener prevented its default action. */
+  const fire = (kind: Kind, name: string, init: Record<string, unknown> = {}) => {
+    let prevented = false;
+    const event = {
+      type: name,
+      preventDefault: () => {
+        prevented = true;
+      },
+      ...init,
+    } as unknown as Event;
+    for (const fn of listeners[kind].get(name) ?? []) fn(event);
+    return prevented;
   };
-  const trackEnded = new Set<() => void>();
-  const track = {
-    stop: vi.fn(),
-    addEventListener: vi.fn((_: string, fn: () => void) => trackEnded.add(fn)),
-  };
-  const stream = {
-    getTracks: () => [track],
-    getVideoTracks: () => [track],
-  } as unknown as MediaStream;
   const doc = {
     ...target('document'),
     visibilityState: 'visible' as DocumentVisibilityState,
@@ -56,38 +50,13 @@ function fakeEnv(
             ),
     },
   };
-  let interval: (() => void) | null = null;
-  let faces: unknown[] = [];
-  const faceDetector: FaceDetectorLike = { detect: vi.fn(() => Promise.resolve(faces)) };
-  const video = {
-    play: vi.fn(() => Promise.resolve()),
-    srcObject: null,
-    muted: false,
-    playsInline: false,
-  };
+  const screen = { ...target('screen'), isExtended: extended };
+  let now = 1000;
   const env: MonitorEnvironment = {
     window: target('window'),
     document: doc as unknown as MonitorEnvironment['document'],
-    getUserMedia:
-      camera === 'none'
-        ? null
-        : vi.fn(() =>
-            camera === 'ok'
-              ? Promise.resolve(stream)
-              : Promise.reject(
-                  new DOMException('no', camera === 'denied' ? 'NotAllowedError' : 'NotFoundError'),
-                ),
-          ),
-    faceDetector: detector ? () => faceDetector : null,
-    createVideo: () => video as unknown as HTMLVideoElement,
-    now: () => 1000,
-    setInterval: vi.fn((fn: () => void) => {
-      interval = fn;
-      return 7;
-    }),
-    clearInterval: vi.fn(() => {
-      interval = null;
-    }),
+    screen,
+    now: () => now,
   };
   const events: IntegrityEventType[] = [];
   return {
@@ -96,26 +65,28 @@ function fakeEnv(
     onEvent: (type: IntegrityEventType) => events.push(type),
     fire,
     doc,
-    track,
-    endTrack: () => {
-      for (const fn of trackEnded) fn();
-    },
-    setFaces: (n: number) => {
-      faces = Array.from({ length: n }, () => ({}));
-    },
-    tick: async () => {
-      interval?.();
-      await Promise.resolve();
-      await Promise.resolve();
+    screen,
+    advance: (ms: number) => {
+      now += ms;
     },
     listenerCount: () =>
-      [...listeners.window.values(), ...listeners.document.values()].reduce(
-        (n, set) => n + set.size,
-        0,
-      ),
-    hasInterval: () => interval !== null,
+      Object.values(listeners)
+        .flatMap((map) => [...map.values()])
+        .reduce((n, set) => n + set.size, 0),
   };
 }
+
+const key = (
+  k: string,
+  mods: Partial<Record<'ctrlKey' | 'metaKey' | 'shiftKey' | 'altKey', boolean>> = {},
+) => ({
+  key: k,
+  ctrlKey: false,
+  metaKey: false,
+  shiftKey: false,
+  altKey: false,
+  ...mods,
+});
 
 describe('focus monitoring', () => {
   it('logs tab, focus and fullscreen changes with type and time only', () => {
@@ -146,15 +117,22 @@ describe('focus monitoring', () => {
     expect(monitor.getState().fullscreenExited).toBe(false);
   });
 
-  it('does nothing at all in standard mode', async () => {
+  it('does nothing at all in standard mode', () => {
     const fake = fakeEnv();
     const monitor = new IntegrityMonitor(fake.env, 'standard', fake.onEvent);
     monitor.start();
-    await monitor.startCamera();
     fake.fire('window', 'blur');
     expect(fake.events).toEqual([]);
     expect(fake.listenerCount()).toBe(0);
-    expect(fake.env.getUserMedia).not.toHaveBeenCalled();
+  });
+
+  it('does not block shortcuts or watch the pointer in strict practice', () => {
+    const fake = fakeEnv({ extended: true });
+    const monitor = new IntegrityMonitor(fake.env, 'focus', fake.onEvent);
+    monitor.start();
+    expect(fake.fire('document', 'copy')).toBe(false);
+    fake.fire('document', 'mouseout', { relatedTarget: null });
+    expect(fake.events).toEqual(['monitoring-started']);
   });
 
   it('removes every listener when stopped, and stop is safe to repeat', () => {
@@ -214,94 +192,82 @@ describe('fullscreen', () => {
   });
 });
 
-describe('webcam checks', () => {
-  it('reports camera permission denial and continues without the camera', async () => {
-    const fake = fakeEnv({ camera: 'denied' });
-    const monitor = new IntegrityMonitor(fake.env, 'webcam', fake.onEvent);
-    await monitor.startCamera();
-    expect(fake.events).toEqual(['camera-denied']);
-    expect(monitor.getState().camera).toBe('denied');
-  });
-
-  it('reports a missing camera or unsupported browser as unavailable', async () => {
-    const missing = fakeEnv({ camera: 'missing' });
-    await new IntegrityMonitor(missing.env, 'webcam', missing.onEvent).startCamera();
-    expect(missing.events).toEqual(['camera-unavailable']);
-
-    const noDetector = fakeEnv({ detector: false });
-    await new IntegrityMonitor(noDetector.env, 'webcam', noDetector.onEvent).startCamera();
-    expect(noDetector.events).toEqual(['camera-unavailable']);
-    expect(noDetector.env.getUserMedia).not.toHaveBeenCalled();
-    expect(webcamChecksSupported(noDetector.env)).toBe(false);
-  });
-
-  it('logs face changes only when the state changes', async () => {
+describe('proctored browser signals', () => {
+  it('AC-7.3 blocks copy, paste, the context menu and printing, and logs them', () => {
     const fake = fakeEnv();
-    const monitor = new IntegrityMonitor(fake.env, 'webcam', fake.onEvent);
-    await monitor.startCamera();
-    fake.setFaces(1);
-    await fake.tick();
-    await fake.tick(); // same state: not logged again
-    fake.setFaces(0);
-    await fake.tick();
-    fake.setFaces(2);
-    await fake.tick();
-    expect(fake.events).toEqual([
-      'camera-started',
-      'face-visible',
-      'face-not-detected',
-      'multiple-faces',
-    ]);
-    expect(monitor.getState().face).toBe('multiple');
-  });
-
-  it('stops all media tracks and the detection timer when the camera is turned off', async () => {
-    const fake = fakeEnv();
-    const monitor = new IntegrityMonitor(fake.env, 'webcam', fake.onEvent);
-    await monitor.startCamera();
-    monitor.stopCamera();
-    expect(fake.track.stop).toHaveBeenCalledTimes(1);
-    expect(fake.hasInterval()).toBe(false);
-    expect(monitor.getState().camera).toBe('off');
-    expect(fake.events.at(-1)).toBe('camera-stopped');
-  });
-
-  it('stops media tracks when the session is cleaned up', async () => {
-    const fake = fakeEnv();
-    const monitor = new IntegrityMonitor(fake.env, 'webcam', fake.onEvent);
+    const monitor = new IntegrityMonitor(fake.env, 'proctored', fake.onEvent);
     monitor.start();
-    await monitor.startCamera();
-    monitor.stop();
-    expect(fake.track.stop).toHaveBeenCalledTimes(1);
-    expect(fake.hasInterval()).toBe(false);
+    for (const name of ['copy', 'paste', 'cut', 'contextmenu']) {
+      expect(fake.fire('document', name)).toBe(true);
+      fake.advance(2000);
+    }
+    expect(fake.fire('window', 'keydown', key('c', { ctrlKey: true }))).toBe(true);
+    fake.advance(2000);
+    expect(fake.fire('window', 'keyup', key('PrintScreen'))).toBe(true);
+    expect(fake.events.filter((e) => e === 'blocked-shortcut')).toHaveLength(6);
   });
 
-  it('releases the camera if monitoring stopped while waiting for permission', async () => {
+  it('AC-7.3 logs a held-down shortcut once, not on every key repeat', () => {
     const fake = fakeEnv();
-    const monitor = new IntegrityMonitor(fake.env, 'webcam', fake.onEvent);
+    const monitor = new IntegrityMonitor(fake.env, 'proctored', fake.onEvent);
     monitor.start();
-    const starting = monitor.startCamera();
+    for (let i = 0; i < 5; i++) fake.fire('window', 'keydown', key('F12'));
+    expect(fake.events.filter((e) => e === 'blocked-shortcut')).toHaveLength(1);
+  });
+
+  it('AC-7.3 lets ordinary keys through (answers can be chosen with the keyboard)', () => {
+    const fake = fakeEnv();
+    const monitor = new IntegrityMonitor(fake.env, 'proctored', fake.onEvent);
+    monitor.start();
+    for (const k of ['ArrowDown', ' ', 'Enter', 'Tab', 'a']) {
+      expect(fake.fire('window', 'keydown', key(k))).toBe(false);
+    }
+    expect(fake.events).toEqual(['monitoring-started']);
+  });
+
+  it('AC-7.3 logs the pointer leaving the page, but not moving between elements', () => {
+    const fake = fakeEnv();
+    const monitor = new IntegrityMonitor(fake.env, 'proctored', fake.onEvent);
+    monitor.start();
+    fake.fire('document', 'mouseout', { relatedTarget: {} });
+    fake.fire('document', 'mouseout', { relatedTarget: null });
+    expect(fake.events).toEqual(['monitoring-started', 'pointer-left']);
+  });
+
+  it('AC-7.3 reports a second display at the start and when one is connected', () => {
+    const fake = fakeEnv({ extended: true });
+    const monitor = new IntegrityMonitor(fake.env, 'proctored', fake.onEvent);
+    monitor.start();
+    expect(fake.events).toEqual(['monitoring-started', 'extra-display']);
+
+    const single = fakeEnv();
+    const other = new IntegrityMonitor(single.env, 'proctored', single.onEvent);
+    other.start();
+    single.fire('screen', 'change');
+    single.screen.isExtended = true;
+    single.fire('screen', 'change');
+    expect(single.events).toEqual(['monitoring-started', 'extra-display']);
+  });
+
+  it('AC-7.7 removes every proctored listener when stopped', () => {
+    const fake = fakeEnv();
+    const monitor = new IntegrityMonitor(fake.env, 'proctored', fake.onEvent);
+    monitor.start();
+    expect(fake.listenerCount()).toBeGreaterThan(4);
     monitor.stop();
-    await starting;
-    expect(fake.track.stop).toHaveBeenCalledTimes(1);
-    expect(fake.events).not.toContain('camera-started');
+    expect(fake.listenerCount()).toBe(0);
   });
+});
 
-  it('reports a camera that disconnects during the exam', async () => {
-    const fake = fakeEnv();
-    const monitor = new IntegrityMonitor(fake.env, 'webcam', fake.onEvent);
-    await monitor.startCamera();
-    fake.endTrack();
-    expect(fake.events.at(-1)).toBe('camera-unavailable');
-    expect(monitor.getState().camera).toBe('unavailable');
-    expect(fake.track.stop).toHaveBeenCalled();
-  });
-
-  it('ignores a failed detection frame', async () => {
-    const fake = fakeEnv();
-    const monitor = new IntegrityMonitor(fake.env, 'webcam', fake.onEvent);
-    await monitor.startCamera();
-    await monitor.checkFaces({ detect: () => Promise.reject(new Error('frame')) });
-    expect(fake.events).toEqual(['camera-started']);
+describe('isBlockedShortcut', () => {
+  it('AC-7.3 covers copy, paste, print, save, dev tools and screenshots', () => {
+    expect(isBlockedShortcut(key('v', { ctrlKey: true }))).toBe(true);
+    expect(isBlockedShortcut(key('P', { metaKey: true }))).toBe(true);
+    expect(isBlockedShortcut(key('i', { ctrlKey: true, shiftKey: true }))).toBe(true);
+    expect(isBlockedShortcut(key('i', { metaKey: true, altKey: true }))).toBe(true);
+    expect(isBlockedShortcut(key('s', { metaKey: true, shiftKey: true }))).toBe(true);
+    expect(isBlockedShortcut(key('F12'))).toBe(true);
+    expect(isBlockedShortcut(key('c'))).toBe(false);
+    expect(isBlockedShortcut(key('ArrowLeft', { ctrlKey: true }))).toBe(false);
   });
 });

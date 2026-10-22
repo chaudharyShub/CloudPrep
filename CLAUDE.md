@@ -6,7 +6,7 @@ CloudPrep is an unofficial, frontend-only AWS Certified Cloud Practitioner (CLF-
 
 ## Current status
 
-All user phases are built: Phases 1–6, the QA pass and release preparation (static deployment on Vercel). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
+All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel) and Phase 7 (AI proctoring, awaiting review). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
 
 ## Commands
 
@@ -43,10 +43,10 @@ Deployment: static build in `dist/`; `vercel.json` sets the build, output, SPA f
 - Use the **current** AWS service names from the exam guide (for example, Business Support+, Unified Operations, SageMaker AI, Quick Sight).
 - Each question: stable never-reused ID (`clf-d<n>-<nnnn>`), at least one https AWS reference, an overall explanation, and an explanation for every incorrect option.
 - Single answer = exactly 4 options; multiple response = 5 or more options with 2 or more correct. No "all/none of the above".
-- Review statuses: `draft` → `checked` (verified against the cited AWS pages) → `approved` (human sign-off) → `retired` (ID never reused). Only the user may set `approved`. Learning Mode shows `checked` + `approved` (D-016).
-- Every option needs an explanation, correct ones included (D-022). Questions live in `src/content/questions/d<n>-*.ts`; bump `BANK_VERSION` when they change.
+- Review statuses: `draft` → `unverified` (written from the cited pages, not yet re-checked; D-041) → `checked` (verified against the cited AWS pages) → `approved` (human sign-off) → `retired` (ID never reused). Only the user may set `approved`. Learning and Exam modes show `unverified`, `checked` and `approved`.
+- Every option needs an explanation, correct ones included (D-022). Questions live in `src/content/questions/d<n>-*.ts` and `src/content/questions/batches/*.ts` (compact specs via `author.ts`, references from `refs.ts`); bump `BANK_VERSION` when they change. Run `node scripts/check-duplicates.mjs 0.3` after adding questions.
 - Note AWS's 2026–27 Support plan changes (Developer, Business and Enterprise On-Ramp end on 1 January 2027).
-- Never pad the bank with unverified questions.
+- Never import scraped, dump or paid question sets (D-042). New questions must be original and marked `unverified` until checked.
 
 ## Definition of done (per phase)
 
@@ -72,7 +72,10 @@ Deployment: static build in `dist/`; `vercel.json` sets the build, output, SPA f
 
 ## Practice integrity
 
-- Monitoring is opt-in and lives in `src/features/exam/integrity/`. Store only `{type, at}`. Never compute a score or verdict from events. Always stop media tracks on cleanup.
+- Monitoring is opt-in. Strict practice (`focus`) lives in `src/features/exam/integrity/` and never judges events.
+- The AI proctor (`proctored` mode, D-043): rules and verdict in `src/domain/exam/proctor.ts` (pure), engine and UI in `src/features/exam/proctor/`. The verdict (warnings, `proctor_ended`) is always derived from the saved log, and `ExamWatcher` ends the exam. Proctor-ended attempts are void (`benchmarkMet` false, left out of readiness).
+- Store only `{type, at}`: never frames, audio or images. Always stop media tracks on cleanup. The models and runtime are self-hosted in `public/proctor/` (created by `scripts/setup-proctor-assets.mjs`).
+- E2E tests replace the models through `window.__cloudprepProctorAnalyzer`.
 
 ## Statistics
 

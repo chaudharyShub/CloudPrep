@@ -13,9 +13,17 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-    { name: 'mobile', use: { ...devices['Pixel 7'] } },
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] }, grepInvert: /@real-models/ },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] }, grepInvert: /@real-models/ },
+    { name: 'mobile', use: { ...devices['Pixel 7'] }, grepInvert: /@real-models/ },
+    // The real AI models use a lot of CPU, which slows parallel tests down, so they run
+    // last, on their own.
+    {
+      name: 'real-models',
+      use: { ...devices['Desktop Chrome'] },
+      grep: /@real-models/,
+      dependencies: ['chromium', 'webkit', 'mobile'],
+    },
   ],
   // Tests run against the production build, served by `vite preview`.
   webServer: {

@@ -23,6 +23,8 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { nextSteps, weakAreas, type NextStep } from '@/domain/analytics/attemptInsights';
 import { DOMAINS } from '@/domain/exam-guide/clf-c02';
 import type { ExamAttempt } from '@/domain/exam/attempt';
+import { EVENT_DESCRIPTIONS } from '@/domain/exam/integrity';
+import { proctorStatus } from '@/domain/exam/proctor';
 import { formatDateTime, formatPercent } from '@/lib/format';
 import { EXAM_QUESTIONS } from '@/state/examQuestions';
 import { useExamAttempts, usePreferences } from '@/state/hooks';
@@ -86,7 +88,8 @@ function Results({ attempt }: { attempt: ExamAttempt }) {
         description={`${attempt.kind === 'short' ? 'Shorter timed exam' : 'Full mock exam'} · completed ${formatDateTime(attempt.submittedAt)}`}
       />
 
-      {attempt.submitReason !== 'manual' && (
+      {attempt.submitReason === 'proctor_ended' && <ProctorEndedNotice attempt={attempt} />}
+      {attempt.submitReason !== 'manual' && attempt.submitReason !== 'proctor_ended' && (
         <Notice tone="warning" title="Time ran out" className="mb-6">
           {attempt.submitReason === 'expired_while_away'
             ? 'The exam time ended while CloudPrep was closed, so it was submitted with the answers saved before then.'
@@ -281,6 +284,20 @@ function Results({ attempt }: { attempt: ExamAttempt }) {
 
       <IntegrityReport attempt={attempt} />
     </>
+  );
+}
+
+/** Why the AI proctor ended the exam. The attempt is void: it never meets the benchmark. */
+function ProctorEndedNotice({ attempt }: { attempt: ExamAttempt }) {
+  const endedBy = proctorStatus(attempt.integrity).endedBy;
+  const reason = endedBy ? EVENT_DESCRIPTIONS[endedBy.type].label : null;
+  return (
+    <Notice tone="danger" title="Exam ended by the proctor" className="mb-6">
+      {reason ? `Reason: ${reason}. ` : ''}
+      Under the proctored rules this attempt is void, so it doesn&apos;t count towards the practice
+      benchmark or your readiness. The score below shows only the answers given before it ended. See
+      the proctor report for the full timeline.
+    </Notice>
   );
 }
 

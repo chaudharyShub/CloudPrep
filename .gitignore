@@ -13,3 +13,5 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+# AI proctor runtime and models (created by scripts/setup-proctor-assets.mjs)
+public/proctor/

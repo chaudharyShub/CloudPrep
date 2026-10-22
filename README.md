@@ -7,10 +7,11 @@ An unofficial practice simulator for the **AWS Certified Cloud Practitioner (CLF
 ## What it does
 
 - **Learning mode:** untimed practice by domain or topic, with instant feedback, an explanation for every option, and links to the AWS documentation each question is based on. You can bookmark questions.
-- **Timed mock exam:** a 65-question / 90-minute exam that follows the CLF-C02 domain weightings, with flagging, a question grid, final review and automatic submission when time runs out. Until the question bank is large enough, a shorter exam at the same pace is offered (currently 41 questions / 57 minutes).
+- **Timed mock exam:** a 65-question / 90-minute exam that follows the CLF-C02 domain weightings, with flagging, a question grid, final review and automatic submission when time runs out. If the question bank were too small, a shorter exam at the same pace would be offered instead.
 - **Results:** a practice score, per-domain breakdown, answer review with explanations, exam history, and progress guidance across attempts.
 - **Your data:** settings (theme, motion, benchmark, warnings), export/import to a file, automatic backups before risky changes, and separate "clear" actions.
-- **Optional practice integrity:** a strict mode that asks for fullscreen and logs tab and focus changes, plus optional local webcam checks where the browser supports them. These features are opt-in and processed locally, and they never affect your score. See the in-app Privacy page.
+- **Optional practice integrity:** a strict mode that asks for fullscreen and logs tab and focus changes, without judging them.
+- **AI-proctored exams (opt-in):** a check-in like an online proctored exam, then a strict AI proctor that runs on your device (MediaPipe face and object models plus microphone loudness). It watches your face, head, eyes and mouth, looks for phones, other people, books and screens, and blocks shortcuts. Two warnings, then the exam ends; a phone or another person ends it at once. Nothing is recorded or uploaded. See the in-app Privacy page.
 
 All questions are original, written from public AWS documentation and the official exam guide. See [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) before relying on it.
 
@@ -56,7 +57,7 @@ Questions live in `src/content/questions/d<n>-*.ts`, one file per exam domain. E
 - Four options for single answer, or five or more with at least two correct for multiple response.
 - An explanation for every option and an overall explanation.
 - At least one https AWS reference.
-- A review status: `draft` → `checked` → `approved` (human sign-off) → `retired`.
+- A review status: `draft` → `unverified` (written, not yet re-checked) → `checked` → `approved` (human sign-off) → `retired`.
 
 After editing:
 

@@ -45,7 +45,11 @@ export function HistoryPage() {
                           {attempt.kind === 'short' ? 'Shorter exam' : 'Full exam'} · {score.total}{' '}
                           questions
                         </span>
-                        {attempt.submitReason !== 'manual' && <Badge>Time ran out</Badge>}
+                        {attempt.submitReason === 'proctor_ended' ? (
+                          <Badge tone="danger">Ended by proctor</Badge>
+                        ) : (
+                          attempt.submitReason !== 'manual' && <Badge>Time ran out</Badge>
+                        )}
                       </span>
                       <span className="mt-0.5 block text-sm text-fg-muted">
                         {formatDateTime(attempt.submittedAt)}

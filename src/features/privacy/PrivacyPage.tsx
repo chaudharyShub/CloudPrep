@@ -14,7 +14,7 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: 'What strict practice monitors',
+    title: 'What is monitored',
     body: (
       <ul className="list-disc space-y-1 pl-5">
         <li>
@@ -26,9 +26,10 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
           or unavailable.
         </li>
         <li>
-          <strong className="text-fg">Strict practice with webcam</strong> also checks, every few
-          seconds, whether zero, one or more faces are visible, and records changes, camera denials
-          and camera disconnections.
+          <strong className="text-fg">AI-proctored exams</strong> also use your camera and
+          microphone for the whole exam. They check your face, head position, eyes and mouth, look
+          for phones, other people, books and other screens, measure sound levels, and watch for the
+          mouse leaving the page, blocked shortcuts and extra displays.
         </li>
       </ul>
     ),
@@ -44,14 +45,16 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: 'How webcam checks work',
+    title: 'How the AI proctor works',
     body: (
       <>
-        Face detection runs locally in your browser using its built-in face detector. Frames are
-        analysed in memory and discarded immediately. CloudPrep does not recognise who you are and
-        does not interpret expressions, emotions or intent. A visible camera indicator is shown
-        while the camera is on. If your browser has no built-in face detector, the webcam option is
-        unavailable.
+        The proctor uses Google&apos;s open-source MediaPipe models (face landmarks and object
+        detection), which run entirely on your device. CloudPrep downloads them from its own site
+        when you start a proctored exam, about 25 MB the first time. Camera frames and microphone
+        sound are analysed in memory and discarded straight away: nothing is recorded, saved or
+        uploaded, and only loudness is measured, not words. CloudPrep doesn&apos;t recognise who you
+        are or interpret emotions. Your camera image is always shown on screen while the proctor is
+        on.
       </>
     ),
   },
@@ -59,10 +62,11 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     title: 'Limits',
     body: (
       <>
-        These are practice aids, not proctoring. A browser can&apos;t see other devices, a second
-        screen, notes or people in the room, and fullscreen doesn&apos;t block other apps. Events
-        have many innocent causes, so CloudPrep never labels anything as cheating and never produces
-        an integrity score.
+        Strict practice only logs events and never judges them. The AI proctor you opt into does
+        judge: it gives warnings and can end the exam, and its detection is approximate, so it can
+        miss things or react to innocent ones. A browser can&apos;t see other apps, devices out of
+        view or a second screen in every browser, and fullscreen doesn&apos;t block other apps.
+        Neither mode produces an integrity score.
       </>
     ),
   },
@@ -70,10 +74,10 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     title: 'How to stop monitoring',
     body: (
       <>
-        During an exam, use &ldquo;Stop monitoring&rdquo; or &ldquo;Turn camera off&rdquo; in the
-        bar under the exam header. The exam continues normally. Monitoring and the camera also stop
-        automatically when the exam ends. You can also deny camera permission in your browser at any
-        time.
+        In strict practice, use &ldquo;Stop monitoring&rdquo; in the bar under the exam header; the
+        exam continues normally. A proctored exam can&apos;t run without the proctor: turning off
+        the camera or microphone ends it, and finishing the exam or closing the page stops them.
+        Monitoring, the camera and the microphone always stop when the exam ends.
       </>
     ),
   },
@@ -101,7 +105,7 @@ export function PrivacyPage() {
     <>
       <PageHeader
         title="Privacy"
-        description="What CloudPrep stores, and what strict practice monitors."
+        description="What CloudPrep stores, and what strict practice and the AI proctor monitor."
       />
       <div className="flex max-w-prose flex-col gap-6">
         {SECTIONS.map((section) => (

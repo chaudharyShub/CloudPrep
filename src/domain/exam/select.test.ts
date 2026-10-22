@@ -80,9 +80,13 @@ describe('selectExamQuestions', () => {
 });
 
 describe('examEligibleQuestions', () => {
-  it('excludes drafts and retired questions', () => {
+  it('excludes drafts and retired questions, and includes unverified ones (D-041)', () => {
     const questions = [
       makeQuestion({ id: 'clf-d1-0001' }),
+      makeQuestion({
+        id: 'clf-d1-0005',
+        review: { status: 'unverified', lastVerified: '2026-10-21' },
+      }),
       makeQuestion({ id: 'clf-d1-0002', review: { status: 'draft', lastVerified: '2026-10-21' } }),
       makeQuestion({
         id: 'clf-d1-0003',
@@ -95,6 +99,7 @@ describe('examEligibleQuestions', () => {
     ];
     expect(examEligibleQuestions(questions).map((q) => q.id)).toEqual([
       'clf-d1-0001',
+      'clf-d1-0005',
       'clf-d1-0004',
     ]);
   });

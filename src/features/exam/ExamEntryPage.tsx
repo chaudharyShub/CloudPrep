@@ -25,6 +25,7 @@ import { useActiveExam } from '@/state/hooks';
 import { useExamActions } from './useExamActions';
 import { IntegrityModePicker, MODE_SUMMARY } from './integrity/IntegrityModePicker';
 import type { IntegrityMode } from '@/domain/exam/integrity';
+import type { CheckInState } from './proctor/CheckInPage';
 
 const MINUTE = 60_000;
 
@@ -55,6 +56,15 @@ export function ExamEntryPage() {
   const [startError, setStartError] = useState<string | null>(null);
   const [integrityMode, setIntegrityMode] = useState<IntegrityMode>('standard');
   const inProgress = activeExam !== null && activeExam.status !== 'submitted';
+
+  /** Proctored exams go through check-in first; the others ask for confirmation. */
+  function choose(config: ExamConfig) {
+    if (integrityMode === 'proctored') {
+      void navigate('/exam/check-in', { state: { kind: config.kind } satisfies CheckInState });
+    } else {
+      setPending(config);
+    }
+  }
 
   function confirmStart() {
     if (!pending) return;
@@ -195,7 +205,7 @@ export function ExamEntryPage() {
                   className="w-full"
                   disabled={inProgress}
                   onClick={() => {
-                    setPending(FULL_EXAM);
+                    choose(FULL_EXAM);
                   }}
                 >
                   Start full exam
@@ -256,7 +266,7 @@ export function ExamEntryPage() {
                         className="w-full"
                         disabled={inProgress}
                         onClick={() => {
-                          setPending(shortConfig);
+                          if (shortConfig) choose(shortConfig);
                         }}
                       >
                         Start shorter exam

@@ -62,6 +62,11 @@ describe('integrity storage', () => {
     expect(parseIntegrityLog(undefined)).toEqual({ log: STANDARD_LOG, dropped: 0 });
   });
 
+  it('AC-7.8 still loads logs saved with the retired webcam mode', () => {
+    const log = { mode: 'webcam', events: [{ type: 'face-visible', at: 5 }] };
+    expect(parseIntegrityLog(log)).toEqual({ log, dropped: 0 });
+  });
+
   it('keeps valid events and drops invalid ones without losing the exam', () => {
     expect(
       parseIntegrityLog({
@@ -89,17 +94,27 @@ describe('integrity storage', () => {
 });
 
 describe('IntegrityModePicker', () => {
-  it('explains each mode and disables webcam checks where unsupported', () => {
-    const onChange = vi.fn();
+  it('AC-7.8 offers standard, strict and AI-proctored modes, without the retired webcam option', () => {
     render(
       <MemoryLink>
-        <IntegrityModePicker value="standard" onChange={onChange} webcamSupported={false} />
+        <IntegrityModePicker value="standard" onChange={vi.fn()} proctoringAvailable />
       </MemoryLink>,
     );
     expect(screen.getByRole('radio', { name: /Standard practice/ })).toBeChecked();
-    expect(screen.getByRole('radio', { name: /Strict practice with webcam/ })).toBeDisabled();
-    expect(screen.getByText(/doesn’t provide built-in face detection/)).toBeVisible();
-    expect(screen.getByText(/not proctoring/)).toBeVisible();
+    expect(screen.getByRole('radio', { name: /^Strict practice/ })).toBeEnabled();
+    expect(screen.getByRole('radio', { name: /AI-proctored exam/ })).toBeEnabled();
+    expect(screen.queryByRole('radio', { name: /webcam/i })).not.toBeInTheDocument();
+    expect(screen.queryByText(/built-in face detection/)).not.toBeInTheDocument();
+  });
+
+  it('AC-7.1 disables the proctored mode where the browser lacks camera or fullscreen support', () => {
+    render(
+      <MemoryLink>
+        <IntegrityModePicker value="standard" onChange={vi.fn()} proctoringAvailable={false} />
+      </MemoryLink>,
+    );
+    expect(screen.getByRole('radio', { name: /AI-proctored exam/ })).toBeDisabled();
+    expect(screen.getByText(/needs camera and microphone access and fullscreen/)).toBeVisible();
   });
 });
 
@@ -110,7 +125,7 @@ describe('strict practice in the app', () => {
     const store = createTestStore();
     const { user } = renderApp('/exam', { store });
     await user.click(await screen.findByRole('radio', { name: /^Strict practice(?! with)/ }));
-    await user.click(screen.getByRole('button', { name: 'Start shorter exam' }));
+    await user.click(screen.getByRole('button', { name: 'Start full exam' }));
     expect(screen.getByRole('dialog')).toHaveAccessibleDescription(/logs when the tab is hidden/);
     await user.click(screen.getByRole('button', { name: 'Start exam' }));
 
@@ -183,7 +198,8 @@ describe('strict practice in the app', () => {
     renderApp('/privacy');
     expect(await screen.findByRole('heading', { level: 1, name: 'Privacy' })).toBeVisible();
     for (const title of [
-      'What strict practice monitors',
+      'What is monitored',
+      'How the AI proctor works',
       'What is stored',
       'How to stop monitoring',
       'How to delete records',

@@ -45,7 +45,13 @@ export const MULTIPLE_MIN_OPTIONS = 5;
 
 const ID_PATTERN = /^clf-d([1-4])-\d{4}$/;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const ALLOWED_REFERENCE_HOSTS = ['docs.aws.amazon.com', 'aws.amazon.com'];
+const ALLOWED_REFERENCE_HOSTS = [
+  'docs.aws.amazon.com',
+  'aws.amazon.com',
+  'repost.aws',
+  'calculator.aws',
+  'skillbuilder.aws',
+];
 const ALL_OR_NONE = /\b(all|none) of the above\b/i;
 
 function isRecord(value: unknown): value is Record<string, unknown> {

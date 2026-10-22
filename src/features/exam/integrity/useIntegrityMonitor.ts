@@ -8,19 +8,24 @@ import {
   type MonitorState,
 } from './monitor';
 
-const IDLE: MonitorState = {
-  active: false,
-  fullscreen: 'off',
-  fullscreenExited: false,
-  camera: 'off',
-  face: 'unknown',
-};
+const IDLE: MonitorState = { active: false, fullscreen: 'off', fullscreenExited: false };
 const noopSubscribe = () => () => undefined;
 
 /**
- * Runs integrity monitoring for the open exam (strict modes only). Monitoring stops, and
- * camera tracks are released, when the exam ends, the layout unmounts, or the learner
- * stops it. Events are saved to the exam session through the store.
+ * Leaving fullscreen waits until after the current render pass. React (in development)
+ * unmounts and remounts the exam layout straight away; exiting at once would end the
+ * fullscreen the exam just entered and count as a violation.
+ */
+let pendingExit: number | null = null;
+function cancelPendingExit() {
+  if (pendingExit !== null) window.clearTimeout(pendingExit);
+  pendingExit = null;
+}
+
+/**
+ * Runs browser-signal monitoring for the open exam (strict and proctored modes). Monitoring
+ * stops when the exam ends, the layout unmounts, or the learner stops it (strict mode).
+ * Events are saved to the exam session through the store.
  */
 export function useIntegrityMonitor(
   exam: ExamSession | null,
@@ -28,7 +33,9 @@ export function useIntegrityMonitor(
 ): { monitor: IntegrityMonitor | null; state: MonitorState } {
   const store = useAppStore();
   const examId = exam?.id ?? null;
-  const mode = exam?.integrity.mode ?? 'standard';
+  const saved = exam?.integrity.mode ?? 'standard';
+  // An exam started with the retired webcam mode continues with focus monitoring.
+  const mode = saved === 'webcam' ? 'focus' : saved;
   // Constructing a monitor has no side effects; the effect below starts and stops it.
   const monitor = useMemo(
     () =>
@@ -44,12 +51,17 @@ export function useIntegrityMonitor(
 
   useEffect(() => {
     if (!monitor) return;
+    cancelPendingExit();
     monitor.start();
-    if (mode === 'webcam') void monitor.startCamera();
     return () => {
-      monitor.stop();
+      monitor.stop(false, { keepFullscreen: true });
+      cancelPendingExit();
+      pendingExit = window.setTimeout(() => {
+        pendingExit = null;
+        monitor.exitFullscreen();
+      }, 0);
     };
-  }, [monitor, mode]);
+  }, [monitor]);
 
   const state = useSyncExternalStore(
     monitor?.subscribe ?? noopSubscribe,

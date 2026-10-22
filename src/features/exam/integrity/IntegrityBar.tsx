@@ -1,26 +1,14 @@
 import { Link } from 'react-router';
-import { Camera, CameraOff, Eye, Maximize, ShieldOff } from 'lucide-react';
+import { Eye, Maximize, ShieldOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Notice } from '@/components/ui/Notice';
 import type { IntegrityMode } from '@/domain/exam/integrity';
-import { cn } from '@/lib/cn';
 import type { IntegrityMonitor, MonitorState } from './monitor';
 
-const CAMERA_TEXT: Record<MonitorState['camera'], string> = {
-  off: 'Camera off',
-  starting: 'Waiting for camera permission…',
-  on: 'Camera on',
-  denied: 'Camera permission denied',
-  unavailable: 'Camera unavailable',
-};
-const FACE_TEXT: Record<MonitorState['face'], string | null> = {
-  unknown: null,
-  visible: 'face visible',
-  none: 'no face detected',
-  multiple: 'more than one face',
-};
-
-/** Always-visible status for strict practice, with ways to stop monitoring at any time. */
+/**
+ * Always-visible status for strict practice, with a way to stop monitoring at any time.
+ * Proctored exams use `ProctorPanel` instead.
+ */
 export function IntegrityBar({
   mode,
   monitor,
@@ -30,8 +18,7 @@ export function IntegrityBar({
   monitor: IntegrityMonitor | null;
   state: MonitorState;
 }) {
-  if (mode === 'standard') return null;
-  const cameraOn = state.camera === 'on';
+  if (mode === 'standard' || mode === 'proctored') return null;
   return (
     <div className="flex flex-col gap-3">
       <div
@@ -42,52 +29,15 @@ export function IntegrityBar({
           <Eye size={14} aria-hidden="true" />
           {state.active ? 'Strict practice: focus monitoring on' : 'Monitoring off'}
         </span>
-        {mode === 'webcam' && (
-          <span className="flex items-center gap-1.5">
-            <span
-              aria-hidden="true"
-              className={cn('size-2 rounded-full', cameraOn ? 'bg-danger' : 'bg-fg-subtle')}
-            />
-            {CAMERA_TEXT[state.camera]}
-            {cameraOn && FACE_TEXT[state.face] && ` · ${FACE_TEXT[state.face] ?? ''}`}
-            {cameraOn && ' · nothing is recorded'}
-          </span>
-        )}
         <span className="ml-auto flex flex-wrap items-center gap-1">
           <Link
             to="/privacy"
             target="_blank"
             className="rounded-sm px-1 text-accent-fg underline-offset-4 hover:underline"
+            aria-label="What's monitored (opens in a new tab)"
           >
             What&apos;s monitored
-            <span className="sr-only"> (opens in a new tab)</span>
           </Link>
-          {cameraOn && (
-            <Button
-              size="sm"
-              variant="ghost"
-              icon={CameraOff}
-              onClick={() => {
-                monitor?.stopCamera();
-              }}
-            >
-              Turn camera off
-            </Button>
-          )}
-          {mode === 'webcam' &&
-            (state.camera === 'off' || state.camera === 'unavailable') &&
-            state.active && (
-              <Button
-                size="sm"
-                variant="ghost"
-                icon={Camera}
-                onClick={() => {
-                  void monitor?.startCamera();
-                }}
-              >
-                Turn camera on
-              </Button>
-            )}
           {state.active && (
             <Button
               size="sm"

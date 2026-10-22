@@ -13,9 +13,10 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Phase 3: timed practice exam | P2 exam parts (blueprint, selection, timer, exam reducer), P3 active exam + exam history, P5, most of P6 (results, answer review, basic history list) | Done (awaiting review) |
 | Phase 4: results, review, history, readiness | Rest of P6 (scoring module, answer review page, history schema v2, question archive) and readiness analytics (/progress) | Done (awaiting review) |
 | Phase 5: persistence, settings, export/import | P3 preferences, P8 (export/import, recovery, separate clear actions) | Done (awaiting review) |
-| Phase 6: practice integrity | P10 "proctoring-lite" (focus, fullscreen, optional webcam via built-in FaceDetector) and a privacy page | Done (awaiting review) |
+| Phase 6: practice integrity | P10 "proctoring-lite" (focus, fullscreen, optional webcam via built-in FaceDetector, retired in Phase 7) and a privacy page | Done (awaiting review) |
 | QA pass | Journeys A–G, responsive and accessibility checks, defect fixes | Done |
 | Release preparation | P9: visual clean-up, Vercel configuration, performance review, README / DEPLOYMENT / KNOWN_LIMITATIONS | Done (deployment itself is a manual step) |
+| Phase 7: AI proctoring | Strict AI-proctored exam mode replacing the built-in FaceDetector webcam option (D-043); acceptance criteria below | Done (awaiting review) |
 | Not started | P4 (welcome/onboarding), attempt-to-attempt comparison view, C2–C3 content (more questions) | — |
 
 Changes from the original plan so far:
@@ -257,6 +258,19 @@ Each batch covers **every** task statement, includes about 15% multiple-response
 - AC-9.5 The manual QA checklist in TEST_PLAN.md §7 is completed and recorded.
 
 ---
+
+## Phase 7 — AI-proctored exams
+
+Acceptance criteria (tests are tagged with these IDs):
+
+- **AC-7.1 Check-in.** Choosing "AI-proctored exam" leads to a check-in: agree to every rule, allow the camera and microphone (with clear errors for denial, busy devices and failed model loads), load the models, pass a live room check for 3 seconds (lighting, one face, eyes open, no phone, other person, books or screens, quiet room, single display, no virtual camera), and calibrate. Only then can the exam start, in fullscreen. The mode is disabled where the browser lacks camera, fullscreen or WebAssembly support.
+- **AC-7.2 Camera and microphone rules.** Sustained conditions become violations: no face (2 s), more than one face (1 s), camera covered (1.5 s), head turned (2 s), eyes off the screen (2 s), eyes closed (3 s), lips moving, voice or noise above the check-in level, and a phone, extra person or book/screen in 2 of 3 object checks. Each episode counts once and must clear before it counts again. Head and eye rules are relative to calibration.
+- **AC-7.3 Browser rules.** Tab hidden, window blur, fullscreen exit, the pointer leaving the page, blocked shortcuts (copy, cut, paste, context menu, print, save, find, developer tools, screenshots; logged at most once a second) and a second display are recorded. Blocked shortcuts are prevented; ordinary keys are not.
+- **AC-7.4 Verdict.** Strikes within 3 s count as one incident. Strikes 1 and 2 show warnings (the second is the final warning); the third ends the exam. A phone, another person or face, a second display, or a lost camera or microphone ends it at once. The verdict is derived from the saved log, so it survives reloads, and the exam is submitted with reason `proctor_ended` on any page.
+- **AC-7.5 Interruptions.** Reopening a proctored exam logs "Exam interrupted" (a strike) and hides the questions until the learner restarts the proctor (camera, microphone, 2-second calibration, fullscreen). Outside fullscreen, the questions are hidden until fullscreen returns. The timer keeps running.
+- **AC-7.6 Results.** A proctor-ended attempt is void: it never meets the benchmark, is marked "Ended by proctor" in history, is left out of readiness, and its results page explains why. The proctor report shows each event and what the proctor did (warning, final warning, same incident, exam ended).
+- **AC-7.7 Privacy.** Only `{type, at}` is stored. Frames and audio are analysed in memory. Every camera and microphone track, timer and model is released when the exam ends, check-in is left, or loading fails. The privacy page describes the proctor.
+- **AC-7.8 Retired webcam option.** The built-in-FaceDetector webcam mode is no longer offered. Logs saved with it still load and display, and an exam in progress with it continues with focus monitoring.
 
 ## P10 — Optional features (v1.x, pick à la carte)
 

@@ -16,7 +16,11 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ExternalLink } from '@/components/ui/ExternalLink';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { assessReadiness, MIN_ATTEMPTS_FOR_GUIDANCE } from '@/domain/analytics/readiness';
+import {
+  assessReadiness,
+  countedAttempts,
+  MIN_ATTEMPTS_FOR_GUIDANCE,
+} from '@/domain/analytics/readiness';
 import { FULL_EXAM } from '@/domain/exam/config';
 import { DOMAINS, EXAM_GUIDE_URL } from '@/domain/exam-guide/clf-c02';
 import { practiceStats } from '@/domain/practice/progress';
@@ -103,7 +107,7 @@ export function DashboardPage() {
               </div>
               <p className="mt-4 text-sm text-fg-muted">
                 {readiness.level === 'insufficient-data'
-                  ? `Readiness guidance starts after ${MIN_ATTEMPTS_FOR_GUIDANCE} exams (${attempts.length} so far).`
+                  ? `Readiness guidance starts after ${MIN_ATTEMPTS_FOR_GUIDANCE} exams (${countedAttempts(attempts).length} so far).`
                   : readiness.level === 'consistent'
                     ? 'Your last three exams are consistently at or above your benchmark.'
                     : readiness.level === 'mixed'
