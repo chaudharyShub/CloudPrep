@@ -52,6 +52,7 @@
 | D-045 | Sign-in: magic link + Google via an auth interface; guests keep Learning mode; fake sign-in for E2E builds | Accepted |
 | D-046 | Questions load from Supabase at runtime, cached in IndexedDB by bank version; the bank leaves the bundle | Accepted |
 | D-047 | Signed-in users' data syncs to Supabase from a local copy; guest data stays separate and is added only on request | Accepted |
+| D-048 | Vercel Web Analytics for page views, production builds only | Accepted |
 
 ---
 
@@ -290,3 +291,10 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Without a server** (E2E builds by default, development without Supabase settings) the account copy simply stays in the browser.
 - **Theme before first paint:** `index.html` reads the account copy's settings when its owner is signed in, otherwise the guest's.
 - **Tests:** `renderApp` uses one store for guests and accounts unless a test passes real accounts. E2E specs that seed storage while signed in use the `cloudprep-account:` keys and wait for the copy to exist.
+
+### D-048 Page-view analytics (Vercel Web Analytics)
+- **Requested by the user (2026-10-24):** to see how the shared site is used. `@vercel/analytics` (`<Analytics />` from `@vercel/analytics/react`) is mounted in `src/main.tsx`, outside `App`, and only when `import.meta.env.MODE === 'production'`, so development and E2E builds load and send nothing. It follows React Router's history changes on its own.
+- **What it collects:** page views (URL path), referrer, country, browser, operating system and device type. No cookies; Vercel tells visitors apart with a hash that changes daily. App data (answers, progress, results, account details) is never sent. The privacy page has a "Usage statistics" section.
+- **Hosting:** the script and its endpoint are served by Vercel under `/_vercel/insights/`; the SPA rewrite in `vercel.json` now leaves `/_vercel/*` alone. Web Analytics must be enabled once in the Vercel project (*Analytics → Enable*); until then the script isn't served and nothing is collected.
+- **Deployment:** through the usual Git flow (merge the PR; Vercel deploys `master`), not `vercel --prod` from a local folder.
+
