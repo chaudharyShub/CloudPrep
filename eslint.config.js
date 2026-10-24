@@ -57,6 +57,30 @@ export default defineConfig([
     rules: { 'no-restricted-syntax': 'off' },
   },
   {
+    // The app loads questions at runtime (D-046); importing the bundled bank would put it
+    // back in the production bundle. Only tests and the dev/E2E source may import it.
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: [
+      'src/**/*.test.{ts,tsx}',
+      'src/test/**',
+      'src/content/**',
+      'src/backend/createQuestionSource.ts',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/content/*', '@/content/**'],
+              message: 'Use the loaded bank (useQuestionBank) instead of the bundled questions.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // The domain layer must stay framework-free and independent of UI and storage.
     files: ['src/domain/**/*.{ts,tsx}'],
     rules: {

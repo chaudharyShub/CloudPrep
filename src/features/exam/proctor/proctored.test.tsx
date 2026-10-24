@@ -5,7 +5,7 @@ import { buildAttempt } from '@/domain/exam/attempt';
 import type { IntegrityEventType } from '@/domain/exam/integrity';
 import { examReducer, type ExamSession } from '@/domain/exam/session';
 import { EXAM_ATTEMPTS_AREA } from '@/storage/attemptsArea';
-import { EXAM_QUESTIONS, EXAM_QUESTIONS_BY_ID } from '@/state/examQuestions';
+import { EXAM_QUESTIONS, EXAM_QUESTIONS_BY_ID } from '@/test/bank';
 import { makeExam } from '@/test/exam';
 import { createTestStore, renderApp } from '@/test/renderApp';
 

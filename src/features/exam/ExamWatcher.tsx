@@ -5,6 +5,7 @@ import { isExpired } from '@/domain/exam/timer';
 import { useToast } from '@/components/ui/Toast';
 import { useNow } from '@/hooks/useNow';
 import { useAuth } from '@/state/AuthProvider';
+import { useQuestionBankState } from '@/state/QuestionBankProvider';
 import { useActiveExam } from '@/state/hooks';
 import { useAppStore } from '@/state/StoreProvider';
 import { useExamActions } from './useExamActions';
@@ -28,9 +29,11 @@ export function ExamWatcher() {
   // Wait until sign-in is known, so the exam pages (which need sign-in) are on screen first and
   // can show the results themselves.
   const authLoading = useAuth().state.status === 'loading';
+  // Scoring needs the questions.
+  const bankReady = useQuestionBankState().state.status === 'ready';
 
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading || !bankReady) return;
     const firstCheck = isFirstCheck.current;
     isFirstCheck.current = false;
     if (!exam) return;
@@ -69,7 +72,7 @@ export function ExamWatcher() {
         durationMs: null,
       });
     }
-  }, [exam, now, submit, showToast, pathname, store, navigate, authLoading]);
+  }, [exam, now, submit, showToast, pathname, store, navigate, authLoading, bankReady]);
 
   return null;
 }

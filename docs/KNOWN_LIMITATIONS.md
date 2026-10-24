@@ -23,6 +23,11 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 - Signing in doesn't move your data yet: progress, exam history and settings stay in this browser and are shared by everyone who uses it, signed in or not. Saving them to your account is the next step.
 - Mock exams, the dashboard, exam history and progress need an account; Learning mode, bookmarks and settings don't.
 
+## Questions
+
+- Questions are downloaded from CloudPrep's database (about 1.6 MB) the first time you open a page that uses them, and kept in this browser afterwards. The first visit needs an internet connection; after that, practice works offline with the copy you have, and a newer set is downloaded when one is published.
+- Clearing site data removes the downloaded copy; it is downloaded again next time.
+
 ## Your data
 
 - Everything is stored in **this browser on this device** (`localStorage`). It isn't synced between devices or browsers.

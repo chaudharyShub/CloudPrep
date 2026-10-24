@@ -7,7 +7,7 @@ import { createMemoryDriver } from '@/storage/driver';
 import { createAppStore } from '@/storage/store';
 import { EXAM_ATTEMPTS_AREA } from '@/storage/attemptsArea';
 import { parseIntegrityLog } from '@/storage/integrityParse';
-import { EXAM_QUESTIONS } from '@/state/examQuestions';
+import { EXAM_QUESTIONS } from '@/test/bank';
 import { makeAttempt, makeExam } from '@/test/exam';
 import { createTestStore, renderApp } from '@/test/renderApp';
 import { IntegrityModePicker } from './IntegrityModePicker';

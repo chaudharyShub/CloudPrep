@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { examReducer } from '@/domain/exam/session';
 import { examQuestion, makeAttempt, makeExam } from '@/test/exam';
-import { EXAM_QUESTIONS } from '@/state/examQuestions';
+import { EXAM_QUESTIONS } from '@/test/bank';
 import { createMemoryDriver } from './driver';
 import { BACKUP_PREFIX, readArea, storageKey, writeArea } from './envelope';
 import { EXAM_ATTEMPTS_AREA } from './attemptsArea';

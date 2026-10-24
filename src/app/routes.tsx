@@ -1,6 +1,7 @@
 import { Navigate, type RouteObject } from 'react-router';
 import { RequireAuth } from '@/features/auth/RequireAuth';
 import { RouteErrorPage } from '@/features/errors/RouteErrorPage';
+import { RequireQuestions } from '@/features/shared/RequireQuestions';
 import { AppLayout } from './layouts/AppLayout';
 import { ExamLayout } from './layouts/ExamLayout';
 import { RootLayout } from './layouts/RootLayout';
@@ -35,10 +36,16 @@ export const routes: RouteObject[] = [
         children: [
           { index: true, element: <Navigate to="/dashboard" replace /> },
           // Open to guests (D-045): Learning mode, bookmarks, settings and sign-in.
-          { path: 'practice', element: <PracticePage /> },
-          { path: 'practice/session', element: <PracticeSessionPage /> },
+          {
+            // Pages that use questions wait for the bank (D-046).
+            element: <RequireQuestions />,
+            children: [
+              { path: 'practice', element: <PracticePage /> },
+              { path: 'practice/session', element: <PracticeSessionPage /> },
+              { path: 'bookmarks', element: <BookmarksPage /> },
+            ],
+          },
           { path: 'privacy', element: <PrivacyPage /> },
-          { path: 'bookmarks', element: <BookmarksPage /> },
           { path: 'settings', element: <SettingsPage /> },
           { path: 'sign-in', element: <SignInPage /> },
           { path: 'auth/callback', element: <AuthCallbackPage /> },
@@ -46,13 +53,18 @@ export const routes: RouteObject[] = [
             // Signed-in only.
             element: <RequireAuth />,
             children: [
-              { path: 'dashboard', element: <DashboardPage /> },
-              { path: 'exam', element: <ExamEntryPage /> },
-              { path: 'exam/check-in', element: <CheckInPage /> },
-              { path: 'results/:attemptId', element: <ResultsPage /> },
-              { path: 'results/:attemptId/review', element: <AnswerReviewPage /> },
-              { path: 'progress', element: <ProgressPage /> },
-              { path: 'history', element: <HistoryPage /> },
+              {
+                element: <RequireQuestions />,
+                children: [
+                  { path: 'dashboard', element: <DashboardPage /> },
+                  { path: 'exam', element: <ExamEntryPage /> },
+                  { path: 'exam/check-in', element: <CheckInPage /> },
+                  { path: 'results/:attemptId', element: <ResultsPage /> },
+                  { path: 'results/:attemptId/review', element: <AnswerReviewPage /> },
+                  { path: 'progress', element: <ProgressPage /> },
+                  { path: 'history', element: <HistoryPage /> },
+                ],
+              },
             ],
           },
           ...(import.meta.env.DEV ? [{ path: '__ui', element: <DesignSystemPage /> }] : []),
@@ -63,11 +75,16 @@ export const routes: RouteObject[] = [
         element: <RequireAuth />,
         children: [
           {
-            // Focused exam chrome without the sidebar.
-            element: <ExamLayout />,
+            element: <RequireQuestions />,
             children: [
-              { path: 'exam/session', element: <ExamSessionPage /> },
-              { path: 'exam/review', element: <ExamReviewPage /> },
+              {
+                // Focused exam chrome without the sidebar.
+                element: <ExamLayout />,
+                children: [
+                  { path: 'exam/session', element: <ExamSessionPage /> },
+                  { path: 'exam/review', element: <ExamReviewPage /> },
+                ],
+              },
             ],
           },
         ],

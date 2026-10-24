@@ -17,7 +17,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | QA pass | Journeys A–G, responsive and accessibility checks, defect fixes | Done |
 | Release preparation | P9: visual clean-up, Vercel configuration, performance review, README / DEPLOYMENT / KNOWN_LIMITATIONS | Done (deployment itself is a manual step) |
 | Phase 7: AI proctoring | Strict AI-proctored exam mode replacing the built-in FaceDetector webcam option (D-043); acceptance criteria below | Done (awaiting review) |
-| Phase 8: backend (Supabase, D-044, D-045) | Step 1: schema, RLS, publish script. Step 2: sign-in (magic link + Google) and signed-in-only pages. Steps 3–5 (questions from the database, progress in the database, server scoring) not started | Steps 1–2 done (awaiting review) |
+| Phase 8: backend (Supabase, D-044–D-046) | Step 1: schema, RLS, publish script. Step 2: sign-in. Step 3: questions from the database, cached in IndexedDB. Steps 4–5 (progress in the database, server scoring) not started | Steps 1–3 done (awaiting review) |
 | Not started | P4 (welcome/onboarding), attempt-to-attempt comparison view, C2–C3 content (more questions) | — |
 
 Changes from the original plan so far:
@@ -278,7 +278,7 @@ Acceptance criteria (tests are tagged with these IDs):
 Decision: D-044. Steps:
 1. **Foundation (done):** Supabase CLI and `supabase/` folder, schema migration with RLS and grants, `npm run publish:questions`.
 2. **Auth (done):** email magic link and Google sign-in, account in the navigation and Settings, signed-in-only pages. Guests keep Learning mode, bookmarks and settings.
-3. **Questions from the database:** the app loads one exam's bank from Supabase and caches it by `bank_version`; the bank leaves the bundle.
+3. **Questions from the database (done):** the app loads one exam's bank from Supabase and caches it by `bank_version`; the bank leaves the bundle.
 4. **Progress in the database:** remote repositories behind `src/storage/`, a local copy of the exam in progress, and a one-time import of local data on first sign-in.
 5. **Later:** server scoring (lock `question_keys`), then the multi-exam UI.
 
@@ -296,6 +296,13 @@ Step 2 acceptance criteria:
 - AC-B.9 The callback page finishes sign-in and opens the requested page; only paths on this site are accepted; a failed or expired link is explained with a way to try again.
 - AC-B.10 The signed-in account is shown in the navigation and in Settings. Signing out works from both, and signed-in-only pages then need sign-in again. A signed-in visitor to `/sign-in` goes straight on.
 - AC-B.11 Without Supabase settings the site works for guests and says sign-in isn't set up. The Supabase library is loaded once, in its own chunk; production builds contain no fake sign-in.
+
+Step 3 acceptance criteria:
+- AC-B.12 The app loads the exam's questions from Supabase, every page of results, rebuilding and validating each row; invalid rows are left out. The production bundle contains no questions.
+- AC-B.13 The bank is cached per exam with its version. Later visits start from the cache and download again only when the published version changes. Unreadable cache entries are discarded; without IndexedDB the app still works.
+- AC-B.14 Pages that use questions wait for the first download and show an error with "Try again" if it fails. With a cached bank they keep working when the download fails. Without a question source the site says so; settings still open.
+- AC-B.15 An exam is only submitted (including an expired one found on load) once the questions are loaded, and it records the loaded bank's version.
+- AC-B.16 `npm run check:published` confirms that the published questions match the repo.
 
 ## P10 — Optional features (v1.x, pick à la carte)
 

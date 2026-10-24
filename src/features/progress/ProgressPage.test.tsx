@@ -1,7 +1,7 @@
 import { screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import type { ExamAction } from '@/domain/exam/session';
-import { EXAM_QUESTIONS } from '@/state/examQuestions';
+import { EXAM_QUESTIONS } from '@/test/bank';
 import { examQuestion, makeAttempt, makeExam } from '@/test/exam';
 import { createTestStore, renderApp } from '@/test/renderApp';
 

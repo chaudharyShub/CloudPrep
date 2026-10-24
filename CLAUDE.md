@@ -1,12 +1,12 @@
 # CLAUDE.md — CloudPrep
 
-CloudPrep is an unofficial AWS Certified Cloud Practitioner (CLF-C02) exam simulator. It is built with React + TypeScript (strict) + Vite + Tailwind v4 + React Router. It is moving to a Supabase backend (D-044). Sign-in works (D-045); until steps 3–4 land, the app still bundles the questions and stores user data in localStorage. It is for personal use and is shared with friends as a static site.
+CloudPrep is an unofficial AWS Certified Cloud Practitioner (CLF-C02) exam simulator. It is built with React + TypeScript (strict) + Vite + Tailwind v4 + React Router. It is moving to a Supabase backend (D-044). Sign-in works (D-045) and questions load from the database (D-046); until step 4 lands, user data is still stored in localStorage. It is for personal use and is shared with friends as a static site.
 
 **Read first:** `docs/PRODUCT_SPEC.md`, `docs/ARCHITECTURE.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/TEST_PLAN.md`, `docs/DECISIONS.md`.
 
 ## Current status
 
-All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring, awaiting review) and steps 1–2 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script; D-045: sign-in). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
+All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring, awaiting review) and steps 1–3 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script; D-045: sign-in; D-046: questions from the database). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
 
 ## Commands
 
@@ -19,6 +19,7 @@ npm test                    # vitest (unit + component + question-bank validatio
 npm run test:e2e            # playwright (builds dist-e2e/ via build:e2e, with a fake sign-in)
 npm run validate:questions  # validate the question bank + coverage report
 npm run publish:questions   # publish the bank to Supabase (-- --dry-run to only validate/count)
+npm run check:published     # check the published bank matches the repo (public key)
 npm run db:push             # apply supabase/migrations to the linked project (supabase link first)
 npm run check               # typecheck, lint, format, validate, test, build, e2e — must pass
 
@@ -47,7 +48,7 @@ Deployment: static build in `dist/`; `vercel.json` sets the build, output, SPA f
 - Each question: stable never-reused ID (`clf-d<n>-<nnnn>`), at least one https AWS reference, an overall explanation, and an explanation for every incorrect option.
 - Single answer = exactly 4 options; multiple response = 5 or more options with 2 or more correct. No "all/none of the above".
 - Review statuses: `draft` → `unverified` (written from the cited pages, not yet re-checked; D-041) → `checked` (verified against the cited AWS pages) → `approved` (human sign-off) → `retired` (ID never reused). Only the user may set `approved`. Learning and Exam modes show `unverified`, `checked` and `approved`.
-- Every option needs an explanation, correct ones included (D-022). Questions live in `src/content/questions/d<n>-*.ts` and `src/content/questions/batches/*.ts` (compact specs via `author.ts`, references from `refs.ts`); bump `BANK_VERSION` when they change. Run `node scripts/check-duplicates.mjs 0.3` after adding questions.
+- Every option needs an explanation, correct ones included (D-022). Questions live in `src/content/questions/d<n>-*.ts` and `src/content/questions/batches/*.ts` (compact specs via `author.ts`, references from `refs.ts`); bump `BANK_VERSION` when they change, then publish them (`npm run publish:questions`): the live app only sees published questions. Run `node scripts/check-duplicates.mjs 0.3` after adding questions.
 - Note AWS's 2026–27 Support plan changes (Developer, Business and Enterprise On-Ramp end on 1 January 2027).
 - Never import scraped, dump or paid question sets (D-042). New questions must be original and marked `unverified` until checked.
 
@@ -69,7 +70,7 @@ Deployment: static build in `dist/`; `vercel.json` sets the build, output, SPA f
 ## Backend (Supabase)
 
 - `supabase/migrations/` is the schema; add a new timestamped migration for every change, never edit an applied one. Every table has RLS; user tables limit rows to `auth.uid()`; content is written only by `publish:questions`.
-- Questions are authored in the repo and published; never edit them in the database. Answers live in `question_keys`, apart from `questions`, so they can be locked for server scoring.
+- Questions are authored in the repo and published; never edit them in the database. **The app loads them at runtime** (D-046): use `useQuestionBank()` / `usePracticeQuestions()` / `useExamQuestions()` on pages under `RequireQuestions`; never import `@/content/*` in app code (lint enforces it). After changing questions: bump `BANK_VERSION`, `npm run publish:questions`, `npm run check:published`. Answers live in `question_keys`, apart from `questions`, so they can be locked for server scoring.
 - Every table carries `exam_id` for future exams; the app is still CLF-C02 only (`EXAM_ID`).
 - Sign-in (D-045): the app uses `AuthClient` (`src/backend/auth.ts`) through `useAuth()` from `src/state/AuthProvider.tsx`; never import `@supabase/supabase-js` in features. Signed-in-only routes sit under `RequireAuth` in `src/app/routes.tsx`; guests keep Learning mode, bookmarks, settings and privacy. Redirect targets go through `safeNextPath`.
 - Tests: `renderApp(path, { auth })` is signed in by default (pass `createFakeAuthClient()` for a guest). E2E specs import `test`/`expect` from `tests/e2e/support/fixtures.ts` (signed in by default; `test.use({ signedIn: false })` for guests).

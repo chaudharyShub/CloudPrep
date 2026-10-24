@@ -4,7 +4,7 @@
 
 ## 1. Overview
 
-> **Backend (D-044, in progress):** a Supabase project (Postgres, Auth, RLS) is replacing browser-only storage step by step. Schema: `supabase/migrations/`. Row types and mappers: `src/backend/`. Questions are authored in `src/content/questions/` and published with `npm run publish:questions`. Until steps 2–4 of Phase 8 are done, the sections below still describe the running app.
+> **Backend (D-044, in progress):** a Supabase project (Postgres, Auth, RLS) is replacing browser-only storage step by step. Schema: `supabase/migrations/`. Row types and mappers: `src/backend/`. Questions are authored in `src/content/questions/` and published with `npm run publish:questions`. Sign-in (D-045) and runtime question loading (D-046: `QuestionBankProvider`, `RequireQuestions`, IndexedDB cache) are in place; user data moves in step 4. Sections below that describe bundled questions or browser-only data predate this.
 
 CloudPrep is a **static single-page app**. All logic runs in the browser and all user data lives in `localStorage`. The production build is a folder of static files that can be hosted on any static host.
 

@@ -6,7 +6,7 @@ import {
   type ExamAction,
   type ExamSession,
 } from '@/domain/exam/session';
-import { EXAM_QUESTIONS, EXAM_QUESTIONS_BY_ID } from '@/state/examQuestions';
+import { EXAM_QUESTIONS, EXAM_QUESTIONS_BY_ID } from '@/test/bank';
 
 /**
  * An exam over the first `count` real exam questions (no shuffling), starting at `startedAt`.

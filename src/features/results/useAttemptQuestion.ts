@@ -1,7 +1,6 @@
 import { snapshotKey, type AttemptQuestion } from '@/domain/exam/attempt';
 import type { Question } from '@/domain/questions/types';
-import { EXAM_QUESTIONS_BY_ID } from '@/state/examQuestions';
-import { useUserData } from '@/state/hooks';
+import { useExamQuestions, useUserData } from '@/state/hooks';
 
 export type QuestionSource =
   /** The exact revision answered in the exam, from the archive. */
@@ -19,7 +18,7 @@ export type QuestionSource =
 export function resolveAttemptQuestion(
   record: Pick<AttemptQuestion, 'questionId' | 'revision'>,
   archive: Readonly<Record<string, Question>>,
-  bank: ReadonlyMap<string, Question> = EXAM_QUESTIONS_BY_ID,
+  bank: ReadonlyMap<string, Question>,
 ): { question: Question | null; source: QuestionSource } {
   const archived = archive[snapshotKey(record.questionId, record.revision)];
   if (archived) return { question: archived, source: 'snapshot' };
@@ -33,5 +32,6 @@ export function resolveAttemptQuestion(
 
 export function useAttemptQuestion(record: Pick<AttemptQuestion, 'questionId' | 'revision'>) {
   const { questionArchive } = useUserData();
-  return resolveAttemptQuestion(record, questionArchive);
+  const { byId } = useExamQuestions();
+  return resolveAttemptQuestion(record, questionArchive, byId);
 }

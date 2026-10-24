@@ -25,8 +25,13 @@ import { FULL_EXAM } from '@/domain/exam/config';
 import { DOMAINS, EXAM_GUIDE_URL } from '@/domain/exam-guide/clf-c02';
 import { practiceStats } from '@/domain/practice/progress';
 import { formatDateTime, formatPercent } from '@/lib/format';
-import { FULL_EXAM_AVAILABLE, SHORT_EXAM_CONFIG } from '@/state/examQuestions';
-import { useExamAttempts, usePracticeQuestions, useUserData } from '@/state/hooks';
+import type { ExamConfig } from '@/domain/exam/config';
+import {
+  useExamAttempts,
+  useExamQuestions,
+  usePracticeQuestions,
+  useUserData,
+} from '@/state/hooks';
 
 interface QuickAction {
   to: string;
@@ -38,8 +43,8 @@ interface QuickAction {
 const MINUTE = 60_000;
 
 /** The timed exam on offer: the full exam, or the shorter one while the bank is too small. */
-const examAction: QuickAction =
-  FULL_EXAM_AVAILABLE || !SHORT_EXAM_CONFIG
+function examAction(fullAvailable: boolean, shortConfig: ExamConfig | null): QuickAction {
+  return fullAvailable || !shortConfig
     ? {
         to: '/exam',
         title: 'Timed mock exam',
@@ -49,12 +54,12 @@ const examAction: QuickAction =
     : {
         to: '/exam',
         title: 'Timed mock exam (shorter)',
-        description: `${SHORT_EXAM_CONFIG.questionCount} questions · ${SHORT_EXAM_CONFIG.durationMs / MINUTE} minutes`,
+        description: `${shortConfig.questionCount} questions · ${shortConfig.durationMs / MINUTE} minutes`,
         icon: ClipboardCheck,
       };
+}
 
-const QUICK_ACTIONS: readonly QuickAction[] = [
-  examAction,
+const OTHER_ACTIONS: readonly QuickAction[] = [
   {
     to: '/practice',
     title: 'Learning mode',
@@ -72,6 +77,11 @@ const QUICK_ACTIONS: readonly QuickAction[] = [
 export function DashboardPage() {
   const { progress, preferences } = useUserData();
   const { questions } = usePracticeQuestions();
+  const { fullAvailable, shortConfig } = useExamQuestions();
+  const quickActions = useMemo(
+    () => [examAction(fullAvailable, shortConfig), ...OTHER_ACTIONS],
+    [fullAvailable, shortConfig],
+  );
   const stats = useMemo(() => practiceStats(progress, questions), [progress, questions]);
   const attempts = useExamAttempts();
   const latest = attempts[0];
@@ -149,7 +159,7 @@ export function DashboardPage() {
           <CardHeader title="Quick actions" />
           <CardBody>
             <ul className="flex flex-col gap-2">
-              {QUICK_ACTIONS.map((action) => {
+              {quickActions.map((action) => {
                 const Icon = action.icon;
                 return (
                   <li key={action.to}>

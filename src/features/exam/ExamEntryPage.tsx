@@ -14,14 +14,8 @@ import { FULL_EXAM, type ExamConfig } from '@/domain/exam/config';
 import { examCounts } from '@/domain/exam/session';
 import { formatClock, remainingMs } from '@/domain/exam/timer';
 import { useNow } from '@/hooks/useNow';
-import {
-  EXAM_AVAILABILITY,
-  FULL_EXAM_ALLOCATION as fullAllocation,
-  FULL_EXAM_AVAILABLE as fullAvailable,
-  SHORT_EXAM_CONFIG as shortConfig,
-} from '@/state/examQuestions';
 import { useAppStore } from '@/state/StoreProvider';
-import { useActiveExam } from '@/state/hooks';
+import { useActiveExam, useExamQuestions } from '@/state/hooks';
 import { useExamActions } from './useExamActions';
 import { IntegrityModePicker, MODE_SUMMARY } from './integrity/IntegrityModePicker';
 import type { IntegrityMode } from '@/domain/exam/integrity';
@@ -50,6 +44,7 @@ export function ExamEntryPage() {
   const navigate = useNavigate();
   const store = useAppStore();
   const activeExam = useActiveExam();
+  const { availability, fullAllocation, fullAvailable, shortConfig } = useExamQuestions();
   const { start } = useExamActions();
   const [pending, setPending] = useState<ExamConfig | null>(null);
   const [confirmAbandon, setConfirmAbandon] = useState(false);
@@ -234,7 +229,7 @@ export function ExamEntryPage() {
                     </thead>
                     <tbody>
                       {DOMAINS.map((d) => {
-                        const short = EXAM_AVAILABILITY[d.id] < fullAllocation[d.id];
+                        const short = availability[d.id] < fullAllocation[d.id];
                         return (
                           <tr key={d.id} className="border-t border-border">
                             <th scope="row" className="py-2 text-left font-normal text-fg">
@@ -246,7 +241,7 @@ export function ExamEntryPage() {
                             <td
                               className={`py-2 text-right tabular-nums ${short ? 'font-semibold text-warning' : 'text-fg'}`}
                             >
-                              {EXAM_AVAILABILITY[d.id]}
+                              {availability[d.id]}
                               {short && <span className="sr-only"> (not enough)</span>}
                             </td>
                           </tr>
@@ -266,7 +261,7 @@ export function ExamEntryPage() {
                         className="w-full"
                         disabled={inProgress}
                         onClick={() => {
-                          if (shortConfig) choose(shortConfig);
+                          choose(shortConfig);
                         }}
                       >
                         Start shorter exam

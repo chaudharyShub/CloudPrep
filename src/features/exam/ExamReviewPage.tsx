@@ -8,7 +8,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { SegmentedControl } from '@/components/ui/FormControls';
 import { answerState, examCounts } from '@/domain/exam/session';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
-import { EXAM_QUESTIONS_BY_ID } from '@/state/examQuestions';
+import { useExamQuestions } from '@/state/hooks';
 import { useAppStore } from '@/state/StoreProvider';
 import { useExamOutlet } from '@/app/layouts/ExamLayout';
 
@@ -17,6 +17,7 @@ type Filter = 'all' | 'unanswered' | 'flagged';
 /** Pre-submission review: every question's status, with filters and jump-to links. */
 export function ExamReviewPage() {
   const { exam } = useExamOutlet();
+  const { byId: examQuestionsById } = useExamQuestions();
   const store = useAppStore();
   const navigate = useNavigate();
   const [filter, setFilter] = useState<Filter>('all');
@@ -98,7 +99,7 @@ export function ExamReviewPage() {
         ) : (
           <ul className="divide-y divide-border">
             {rows.map((row) => {
-              const stem = EXAM_QUESTIONS_BY_ID.get(row.id)?.stem ?? 'Question unavailable';
+              const stem = examQuestionsById.get(row.id)?.stem ?? 'Question unavailable';
               return (
                 <li key={row.id}>
                   <button

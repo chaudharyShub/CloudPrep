@@ -9,7 +9,7 @@ import { Notice } from '@/components/ui/Notice';
 import { examCounts } from '@/domain/exam/session';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { cn } from '@/lib/cn';
-import { EXAM_QUESTIONS_BY_ID } from '@/state/examQuestions';
+import { useExamQuestions } from '@/state/hooks';
 import { useAppStore } from '@/state/StoreProvider';
 import { useExamOutlet } from '@/app/layouts/ExamLayout';
 import { OptionList } from '@/features/shared/question/OptionList';
@@ -18,6 +18,7 @@ import { selectionInstruction, toExamView } from './examView';
 
 export function ExamSessionPage() {
   const { exam } = useExamOutlet();
+  const { byId: examQuestionsById } = useExamQuestions();
   const store = useAppStore();
   const baseId = useId();
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -27,7 +28,7 @@ export function ExamSessionPage() {
   const total = exam.questionIds.length;
   const index = exam.currentIndex;
   const questionId = exam.questionIds[index] ?? '';
-  const question = EXAM_QUESTIONS_BY_ID.get(questionId);
+  const question = examQuestionsById.get(questionId);
   const view = question ? toExamView(question) : null;
   const selected = exam.answers[questionId] ?? [];
   const required = exam.requiredSelections[questionId] ?? 1;

@@ -7,8 +7,7 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Notice } from '@/components/ui/Notice';
 import { FULL_EXAM, type ExamConfig } from '@/domain/exam/config';
 import { checkInIssues, MAX_STRIKES, type CheckInIssue } from '@/domain/exam/proctor';
-import { FULL_EXAM_AVAILABLE, SHORT_EXAM_CONFIG } from '@/state/examQuestions';
-import { useActiveExam } from '@/state/hooks';
+import { useActiveExam, useExamQuestions } from '@/state/hooks';
 import { useExamActions } from '../useExamActions';
 import {
   ERROR_TEXT,
@@ -38,9 +37,13 @@ export interface CheckInState {
   kind: 'full' | 'short';
 }
 
-function examConfig(kind: CheckInState['kind'] | undefined): ExamConfig | null {
-  if (kind === 'short') return SHORT_EXAM_CONFIG;
-  return FULL_EXAM_AVAILABLE ? FULL_EXAM : SHORT_EXAM_CONFIG;
+function examConfig(
+  kind: CheckInState['kind'] | undefined,
+  fullAvailable: boolean,
+  shortConfig: ExamConfig | null,
+): ExamConfig | null {
+  if (kind === 'short') return shortConfig;
+  return fullAvailable ? FULL_EXAM : shortConfig;
 }
 
 function hasExtraDisplay(): boolean {
@@ -56,7 +59,12 @@ export function CheckInPage() {
   const navigate = useNavigate();
   const activeExam = useActiveExam();
   const { start } = useExamActions();
-  const config = examConfig((location.state as Partial<CheckInState> | null)?.kind);
+  const { fullAvailable, shortConfig } = useExamQuestions();
+  const config = examConfig(
+    (location.state as Partial<CheckInState> | null)?.kind,
+    fullAvailable,
+    shortConfig,
+  );
   const [agreed, setAgreed] = useState<boolean[]>(() => RULES.map(() => false));
   const [engine, setEngine] = useState<ProctorEngine | null>(null);
   const [clearLongEnough, setClearLongEnough] = useState(false);

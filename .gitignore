@@ -16,3 +16,4 @@ Thumbs.db
 !.env.example
 # AI proctor runtime and models (created by scripts/setup-proctor-assets.mjs)
 public/proctor/
+google_user_content.json

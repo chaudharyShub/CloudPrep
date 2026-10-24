@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { recordAnswer } from '@/domain/practice/progress';
-import { EXAM_QUESTIONS } from '@/state/examQuestions';
+import { EXAM_QUESTIONS } from '@/test/bank';
 import { examQuestion, makeAttempt, makeExam } from '@/test/exam';
 import { createMemoryDriver } from './driver';
 import { decodeArea } from './envelope';

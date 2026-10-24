@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { snapshotKey } from '@/domain/exam/attempt';
 import { indexQuestions } from '@/domain/questions/query';
 import { resolveAttemptQuestion } from '@/features/results/useAttemptQuestion';
-import { EXAM_QUESTIONS } from '@/state/examQuestions';
+import { EXAM_QUESTIONS } from '@/test/bank';
 import { examQuestion, makeAttempt, makeExam } from '@/test/exam';
 import { EXAM_ATTEMPTS_AREA, parseExamAttempt } from './attemptsArea';
 import { createMemoryDriver } from './driver';

@@ -1,8 +1,8 @@
-import { useMemo, useSyncExternalStore } from 'react';
-import { QUESTION_BANK } from '@/content/questions';
-import { indexQuestions, practiceableQuestions } from '@/domain/questions/query';
+import { useSyncExternalStore } from 'react';
 import type { Question } from '@/domain/questions/types';
 import type { StoreSnapshot, UserData } from '@/storage/store';
+import { useQuestionBank } from './QuestionBankProvider';
+import type { QuestionBank } from './questionBank';
 import { useAppStore } from './StoreProvider';
 
 function useSnapshot(): StoreSnapshot {
@@ -23,23 +23,18 @@ export function useIsBookmarked(questionId: string): boolean {
   return questionId in useUserData().bookmarks;
 }
 
-const PRACTICE_QUESTIONS = practiceableQuestions(QUESTION_BANK);
-const PRACTICE_INDEX = indexQuestions(PRACTICE_QUESTIONS);
-
-/** Questions learners may practise (checked or approved), plus a lookup by id. */
+/** Questions learners may practise, plus lookups. Pages under `RequireQuestions` only. */
 export function usePracticeQuestions(): {
   questions: readonly Question[];
   byId: ReadonlyMap<string, Question>;
   ids: ReadonlySet<string>;
 } {
-  return useMemo(
-    () => ({
-      questions: PRACTICE_QUESTIONS,
-      byId: PRACTICE_INDEX,
-      ids: new Set(PRACTICE_INDEX.keys()),
-    }),
-    [],
-  );
+  return useQuestionBank().practice;
+}
+
+/** Exam-eligible questions and which exams the bank can supply. Pages under `RequireQuestions` only. */
+export function useExamQuestions(): QuestionBank['exam'] {
+  return useQuestionBank().exam;
 }
 
 export function useActiveExam() {

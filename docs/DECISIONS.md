@@ -1,7 +1,7 @@
 # CloudPrep — Decision Log
 
 > Lightweight ADRs. Status: **Proposed** (awaiting approval) · **Accepted** · **Superseded**.
-> Last updated: 2026-10-23 (backend step 2)
+> Last updated: 2026-10-23 (backend step 3)
 
 | ID | Decision | Status |
 |---|---|---|
@@ -50,6 +50,7 @@
 | D-043 | Strict AI proctoring replaces the webcam option | Accepted |
 | D-044 | Supabase backend: one repo, questions authored in the repo and published to Postgres | Accepted |
 | D-045 | Sign-in: magic link + Google via an auth interface; guests keep Learning mode; fake sign-in for E2E builds | Accepted |
+| D-046 | Questions load from Supabase at runtime, cached in IndexedDB by bank version; the bank leaves the bundle | Accepted |
 
 ---
 
@@ -224,7 +225,7 @@ Verified on 2026-10-21: Playwright Chromium and WebKit both lack `FaceDetector`,
 The real bank is too small for a 65-question exam, so the full journey (65 unique questions in a 16 / 19 / 22 / 8 split, 90 minutes, change answers, flag and unflag, grid navigation, final review, submit and exact scoring) is tested in `src/features/exam/FullExam.test.tsx`. That test swaps in a generated bank with `vi.mock`. The shorter-exam journey runs end to end against the real bank in Playwright.
 
 ### D-041 Large generated bank with an `unverified` status
-At the user's request (2026-10-21), the bank grew from 44 to 2,000 original questions, written in batches from public AWS documentation and the CLF-C02 exam guide. They could not each be re-checked against their sources, so they use a new review status, `unverified`, between `draft` and `checked`. Unverified questions appear in Learning and Exam modes (this replaces the D-016 rule for them), and Learning mode shows a note on their feedback. Every reference URL comes from `refs.ts`, a list checked for HTTP 200 on 2026-10-21 (`scripts/check-references.mjs` re-checks it). `scripts/check-duplicates.mjs` flags near-duplicates by wording; pairs above 0.3 were rewritten or reviewed. With 400 / 600 / 753 / 247 questions per domain, the full 65-question exam is available, and the unit and E2E tests now cover it against the real bank. The "full exam unavailable" state is tested with a small mocked bank (`ExamUnavailable.test.tsx`). The bank stays in the main bundle (about 430 KB compressed); lazy loading was not added without discussion.
+At the user's request (2026-10-21), the bank grew from 44 to 2,000 original questions, written in batches from public AWS documentation and the CLF-C02 exam guide. They could not each be re-checked against their sources, so they use a new review status, `unverified`, between `draft` and `checked`. Unverified questions appear in Learning and Exam modes (this replaces the D-016 rule for them), and Learning mode shows a note on their feedback. Every reference URL comes from `refs.ts`, a list checked for HTTP 200 on 2026-10-21 (`scripts/check-references.mjs` re-checks it). `scripts/check-duplicates.mjs` flags near-duplicates by wording; pairs above 0.3 were rewritten or reviewed. With 400 / 600 / 753 / 247 questions per domain, the full 65-question exam is available, and the unit and E2E tests now cover it against the real bank. The "full exam unavailable" state is tested with a small mocked bank (`ExamUnavailable.test.tsx`). The bank stays in the main bundle (about 430 KB compressed); lazy loading was not added without discussion. (Superseded by D-046: the bank is now loaded from Supabase.)
 
 ### D-042 No imported question sets
 Public repositories with large CLF-C02 sets were reviewed (for example, nastaso/cloudcertprep and kananinirav/AWS-Certified-Cloud-Practitioner-Notes). Despite MIT labels, their questions have no documented origin and match widely circulated exam-dump questions, so none were imported. All questions in the bank are original.
@@ -264,3 +265,13 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Exam auto-submit fix:** the guard renders a skeleton while sign-in loads, so an exam that expired while the app was closed could be submitted before the exam layout mounted, and the layout then sent the learner to the exam start page instead of the results. `ExamWatcher` now waits until sign-in has loaded before submitting (so the exam layout is mounted first and redirects to the results as before), and also opens the results itself when a submission happens on an exam page.
 - **Known flaky tests (not caused by this step):** in WebKit on the dev machine, the two Learning mode E2E journeys take 18–31 s against Playwright's 30 s limit and sometimes time out. The same happens on the step 1 commit (checked 2026-10-23). The tests were not changed.
 - **Email delivery:** Supabase's built-in email service only sends to the project team's addresses and has a low hourly limit, so magic links for friends need custom SMTP (DEPLOYMENT.md). Google sign-in doesn't.
+
+### D-046 Questions from the database (Phase 8, step 3)
+- **Source:** the app downloads the exam's visible questions from Supabase (`questions` with their `question_keys` embedded, 1,000 rows per request), as a guest or signed in. Every row is rebuilt with `rowsToQuestion` and checked with `validateQuestion`; invalid rows are left out and counted. The production bundle no longer contains questions: the main chunk went from about 1.55 MB to 317 KB (uncompressed), and `dist/` contains no question IDs. An ESLint rule stops app code from importing `@/content/*`.
+- **Cache:** the downloaded bank is stored in IndexedDB (`cloudprep` / `questionBanks`, keyed by exam id) with its `bank_version`, in a versioned envelope (`parseCachedBank` validates every question). It's a copy of server data, so an unreadable entry is discarded and downloaded again, not backed up. IndexedDB rather than localStorage, because the bank (about 1.6 MB) would crowd out user data in localStorage's ~5 MB. Where IndexedDB is unavailable, an in-memory cache is used.
+- **Loading:** `QuestionBankProvider` shows the cached bank at once, then fetches `exams.bank_version` and downloads the bank only if it changed. Without a cache, pages that use questions (`RequireQuestions`: Learning mode, bookmarks, dashboard, exams, results, history, progress) show a skeleton, and on failure an error with "Try again". With a cache the app keeps working when the download fails (offline). Settings, privacy and sign-in never wait. A newer bank replaces the old one while the app is open; question IDs are stable, so sessions continue, as they did when a new deployment changed the bundled bank.
+- **Derived data:** `buildQuestionBank` computes the practice and exam sets, lookups, domain availability and the full/short exam offer once per version (these were import-time constants in `state/examQuestions.ts`, now removed). Exams record the loaded bank's version.
+- **Auto-submit:** `ExamWatcher` also waits until the bank is loaded, because scoring needs the questions (and the "expired while away" reason depends on the first check).
+- **Other sources:** E2E builds, and development without Supabase settings or with `VITE_QUESTIONS_SOURCE=local`, load the bundled bank as a separate chunk; production builds drop those branches. Tests start ready with `TEST_BANK` (`src/test/bank.ts`) or pass a loader to `renderApp`.
+- **Checking a publish:** `npm run check:published` downloads the bank with the public key through the app's own code and compares it with the repo (checked 2026-10-23: 2,000 questions, none rejected, identical, about 1–3 s).
+- **Not done here:** answers are still downloaded with the questions (server scoring is step 5), and user data still lives in the browser (step 4).

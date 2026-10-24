@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { describe, expect, it, vi } from 'vitest';
 import { isPlausibleEmail, lazyAuthClient, unavailableAuthClient, type AuthUser } from './auth';
-import { readSupabaseConfig } from './createAuthClient';
+import { readSupabaseConfig } from './supabaseClient';
 import { createFakeAuthClient, FAKE_USER } from './fakeAuth';
 import { authErrorMessage, createSupabaseAuthClient, toAuthUser } from './supabaseAuth';
 

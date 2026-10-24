@@ -26,8 +26,7 @@ import type { ExamAttempt } from '@/domain/exam/attempt';
 import { EVENT_DESCRIPTIONS } from '@/domain/exam/integrity';
 import { proctorStatus } from '@/domain/exam/proctor';
 import { formatDateTime, formatPercent } from '@/lib/format';
-import { EXAM_QUESTIONS } from '@/state/examQuestions';
-import { useExamAttempts, usePreferences } from '@/state/hooks';
+import { useExamAttempts, useExamQuestions, usePreferences } from '@/state/hooks';
 import { SESSION_PATH, sessionState } from '@/features/practice/sessionSetup';
 import { formatDuration } from './format';
 import { IntegrityReport } from './IntegrityReport';
@@ -308,6 +307,7 @@ function stepKey(step: NextStep): string {
 function NextStepItem({ step }: { step: NextStep }) {
   const navigate = useNavigate();
   const { practiceSessionLength } = usePreferences();
+  const { questions: examQuestions } = useExamQuestions();
   const limit = practiceSessionLength === 'all' ? null : Number(practiceSessionLength);
 
   const startPractice = (label: string, questionIds: string[], max: number | null) => {
@@ -343,7 +343,7 @@ function NextStepItem({ step }: { step: NextStep }) {
             onClick={() => {
               startPractice(
                 name,
-                EXAM_QUESTIONS.filter((q) => q.domain === step.domain).map((q) => q.id),
+                examQuestions.filter((q) => q.domain === step.domain).map((q) => q.id),
                 limit,
               );
             }}

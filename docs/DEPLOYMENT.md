@@ -53,12 +53,12 @@ If someone has CloudPrep open during a deployment, opening a page that hasn't lo
 
 ## Supabase (backend, D-044)
 
-The app uses Supabase for sign-in (D-045); questions and progress move there in later steps. To set up the database:
+The app uses Supabase for sign-in (D-045) and loads its questions from there (D-046); progress moves there in a later step. **The live site only shows published questions**, so publish after every question change. To set up the database:
 
 1. **Keys:** copy `.env.example` to `.env.local` and fill in the project URL and keys from the Supabase dashboard (*Project Settings → API keys*). `.env.local` is git-ignored. Never commit the secret key or give it a `VITE_` prefix.
 2. **Link the project:** `npx supabase login`, then `npx supabase link --project-ref <project-ref>` (it asks for the database password).
 3. **Create the tables:** `npm run db:push` applies `supabase/migrations/`.
-4. **Publish the questions:** `npm run publish:questions -- --dry-run` to check, then `npm run publish:questions`. Run it again whenever questions change (after bumping `BANK_VERSION`).
+4. **Publish the questions:** `npm run publish:questions -- --dry-run` to check, then `npm run publish:questions`. Run it again whenever questions change (after bumping `BANK_VERSION`), then `npm run check:published` to confirm the app receives exactly the repo's questions. Visitors get the new set on their next visit.
 5. **Check:** in the dashboard's Table Editor, `exams` has one row (`clf-c02`, `is_published` true, `bank_version` set) and `questions` has every non-draft question.
 
 ### Sign-in setup

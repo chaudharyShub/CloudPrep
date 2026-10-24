@@ -2,8 +2,13 @@ import { useState } from 'react';
 import { createBrowserRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import { createAuthClient } from '@/backend/createAuthClient';
+import { createQuestionSource } from '@/backend/createQuestionSource';
+import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
 import { ToastProvider } from '@/components/ui/Toast';
 import { AuthProvider } from '@/state/AuthProvider';
+import { QuestionBankProvider } from '@/state/QuestionBankProvider';
+import { createQuestionLoader, type QuestionLoader } from '@/state/questionLoader';
+import { createIndexedDbQuestionCache, createMemoryQuestionCache } from '@/storage/questionCache';
 import { StoreProvider } from '@/state/StoreProvider';
 import { createLocalStorageDriver, createMemoryDriver } from '@/storage/driver';
 import { createAppStore } from '@/storage/store';
@@ -18,6 +23,11 @@ import { routes } from './routes';
 export function App() {
   const [router] = useState(() => createBrowserRouter(routes));
   const [auth] = useState(createAuthClient);
+  const [questions] = useState<QuestionLoader | null>(() => {
+    const source = createQuestionSource();
+    const cache = createIndexedDbQuestionCache() ?? createMemoryQuestionCache();
+    return source ? createQuestionLoader(source, cache, EXAM_ID) : null;
+  });
   const [store] = useState(() => {
     const local = createLocalStorageDriver();
     const created = createAppStore({
@@ -33,9 +43,11 @@ export function App() {
   return (
     <StoreProvider store={store}>
       <AuthProvider client={auth}>
-        <ToastProvider>
-          <RouterProvider router={router} />
-        </ToastProvider>
+        <QuestionBankProvider loader={questions}>
+          <ToastProvider>
+            <RouterProvider router={router} />
+          </ToastProvider>
+        </QuestionBankProvider>
       </AuthProvider>
     </StoreProvider>
   );
