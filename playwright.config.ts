@@ -6,6 +6,11 @@ export default defineConfig({
   testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
+  // The longest journeys take 24-28 s in WebKit on the dev machine, too close to the
+  // default 30 s, and the first page of a run builds the question bank from scratch, which
+  // can take longer than the default 5 s per assertion (D-049).
+  timeout: 60_000,
+  expect: { timeout: 15_000 },
   retries: process.env['CI'] ? 1 : 0,
   reporter: process.env['CI'] ? 'github' : 'list',
   use: {

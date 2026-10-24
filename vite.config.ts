@@ -12,6 +12,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // Page tests load lazy route chunks and render the whole app in jsdom; with the suite
+    // running in parallel on a 4-core machine they routinely take 2-4 s, so the default
+    // 5 s limit made random tests time out (D-049). Assertions are unchanged.
+    testTimeout: 15_000,
     include: ['src/**/*.test.{ts,tsx}'],
     restoreMocks: true,
     coverage: {

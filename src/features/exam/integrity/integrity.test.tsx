@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter as RouterShim } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
 import { appendEvent, MAX_INTEGRITY_EVENTS, STANDARD_LOG } from '@/domain/exam/integrity';
@@ -145,6 +145,12 @@ describe('strict practice in the app', () => {
     store.startExam(strictExam());
     const { user } = renderApp('/exam/session', { store });
     await screen.findByRole('heading', { level: 1, name: /^Question 1 of/ });
+    // Monitoring starts in an effect, which can run just after the heading appears; it logs
+    // `monitoring-started` as it attaches its listeners.
+    await waitFor(() => {
+      const logged = store.getSnapshot().data.activeExam?.integrity.events ?? [];
+      expect(logged.map((e) => e.type)).toContain('monitoring-started');
+    });
 
     Object.defineProperty(document, 'fullscreenElement', { configurable: true, value: null });
     document.dispatchEvent(new Event('fullscreenchange'));
