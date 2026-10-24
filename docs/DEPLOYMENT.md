@@ -71,6 +71,12 @@ The app uses Supabase for sign-in (D-045) and loads its questions from there (D-
 
 Note: free-tier projects pause after about a week without activity; resume them from the dashboard.
 
+### Web Analytics (D-048)
+
+1. In the Vercel project, open *Analytics* and choose *Enable* (Web Analytics; the free tier is enough for personal use).
+2. Deploy as usual (merge the PR). The app loads Vercel's script only in production builds.
+3. **Check:** open the live site and visit a few pages, then look at *Analytics* in the Vercel dashboard; visits appear within a minute or so. Ad blockers can block the script, so test in a normal window without one. In the browser's network panel, `/_vercel/insights/script.js` should load with status 200.
+
 ## Other static hosts
 
 Any static host works if it can serve `index.html` for unknown paths:

@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { assessReadiness, countedAttempts } from '@/domain/analytics/readiness';
 import { buildAttempt } from '@/domain/exam/attempt';
@@ -31,8 +31,13 @@ describe('proctored exam in the app', () => {
     expect(screen.queryByRole('heading', { name: /^Question 1 of/ })).not.toBeInTheDocument();
     expect(screen.getByRole('timer')).toBeVisible(); // the timer keeps running
     expect(screen.getByRole('button', { name: 'Restart proctor and continue' })).toBeEnabled();
-    const types = store.getSnapshot().data.activeExam?.integrity.events.map((e) => e.type);
-    expect(types?.filter((t) => t === 'proctor-resumed')).toHaveLength(1);
+    // Logged by an effect, which can run just after the heading appears.
+    const loggedTypes = () =>
+      store.getSnapshot().data.activeExam?.integrity.events.map((e) => e.type);
+    await waitFor(() => {
+      expect(loggedTypes()?.filter((t) => t === 'proctor-resumed')).toHaveLength(1);
+    });
+    const types = loggedTypes();
     expect(types?.indexOf('proctor-resumed')).toBeGreaterThan(
       types?.indexOf('proctor-started') ?? 0,
     );

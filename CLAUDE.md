@@ -26,7 +26,7 @@ npm run check               # typecheck, lint, format, validate, test, build, e2
 # First-time E2E setup: npx playwright install chromium webkit
 ```
 
-Deployment: static build in `dist/`; `vercel.json` sets the build, output, SPA fallback (everything except `/assets/*`) and asset caching. `index.html` has a tiny inline script that applies the saved theme before first paint. Keep it in sync with `src/lib/theme.ts` and the preferences storage key.
+Deployment: static build in `dist/`; Vercel Web Analytics is mounted in `src/main.tsx` for production builds only (D-048); `vercel.json` sets the build, output, SPA fallback (everything except `/assets/*` and Vercel's `/_vercel/*`) and asset caching. `index.html` has a tiny inline script that applies the saved theme before first paint. Keep it in sync with `src/lib/theme.ts` and the preferences storage key.
 
 ## Hard rules
 
