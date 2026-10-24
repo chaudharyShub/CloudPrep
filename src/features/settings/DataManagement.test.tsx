@@ -1,6 +1,7 @@
 import { screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyTheme } from '@/lib/theme';
+import { createFakeAuthClient } from '@/backend/fakeAuth';
 import { buildExport } from '@/storage/transfer';
 import { createTestStore, renderApp } from '@/test/renderApp';
 
@@ -64,9 +65,15 @@ describe('settings', () => {
     expect(screen.getByRole('button', { name: 'Restore default settings' })).toBeDisabled();
   });
 
-  it('explains that data stays in this browser', async () => {
-    await openSettings();
+  it("explains that a guest's data stays in this browser", async () => {
+    renderApp('/settings', { auth: createFakeAuthClient() });
+    await screen.findByRole('heading', { level: 1, name: 'Settings' });
     expect(screen.getByText(/exist only in this browser on this device/)).toBeVisible();
+  });
+
+  it("AC-B.22 explains that a signed-in user's data is saved to the account", async () => {
+    await openSettings();
+    expect(screen.getByText(/saved to your account and follow you to every device/)).toBeVisible();
   });
 });
 

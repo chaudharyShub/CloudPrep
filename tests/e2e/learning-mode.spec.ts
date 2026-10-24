@@ -145,14 +145,19 @@ test('practice pages fit a phone screen', async ({ page }) => {
 
 test('recovers from corrupted saved progress without crashing', async ({ page }) => {
   await page.goto('/practice');
+  // Signed in, saved data is the account's copy in this browser (D-047). Wait until sign-in
+  // has created it: data found without an owner is removed.
+  await page.waitForFunction(() => window.localStorage.getItem('cloudprep-account:owner') !== null);
   await page.evaluate(() => {
-    window.localStorage.setItem('cloudprep:progress', '{not valid json');
+    window.localStorage.setItem('cloudprep-account:cloudprep:progress', '{not valid json');
   });
   await page.goto('/practice');
   await expect(page.getByText(/Some saved practice progress couldn't be read/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Start practice' })).toBeEnabled();
   const backups = await page.evaluate(() =>
-    Object.keys(window.localStorage).filter((key) => key.startsWith('cloudprep:backup:progress:')),
+    Object.keys(window.localStorage).filter((key) =>
+      key.startsWith('cloudprep-account:cloudprep:backup:progress:'),
+    ),
   );
   expect(backups).toHaveLength(1);
 });

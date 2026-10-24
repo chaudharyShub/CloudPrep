@@ -51,6 +51,7 @@
 | D-044 | Supabase backend: one repo, questions authored in the repo and published to Postgres | Accepted |
 | D-045 | Sign-in: magic link + Google via an auth interface; guests keep Learning mode; fake sign-in for E2E builds | Accepted |
 | D-046 | Questions load from Supabase at runtime, cached in IndexedDB by bank version; the bank leaves the bundle | Accepted |
+| D-047 | Signed-in users' data syncs to Supabase from a local copy; guest data stays separate and is added only on request | Accepted |
 | D-048 | Vercel Web Analytics for page views, production builds only | Accepted |
 
 ---
@@ -278,10 +279,22 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Checking a publish:** `npm run check:published` downloads the bank with the public key through the app's own code and compares it with the repo (checked 2026-10-23: 2,000 questions, none rejected, identical, about 1–3 s).
 - **Not done here:** answers are still downloaded with the questions (server scoring is step 5), and user data still lives in the browser (step 4).
 
+### D-047 Progress in the database (Phase 8, step 4)
+- **Local copy, synced:** for signed-in users the store keeps working on a copy in this browser (so pages stay synchronous, fast and usable offline), and `src/storage/sync.ts` keeps it in step with the user tables. Each local change marks the records it touched (question ids, session or attempt ids, the exam in progress, settings) as pending. Pending records are sent after a short wait (800 ms, so bursts go together), retried with back-off (2 s up to 60 s) and when the browser comes back online, and the pending list is saved in the browser so changes made offline or just before closing the tab are sent later. Values are read from the store at send time, so the list holds only keys.
+- **Downloads:** on sign-in, when the browser comes back online, and when the tab is shown after a minute or more, the engine sends pending changes and then replaces the copy with the server's data, but only if nothing is pending, and it discards a download if a change was made meanwhile. Server data goes through the same parsers as browser storage; invalid rows are left out. If the same account is changed on two devices at once, the last write per record wins.
+- **Guest data stays separate (user's choice, 2026-10-24):** guest data keeps the original `cloudprep:` keys. The account copy lives under `cloudprep-account:` (a scoped driver, `createScopedDriver`) with an owner record `{userId, signedIn}`. Opening another user's copy removes the previous one. On sign-out the copy is removed once everything is on the server; unsent changes are kept (marked signed out, never shown early) and sent at the next sign-in. While sign-in loads, the copy of a user who hasn't signed out is shown at once.
+- **Adding guest data (user's choice):** after signing in on a browser with guest progress, bookmarks, sessions or exams, the user is asked once per account ("Add to my account" / "Not now"); Settings offers it again. Adding merges with the existing import rules (`mergeData`) after a local backup; guest data is left as it is.
+- **Settings act on the account (user's choice):** for signed-in users, clearing and resetting delete the account's rows on every device (an emptied area is sent as one "clear"). Export, import and recovery backups work on the account copy. The account card shows whether changes are saved or waiting.
+- **Sign-out:** waits up to 5 s for pending changes to be sent (the server only accepts them while signed in), then signs out; if they couldn't be sent it says so.
+- **Not synced:** the question archive (D-031) stays local, so on a new device an attempt taken with an older question revision is reviewed with the current one, with the existing note. The integrity log is synced with its attempt (only `{type, at}`).
+- **Server code:** `src/backend/userRows.ts` (row mappers), `userDataRemote.ts` (`UserDataRemote` over a small `UserTables` interface, with a Supabase implementation that pages by primary key) and `fakeUserTables.ts` (tests, and E2E builds when a test sets `sync`). No migration was needed: the step 1 tables already fit. `schema.test.ts` runs the real sync against the migrations in PGlite (constraints, conflict keys, RLS, round trip).
+- **Without a server** (E2E builds by default, development without Supabase settings) the account copy simply stays in the browser.
+- **Theme before first paint:** `index.html` reads the account copy's settings when its owner is signed in, otherwise the guest's.
+- **Tests:** `renderApp` uses one store for guests and accounts unless a test passes real accounts. E2E specs that seed storage while signed in use the `cloudprep-account:` keys and wait for the copy to exist.
+
 ### D-048 Page-view analytics (Vercel Web Analytics)
 - **Requested by the user (2026-10-24):** to see how the shared site is used. `@vercel/analytics` (`<Analytics />` from `@vercel/analytics/react`) is mounted in `src/main.tsx`, outside `App`, and only when `import.meta.env.MODE === 'production'`, so development and E2E builds load and send nothing. It follows React Router's history changes on its own.
 - **What it collects:** page views (URL path), referrer, country, browser, operating system and device type. No cookies; Vercel tells visitors apart with a hash that changes daily. App data (answers, progress, results, account details) is never sent. The privacy page has a "Usage statistics" section.
 - **Hosting:** the script and its endpoint are served by Vercel under `/_vercel/insights/`; the SPA rewrite in `vercel.json` now leaves `/_vercel/*` alone. Web Analytics must be enabled once in the Vercel project (*Analytics → Enable*); until then the script isn't served and nothing is collected.
 - **Deployment:** through the usual Git flow (merge the PR; Vercel deploys `master`), not `vercel --prod` from a local folder.
-- (D-047 is the Phase 8 step 4 decision on its own branch.)
 

@@ -7,11 +7,13 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     title: 'Where your data lives',
     body: (
       <>
-        Your progress, exam history, settings and any integrity logs are currently stored only in
-        this browser on this device, and clearing your browsing data removes them. If you sign in,
-        your email address (and your name, with Google) is stored by Supabase, the service that runs
-        CloudPrep&apos;s accounts, so you can sign in again. Saving progress to your account is
-        planned; this page will say so when it happens.
+        Without signing in, your progress, exam history, settings and any integrity logs are stored
+        only in this browser on this device, and clearing your browsing data removes them. If you
+        sign in, they&apos;re saved to your account with Supabase, the service that runs
+        CloudPrep&apos;s accounts and database, along with your email address (and your name, with
+        Google). Only you can read your account&apos;s data. This browser also keeps a copy while
+        you&apos;re signed in, which is removed when you sign out. Data from before you signed in is
+        added to your account only if you choose to.
       </>
     ),
   },
@@ -108,7 +110,9 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
         >
           Settings
         </Link>
-        .
+        . When you&apos;re signed in, these delete the data from your account on every device. To
+        delete the account itself (your sign-in details and everything saved with it), ask the
+        person who shared CloudPrep with you.
       </>
     ),
   },

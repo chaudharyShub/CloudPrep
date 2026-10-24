@@ -9,13 +9,28 @@ import { ToastProvider } from '@/components/ui/Toast';
 import { AuthProvider } from '@/state/AuthProvider';
 import { QuestionBankProvider } from '@/state/QuestionBankProvider';
 import type { QuestionLoader } from '@/state/questionLoader';
-import { StoreProvider } from '@/state/StoreProvider';
+import type { AccountManager } from '@/state/accounts';
+import { UserDataProvider } from '@/state/UserDataProvider';
 import { createMemoryDriver } from '@/storage/driver';
 import { createAppStore, type AppStore } from '@/storage/store';
 import { TEST_BANK } from './bank';
 
 export function createTestStore(initial: Record<string, string> = {}): AppStore {
   return createAppStore({ driver: createMemoryDriver(initial), persistent: true });
+}
+
+/**
+ * Accounts that all use `store`, without a server, so a test's data shows whether it
+ * runs signed in or as a guest. Tests of sync and guest data pass real accounts instead.
+ */
+export function singleStoreAccounts(store: AppStore): AccountManager {
+  return {
+    owner: () => null,
+    open: (userId) => ({ userId, store, sync: null }),
+    close: () => undefined,
+    wasAskedToImport: () => true,
+    markAskedToImport: () => undefined,
+  };
 }
 
 /**
@@ -30,11 +45,14 @@ export function renderApp(
     state,
     auth = createFakeAuthClient({ user: FAKE_USER }),
     questions,
+    accounts = singleStoreAccounts(store),
   }: {
     store?: AppStore;
     state?: unknown;
     auth?: AuthClient;
     questions?: QuestionLoader | null;
+    /** Signed-in users' data; defaults to `store` too. */
+    accounts?: AccountManager;
   } = {},
 ) {
   const router = createMemoryRouter(routes, {
@@ -42,8 +60,8 @@ export function renderApp(
   });
   const user = userEvent.setup();
   const result = render(
-    <StoreProvider store={store}>
-      <AuthProvider client={auth}>
+    <AuthProvider client={auth}>
+      <UserDataProvider guestStore={store} accounts={accounts}>
         <QuestionBankProvider
           loader={questions ?? null}
           {...(questions === undefined ? { initialBank: TEST_BANK } : {})}
@@ -52,8 +70,8 @@ export function renderApp(
             <RouterProvider router={router} />
           </ToastProvider>
         </QuestionBankProvider>
-      </AuthProvider>
-    </StoreProvider>,
+      </UserDataProvider>
+    </AuthProvider>,
   );
   return { ...result, router, store, user, auth };
 }

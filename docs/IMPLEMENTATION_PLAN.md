@@ -17,7 +17,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | QA pass | Journeys A–G, responsive and accessibility checks, defect fixes | Done |
 | Release preparation | P9: visual clean-up, Vercel configuration, performance review, README / DEPLOYMENT / KNOWN_LIMITATIONS | Done (deployment itself is a manual step) |
 | Phase 7: AI proctoring | Strict AI-proctored exam mode replacing the built-in FaceDetector webcam option (D-043); acceptance criteria below | Done (awaiting review) |
-| Phase 8: backend (Supabase, D-044–D-046) | Step 1: schema, RLS, publish script. Step 2: sign-in. Step 3: questions from the database, cached in IndexedDB. Steps 4–5 (progress in the database, server scoring) not started | Steps 1–3 done (awaiting review) |
+| Phase 8: backend (Supabase, D-044–D-047) | Step 1: schema, RLS, publish script. Step 2: sign-in. Step 3: questions from the database, cached in IndexedDB. Step 4: signed-in users' data synced to the database. Step 5 (server scoring) not started | Steps 1–4 done (awaiting review) |
 | Not started | P4 (welcome/onboarding), attempt-to-attempt comparison view, C2–C3 content (more questions) | — |
 
 Changes from the original plan so far:
@@ -279,7 +279,7 @@ Decision: D-044. Steps:
 1. **Foundation (done):** Supabase CLI and `supabase/` folder, schema migration with RLS and grants, `npm run publish:questions`.
 2. **Auth (done):** email magic link and Google sign-in, account in the navigation and Settings, signed-in-only pages. Guests keep Learning mode, bookmarks and settings.
 3. **Questions from the database (done):** the app loads one exam's bank from Supabase and caches it by `bank_version`; the bank leaves the bundle.
-4. **Progress in the database:** remote repositories behind `src/storage/`, a local copy of the exam in progress, and a one-time import of local data on first sign-in.
+4. **Progress in the database (done, D-047):** signed-in users' data syncs from a local copy, kept apart from guest data; guest data is added to the account on request.
 5. **Later:** server scoring (lock `question_keys`), then the multi-exam UI.
 
 Step 1 acceptance criteria (tests are tagged `AC-B.x`, because AC-8.x belongs to P8):
@@ -303,6 +303,15 @@ Step 3 acceptance criteria:
 - AC-B.14 Pages that use questions wait for the first download and show an error with "Try again" if it fails. With a cached bank they keep working when the download fails. Without a question source the site says so; settings still open.
 - AC-B.15 An exam is only submitted (including an expired one found on load) once the questions are loaded, and it records the loaded bank's version.
 - AC-B.16 `npm run check:published` confirms that the published questions match the repo.
+
+Step 4 acceptance criteria:
+- AC-B.18 Signed-in users' practice progress, bookmarks, practice sessions, exam attempts (with integrity logs), the exam in progress and settings are saved to their account: changes are sent shortly after they happen (bursts together), and signing in on another device shows the same data.
+- AC-B.19 Changes that can't be sent (offline, server errors) are kept, also across reloads, retried, and sent later. A download never overwrites changes that aren't on the server yet.
+- AC-B.20 Guest data and the account's copy are kept apart: signed in, pages show the account's data; after signing out they show the guest's again, and the copy is removed once everything is saved (otherwise kept, without being shown). Another user's copy is never shown.
+- AC-B.21 After signing in on a browser with guest data, the user is asked once whether to add it to the account; "Add to my account" merges it, "Not now" adds nothing and Settings offers it again. Guest data is left as it is. Guests, and browsers without guest data, aren't asked.
+- AC-B.22 For signed-in users, Settings explains that data is saved to the account and shows whether changes are saved or waiting; clearing and resetting delete the data from the account on every device.
+- AC-B.23 Data read from the server is validated like browser storage, and invalid rows are left out. The rows sync writes are accepted by the database schema and read back unchanged.
+- AC-B.24 The exam in progress is saved in the browser on every action and to the account, and removed from the account once submitted. Signing out sends unsaved changes first.
 
 Follow-up to step 2 (D-045):
 - AC-B.17 Email sign-in is offered only when `VITE_EMAIL_SIGN_IN` is `true`; otherwise the sign-in page offers Google alone.

@@ -162,9 +162,10 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
   await page.getByRole('button', { name: 'Bookmark' }).click();
 
   // Rewrite saved data in the version 1 formats (attempts without summaries, full settings).
+  // Signed in, it is the account's copy in this browser (D-047).
   await page.evaluate(() => {
     type Q = { outcome: string } & Record<string, unknown>;
-    const key = 'cloudprep:examAttempts';
+    const key = 'cloudprep-account:cloudprep:examAttempts';
     const stored = JSON.parse(window.localStorage.getItem(key) ?? '{}') as {
       data: ({ questions: Q[] } & Record<string, unknown>)[];
     };
@@ -184,7 +185,7 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
       JSON.stringify({ app: 'cloudprep', schemaVersion: 1, savedAt: 'x', data: v1 }),
     );
     window.localStorage.setItem(
-      'cloudprep:preferences',
+      'cloudprep-account:cloudprep:preferences',
       JSON.stringify({
         app: 'cloudprep',
         schemaVersion: 1,

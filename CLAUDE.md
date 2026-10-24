@@ -1,12 +1,12 @@
 # CLAUDE.md — CloudPrep
 
-CloudPrep is an unofficial AWS Certified Cloud Practitioner (CLF-C02) exam simulator. It is built with React + TypeScript (strict) + Vite + Tailwind v4 + React Router. It is moving to a Supabase backend (D-044). Sign-in works (D-045) and questions load from the database (D-046); until step 4 lands, user data is still stored in localStorage. It is for personal use and is shared with friends as a static site.
+CloudPrep is an unofficial AWS Certified Cloud Practitioner (CLF-C02) exam simulator. It is built with React + TypeScript (strict) + Vite + Tailwind v4 + React Router. It is moving to a Supabase backend (D-044). Sign-in works (D-045), questions load from the database (D-046), and signed-in users' data syncs to it from a local copy (D-047); guests keep using localStorage. It is for personal use and is shared with friends as a static site.
 
 **Read first:** `docs/PRODUCT_SPEC.md`, `docs/ARCHITECTURE.md`, `docs/IMPLEMENTATION_PLAN.md`, `docs/TEST_PLAN.md`, `docs/DECISIONS.md`.
 
 ## Current status
 
-All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring, awaiting review) and steps 1–3 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script; D-045: sign-in; D-046: questions from the database). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
+All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring, awaiting review) and steps 1–4 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script; D-045: sign-in; D-046: questions from the database; D-047: progress in the database). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
 
 ## Commands
 
@@ -82,6 +82,8 @@ Deployment: static build in `dist/`; Vercel Web Analytics is mounted in `src/mai
 - Never write question text into attempts; use the question archive (D-031).
 - Settings: read `data.preferences` (effective values) and write with `store.setPreferences`. Defaults live in `DEFAULT_PREFERENCES` (D-034).
 - Record parsers must skip unsafe keys (`isSafeKey`).
+- Two stores share localStorage (D-047): guest data under `cloudprep:`, the signed-in account's copy under `cloudprep-account:` (owner record, removed on sign-out once synced). `UserDataProvider` swaps the store behind `useAppStore()`; keep using it. Every change made through a store method is synced by `src/storage/sync.ts`; data from the server goes through `applyRemote` and the same parsers. A new synced area needs entries in `SYNCED_AREAS`/`ITEMS` (sync.ts), mappers in `src/backend/userRows.ts`, push/pull in `userDataRemote.ts`, and a schema test.
+- Tests: `renderApp` uses one store for guests and accounts; pass `accounts` (`createAccountManager` with `createFakeUserTables`) to test sync or guest data. E2E specs that seed storage while signed in use `cloudprep-account:` keys; `test.use({ sync: true })` adds a fake server.
 
 ## Practice integrity
 

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Outlet, ScrollRestoration } from 'react-router';
+import { GuestDataPrompt } from '@/features/auth/GuestDataPrompt';
 import { ExamWatcher } from '@/features/exam/ExamWatcher';
 import { applyMotion, applyTheme, resolveTheme, systemPrefersLight } from '@/lib/theme';
 import { usePreferences } from '@/state/hooks';
@@ -29,6 +30,7 @@ export function RootLayout() {
   return (
     <>
       <ExamWatcher />
+      <GuestDataPrompt />
       <Outlet />
       <ScrollRestoration />
     </>

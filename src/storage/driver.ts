@@ -9,6 +9,35 @@ export interface StorageDriver {
   setItem(key: string, value: string): void;
   removeItem(key: string): void;
   keys(): string[];
+  /**
+   * Maps a key from a browser `storage` event to this driver's own key, or null if the key
+   * isn't one of its own. Drivers without it see every key as their own.
+   */
+  ownKey?(physicalKey: string): string | null;
+}
+
+/**
+ * A driver that keeps its keys under `prefix` in `base`, so two stores can share one
+ * localStorage (guest data and the signed-in account's copy, D-047).
+ */
+export function createScopedDriver(base: StorageDriver, prefix: string): StorageDriver {
+  return {
+    kind: base.kind,
+    getItem: (key) => base.getItem(prefix + key),
+    setItem: (key, value) => {
+      base.setItem(prefix + key, value);
+    },
+    removeItem: (key) => {
+      base.removeItem(prefix + key);
+    },
+    keys: () =>
+      base
+        .keys()
+        .filter((key) => key.startsWith(prefix))
+        .map((key) => key.slice(prefix.length)),
+    ownKey: (physicalKey) =>
+      physicalKey.startsWith(prefix) ? physicalKey.slice(prefix.length) : null,
+  };
 }
 
 export function createMemoryDriver(initial: Record<string, string> = {}): StorageDriver {

@@ -143,11 +143,13 @@ test('warns when time is low and submits automatically at zero', async ({ page }
   await expect(
     page.getByText('The exam was submitted automatically when the timer reached zero.'),
   ).toBeVisible();
-  // Only one attempt was stored.
+  // Only one attempt was stored (in the signed-in account's copy, D-047).
   const attempts = await page.evaluate(
     () =>
       (
-        JSON.parse(window.localStorage.getItem('cloudprep:examAttempts') ?? '{}') as {
+        JSON.parse(
+          window.localStorage.getItem('cloudprep-account:cloudprep:examAttempts') ?? '{}',
+        ) as {
           data: unknown[];
         }
       ).data.length,
