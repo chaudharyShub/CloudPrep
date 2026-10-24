@@ -304,6 +304,9 @@ Step 3 acceptance criteria:
 - AC-B.15 An exam is only submitted (including an expired one found on load) once the questions are loaded, and it records the loaded bank's version.
 - AC-B.16 `npm run check:published` confirms that the published questions match the repo.
 
+Follow-up to step 2 (D-045):
+- AC-B.17 Email sign-in is offered only when `VITE_EMAIL_SIGN_IN` is `true`; otherwise the sign-in page offers Google alone.
+
 ## P10 — Optional features (v1.x, pick à la carte)
 
 | Feature | Notes |

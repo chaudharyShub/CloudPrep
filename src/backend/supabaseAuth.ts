@@ -26,9 +26,13 @@ function result(error: AuthError | null): AuthResult {
   return error ? { ok: false, message: authErrorMessage(error) } : { ok: true };
 }
 
-export function createSupabaseAuthClient(supabase: SupabaseClient): AuthClient {
+export function createSupabaseAuthClient(
+  supabase: SupabaseClient,
+  options: { emailSignIn: boolean },
+): AuthClient {
   return {
     available: true,
+    emailSignIn: options.emailSignIn,
     async getUser() {
       // Reads the saved session (waiting for any sign-in in the URL). Data access is still
       // checked by the server, which verifies the token on every request.

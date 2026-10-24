@@ -17,6 +17,8 @@ export interface FakeAuthOptions {
   persist?: (user: AuthUser | null) => void;
   /** Called instead of leaving for Google; defaults to signing in immediately. */
   onGoogle?: (redirectTo: string) => void;
+  /** Shows the email sign-in form (default true). */
+  emailSignIn?: boolean;
   /** Makes every call fail with this message. */
   failWith?: string;
 }
@@ -41,6 +43,7 @@ export function createFakeAuthClient(options: FakeAuthOptions = {}): FakeAuthCli
 
   return {
     available: true,
+    emailSignIn: options.emailSignIn ?? true,
     calls,
     setUser,
     getUser: () => Promise.resolve(user),

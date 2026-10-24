@@ -79,6 +79,16 @@ describe('sign-in', () => {
     expect(screen.getByLabelText('Email address')).toBeVisible();
   });
 
+  it('AC-B.17 offers only Google when email sign-in is switched off', async () => {
+    const { user } = renderApp('/sign-in', { auth: createFakeAuthClient({ emailSignIn: false }) });
+    expect(await screen.findByRole('button', { name: 'Continue with Google' })).toBeVisible();
+    expect(screen.queryByLabelText('Email address')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Email me a sign-in link' })).toBeNull();
+    expect(screen.getByText(/Sign in with your Google account/)).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Continue with Google' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
+  });
+
   it('AC-B.7 shows why a link could not be sent', async () => {
     const { user } = renderApp('/sign-in', {
       auth: createFakeAuthClient({ failWith: 'Too many sign-in attempts.' }),

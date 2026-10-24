@@ -19,6 +19,7 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 
 ## Accounts
 
+- Email sign-in is switched off until custom SMTP is set up (D-045); the site offers Google only.
 - Sign-in links work once, expire after an hour, and only in the browser that asked for them. Opening the email on another device won't sign you in there; request a link on that device instead, or use Google.
 - Signing in doesn't move your data yet: progress, exam history and settings stay in this browser and are shared by everyone who uses it, signed in or not. Saving them to your account is the next step.
 - Mock exams, the dashboard, exam history and progress need an account; Learning mode, bookmarks and settings don't.

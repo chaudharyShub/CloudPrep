@@ -1,4 +1,4 @@
-import { lazyAuthClient, unavailableAuthClient, type AuthClient } from './auth';
+import { lazyAuthClient, readEmailSignIn, unavailableAuthClient, type AuthClient } from './auth';
 import { getSupabase, readSupabaseConfig } from './supabaseClient';
 
 /**
@@ -7,15 +7,22 @@ import { getSupabase, readSupabaseConfig } from './supabaseClient';
  */
 export function createAuthClient(): AuthClient {
   if (import.meta.env.MODE === 'e2e') {
-    return lazyAuthClient(async () => (await import('./fakeAuth')).createE2EAuthClient());
+    // E2E builds keep email sign-in on so its flow stays covered.
+    return lazyAuthClient(async () => (await import('./fakeAuth')).createE2EAuthClient(), {
+      emailSignIn: true,
+    });
   }
   const config = readSupabaseConfig(import.meta.env);
   if (!config) return unavailableAuthClient;
-  return lazyAuthClient(async () => {
-    const [supabase, { createSupabaseAuthClient }] = await Promise.all([
-      getSupabase(config),
-      import('./supabaseAuth'),
-    ]);
-    return createSupabaseAuthClient(supabase);
-  });
+  const emailSignIn = readEmailSignIn(import.meta.env);
+  return lazyAuthClient(
+    async () => {
+      const [supabase, { createSupabaseAuthClient }] = await Promise.all([
+        getSupabase(config),
+        import('./supabaseAuth'),
+      ]);
+      return createSupabaseAuthClient(supabase, { emailSignIn });
+    },
+    { emailSignIn },
+  );
 }

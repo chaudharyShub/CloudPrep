@@ -56,7 +56,11 @@ export function SignInPage() {
     <>
       <PageHeader
         title="Sign in"
-        description="Sign in with a link sent to your email, or with Google. There's no password."
+        description={
+          client.emailSignIn
+            ? "Sign in with a link sent to your email, or with Google. There's no password."
+            : "Sign in with your Google account. There's no password."
+        }
       />
 
       <div className="flex max-w-prose flex-col gap-6">
@@ -74,7 +78,7 @@ export function SignInPage() {
         ) : (
           <Card>
             <CardBody className="flex flex-col gap-6">
-              {sentTo ? (
+              {!client.emailSignIn ? null : sentTo ? (
                 <div role="status" className="flex flex-col items-start gap-4">
                   <Notice tone="success" title="Check your email">
                     We sent a sign-in link to <strong className="text-fg">{sentTo}</strong>. Open it
@@ -125,11 +129,13 @@ export function SignInPage() {
                 </form>
               )}
 
-              <div className="flex items-center gap-3 text-sm text-fg-subtle" aria-hidden="true">
-                <span className="h-px flex-1 bg-border" />
-                or
-                <span className="h-px flex-1 bg-border" />
-              </div>
+              {client.emailSignIn && (
+                <div className="flex items-center gap-3 text-sm text-fg-subtle" aria-hidden="true">
+                  <span className="h-px flex-1 bg-border" />
+                  or
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+              )}
 
               <div className="flex flex-col items-start gap-3">
                 <Button

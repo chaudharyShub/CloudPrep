@@ -1,6 +1,12 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { describe, expect, it, vi } from 'vitest';
-import { isPlausibleEmail, lazyAuthClient, unavailableAuthClient, type AuthUser } from './auth';
+import {
+  isPlausibleEmail,
+  lazyAuthClient,
+  readEmailSignIn,
+  unavailableAuthClient,
+  type AuthUser,
+} from './auth';
 import { readSupabaseConfig } from './supabaseClient';
 import { createFakeAuthClient, FAKE_USER } from './fakeAuth';
 import { authErrorMessage, createSupabaseAuthClient, toAuthUser } from './supabaseAuth';
@@ -9,7 +15,7 @@ describe('auth client', () => {
   it('AC-B.11 loads the real client once, on first use', async () => {
     const real = createFakeAuthClient({ user: FAKE_USER });
     const load = vi.fn(() => Promise.resolve(real));
-    const client = lazyAuthClient(load);
+    const client = lazyAuthClient(load, { emailSignIn: true });
     expect(load).not.toHaveBeenCalled();
     expect(await client.getUser()).toEqual(FAKE_USER);
     await client.signOut();
@@ -19,7 +25,7 @@ describe('auth client', () => {
 
   it('stops listening even when unsubscribed before the client has loaded', async () => {
     const real = createFakeAuthClient();
-    const client = lazyAuthClient(() => Promise.resolve(real));
+    const client = lazyAuthClient(() => Promise.resolve(real), { emailSignIn: true });
     const listener = vi.fn();
     const unsubscribe = client.onChange(listener);
     unsubscribe();
@@ -47,6 +53,17 @@ describe('auth client', () => {
     ).toEqual({ url: 'https://x.supabase.co', publishableKey: 'k' });
     expect(unavailableAuthClient.available).toBe(false);
     expect(await unavailableAuthClient.sendMagicLink('a@b.co', '/')).toMatchObject({ ok: false });
+  });
+
+  it('AC-B.17 email sign-in is off unless VITE_EMAIL_SIGN_IN is true', () => {
+    expect(readEmailSignIn({})).toBe(false);
+    expect(readEmailSignIn({ VITE_EMAIL_SIGN_IN: 'false' })).toBe(false);
+    expect(readEmailSignIn({ VITE_EMAIL_SIGN_IN: '1' })).toBe(false);
+    expect(readEmailSignIn({ VITE_EMAIL_SIGN_IN: 'true' })).toBe(true);
+    expect(
+      lazyAuthClient(() => Promise.reject(new Error('unused')), { emailSignIn: false }),
+    ).toMatchObject({ available: true, emailSignIn: false });
+    expect(unavailableAuthClient.emailSignIn).toBe(false);
   });
 
   it('checks the basic shape of an email address', () => {
@@ -82,7 +99,7 @@ describe('Supabase auth client', () => {
 
   it('AC-B.7 AC-B.8 passes the callback URL to magic links and Google', async () => {
     const { supabase, auth } = fakeSupabase();
-    const client = createSupabaseAuthClient(supabase);
+    const client = createSupabaseAuthClient(supabase, { emailSignIn: true });
     expect(await client.getUser()).toEqual<AuthUser>({ id: 'u1', email: 'a@b.co', name: 'Ada' });
 
     expect(await client.sendMagicLink(' a@b.co ', 'https://app/auth/callback')).toEqual({
