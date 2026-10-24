@@ -51,6 +51,7 @@
 | D-044 | Supabase backend: one repo, questions authored in the repo and published to Postgres | Accepted |
 | D-045 | Sign-in: magic link + Google via an auth interface; guests keep Learning mode; fake sign-in for E2E builds | Accepted |
 | D-046 | Questions load from Supabase at runtime, cached in IndexedDB by bank version; the bank leaves the bundle | Accepted |
+| D-048 | Vercel Web Analytics for page views, production builds only | Accepted |
 
 ---
 
@@ -276,3 +277,11 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Other sources:** E2E builds, and development without Supabase settings or with `VITE_QUESTIONS_SOURCE=local`, load the bundled bank as a separate chunk; production builds drop those branches. Tests start ready with `TEST_BANK` (`src/test/bank.ts`) or pass a loader to `renderApp`.
 - **Checking a publish:** `npm run check:published` downloads the bank with the public key through the app's own code and compares it with the repo (checked 2026-10-23: 2,000 questions, none rejected, identical, about 1–3 s).
 - **Not done here:** answers are still downloaded with the questions (server scoring is step 5), and user data still lives in the browser (step 4).
+
+### D-048 Page-view analytics (Vercel Web Analytics)
+- **Requested by the user (2026-10-24):** to see how the shared site is used. `@vercel/analytics` (`<Analytics />` from `@vercel/analytics/react`) is mounted in `src/main.tsx`, outside `App`, and only when `import.meta.env.MODE === 'production'`, so development and E2E builds load and send nothing. It follows React Router's history changes on its own.
+- **What it collects:** page views (URL path), referrer, country, browser, operating system and device type. No cookies; Vercel tells visitors apart with a hash that changes daily. App data (answers, progress, results, account details) is never sent. The privacy page has a "Usage statistics" section.
+- **Hosting:** the script and its endpoint are served by Vercel under `/_vercel/insights/`; the SPA rewrite in `vercel.json` now leaves `/_vercel/*` alone. Web Analytics must be enabled once in the Vercel project (*Analytics → Enable*); until then the script isn't served and nothing is collected.
+- **Deployment:** through the usual Git flow (merge the PR; Vercel deploys `master`), not `vercel --prod` from a local folder.
+- (D-047 is the Phase 8 step 4 decision on its own branch.)
+

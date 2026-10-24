@@ -16,6 +16,18 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
     ),
   },
   {
+    title: 'Usage statistics',
+    body: (
+      <>
+        The live site counts page visits with Vercel Web Analytics, from Vercel, which hosts
+        CloudPrep: which pages are opened, the site you came from, and your country, browser,
+        operating system and type of device. It uses no cookies and doesn&apos;t identify you;
+        visitors are told apart only by a value that changes every day. Your answers, progress, exam
+        results and account details are never sent to it.
+      </>
+    ),
+  },
+  {
     title: 'What is monitored',
     body: (
       <ul className="list-disc space-y-1 pl-5">
