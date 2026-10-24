@@ -53,6 +53,7 @@
 | D-046 | Questions load from Supabase at runtime, cached in IndexedDB by bank version; the bank leaves the bundle | Accepted |
 | D-047 | Signed-in users' data syncs to Supabase from a local copy; guest data stays separate and is added only on request | Accepted |
 | D-048 | Vercel Web Analytics for page views, production builds only | Accepted |
+| D-049 | Test time limits sized for a parallel run on a 4-core machine; effect-timing races fixed | Accepted |
 
 ---
 
@@ -265,7 +266,7 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Data is unchanged in this step:** progress, attempts and settings stay in this browser and are shared by everyone using it, signed in or not, until step 4.
 - **E2E:** Playwright runs against `vite build --mode e2e` (`dist-e2e/`). In that mode the fake sign-in reads a session from localStorage (`cloudprep-e2e-auth`), which the shared fixture (`tests/e2e/support/fixtures.ts`) seeds by default; `test.use({ signedIn: false })` tests as a guest. Production builds don't contain the fake (the `MODE === 'e2e'` branch is removed at build time; checked by searching `dist/`). Component tests pass a fake through `renderApp(path, { auth })`, signed in by default.
 - **Exam auto-submit fix:** the guard renders a skeleton while sign-in loads, so an exam that expired while the app was closed could be submitted before the exam layout mounted, and the layout then sent the learner to the exam start page instead of the results. `ExamWatcher` now waits until sign-in has loaded before submitting (so the exam layout is mounted first and redirects to the results as before), and also opens the results itself when a submission happens on an exam page.
-- **Known flaky tests (not caused by this step):** in WebKit on the dev machine, the two Learning mode E2E journeys take 18–31 s against Playwright's 30 s limit and sometimes time out. The same happens on the step 1 commit (checked 2026-10-23). The tests were not changed.
+- **Known flaky tests (not caused by this step):** in WebKit on the dev machine, the two Learning mode E2E journeys take 18–31 s against Playwright's 30 s limit and sometimes time out. The same happens on the step 1 commit (checked 2026-10-23). The tests were not changed. (Fixed by D-049.)
 - **Email delivery:** Supabase's built-in email service only sends to the project team's addresses and has a low hourly limit, so magic links for friends need custom SMTP (DEPLOYMENT.md). Google sign-in doesn't.
 - **Email sign-in switched off for now (2026-10-24):** the user chose not to set up SMTP yet (a sender address that isn't a domain they own looked untrustworthy), so the sign-in page offers only Google unless the build has `VITE_EMAIL_SIGN_IN=true` (`readEmailSignIn`, exposed as `AuthClient.emailSignIn`). The magic-link code, callback and tests stay; test fakes and E2E builds keep it on. To turn it on: set up custom SMTP, add the variable in Vercel and redeploy.
 
@@ -297,4 +298,11 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **What it collects:** page views (URL path), referrer, country, browser, operating system and device type. No cookies; Vercel tells visitors apart with a hash that changes daily. App data (answers, progress, results, account details) is never sent. The privacy page has a "Usage statistics" section.
 - **Hosting:** the script and its endpoint are served by Vercel under `/_vercel/insights/`; the SPA rewrite in `vercel.json` now leaves `/_vercel/*` alone. Web Analytics must be enabled once in the Vercel project (*Analytics → Enable*); until then the script isn't served and nothing is collected.
 - **Deployment:** through the usual Git flow (merge the PR; Vercel deploys `master`), not `vercel --prod` from a local folder.
+
+### D-049 Reliable test runs (2026-10-24)
+- **Problem:** almost every `npm run check` on 2026-10-24 failed on one random test, a different one each time, and each passed when rerun on its own. On the 4-core dev machine the unit suite runs 55 jsdom files in parallel; page tests load lazy route chunks and routinely take 2–4 s, against a 5 s test limit and a 3 s `findBy*` wait. The WebKit Learning mode journeys took 24–28 s against Playwright's 30 s limit. Anything else running (a second check, an install, the dev server) pushed tests over.
+- **Time limits:** Vitest `testTimeout` 15 s (was 5 s), Testing Library `asyncUtilTimeout` 10 s (was 3 s), Playwright `timeout` 60 s (was 30 s) and assertion timeout 15 s (was 5 s: the first page of a run, in a fresh browser, can still show "Loading questions…" after 5 s while it builds the bank). They only change how long a failing test takes to report: every assertion is unchanged, and an element that never appears still fails the test.
+- **Parallelism:** running fewer Vitest workers (2) was slower (141 s against 109–133 s) and no more stable, so the default stays.
+- **Races fixed in tests:** two tests acted right after a page appeared, before an effect had run. The proctor test (AC-7.5) now waits for `proctor-resumed` in the log, and the fullscreen-exit test waits for `monitoring-started` (logged as the listeners are attached) before simulating the event.
+- **Checked:** two full unit runs passed; two rounds of two suites run at the same time (double load) passed all 2,040 tests; then `npm run check`.
 

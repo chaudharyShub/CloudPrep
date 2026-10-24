@@ -4,8 +4,9 @@ import { afterEach, beforeEach } from 'vitest';
 
 // Tests that opt into the Node environment (e.g. the database schema test) have no DOM.
 if (typeof window !== 'undefined') {
-  // Routes are lazy-loaded; allow time for chunks to load in slower runs (e.g. with coverage).
-  configure({ asyncUtilTimeout: 3000 });
+  // Routes are lazy-loaded; allow time for chunks to load when the whole suite runs in
+  // parallel (D-049). `findBy*` still fails if the element never appears.
+  configure({ asyncUtilTimeout: 10_000 });
 
   // Mirror index.html, which ships with <html data-theme="dark">.
   beforeEach(() => {
