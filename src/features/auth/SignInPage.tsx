@@ -10,6 +10,7 @@ import { Notice } from '@/components/ui/Notice';
 import { PageSkeleton } from '@/components/ui/Skeleton';
 import { isPlausibleEmail } from '@/backend/auth';
 import { useAuth } from '@/state/AuthProvider';
+import { GoogleLogo } from './GoogleLogo';
 import { callbackUrl, DEFAULT_AFTER_SIGN_IN, safeNextPath } from './redirect';
 
 export function SignInPage() {
@@ -143,6 +144,7 @@ export function SignInPage() {
                   disabled={pending !== null}
                   onClick={() => void continueWithGoogle()}
                 >
+                  <GoogleLogo />
                   {pending === 'google' ? 'Opening Google…' : 'Continue with Google'}
                 </Button>
                 {googleError && (
