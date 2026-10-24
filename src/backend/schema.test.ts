@@ -4,7 +4,13 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { QUESTION_BANK } from '@/content/questions';
 import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
 import type { Question } from '@/domain/questions/types';
+import { createMemoryDriver } from '@/storage/driver';
+import { createAppStore } from '@/storage/store';
+import { createSyncEngine } from '@/storage/sync';
+import { EXAM_QUESTIONS } from '@/test/bank';
+import { examQuestion, makeAttempt, makeExam } from '@/test/exam';
 import { clfExamRows, isPublishable, questionToRows } from './contentRows';
+import { createUserDataRemote, type SelectQuery, type UserTables } from './userDataRemote';
 
 /**
  * Applies supabase/migrations to an in-process Postgres (PGlite) and checks constraints and
@@ -38,6 +44,7 @@ const SUPABASE_STUB = `
 
 const ALICE = '00000000-0000-4000-8000-00000000000a';
 const BOB = '00000000-0000-4000-8000-00000000000b';
+const CAROL = '00000000-0000-4000-8000-00000000000c';
 
 let db: PGlite;
 
@@ -85,6 +92,68 @@ async function publish(questions: readonly Question[]): Promise<void> {
     await insertRow('question_keys', { ...rows.key });
     await insertRow('question_revisions', { ...rows.revision });
   }
+}
+
+/** `UserTables` on PGlite as the current role, like Supabase's API on Postgres. */
+function pgUserTables(): UserTables {
+  const where = (query: Pick<SelectQuery, 'eq' | 'in'>, params: unknown[]) => {
+    const parts: string[] = [];
+    for (const [column, value] of Object.entries(query.eq ?? {})) {
+      params.push(value);
+      parts.push(`"${column}" = $${params.length}`);
+    }
+    if (query.in) {
+      params.push([...query.in.values]);
+      parts.push(`"${query.in.column}"::text = any($${params.length})`);
+    }
+    return parts.length > 0 ? ` where ${parts.join(' and ')}` : '';
+  };
+  // Supabase sends dates as ISO strings; PGlite returns Date objects.
+  const toWire = (row: Record<string, unknown>) =>
+    Object.fromEntries(
+      Object.entries(row).map(([key, value]) => [
+        key,
+        value instanceof Date ? value.toISOString() : value,
+      ]),
+    );
+  return {
+    async select(table, query) {
+      const params: unknown[] = [];
+      let sql = `select * from public.${table}${where(query, params)}`;
+      if (query.order) {
+        sql += ` order by "${query.order.column}" ${query.order.ascending ? 'asc' : 'desc'}`;
+      }
+      if (query.limit !== undefined) sql += ` limit ${String(query.limit)}`;
+      const { rows } = await db.query<Record<string, unknown>>(sql, params);
+      return rows.map(toWire);
+    },
+    async upsert(table, rows, onConflict) {
+      for (const row of rows) {
+        const keys = Object.keys(row);
+        const conflict = onConflict.split(',');
+        const values = keys.map((key) => {
+          const value = row[key];
+          return value !== null && typeof value === 'object' && !Array.isArray(value)
+            ? JSON.stringify(value)
+            : value;
+        });
+        const updates = keys
+          .filter((key) => !conflict.includes(key))
+          .map((key) => `"${key}" = excluded."${key}"`);
+        await db.query(
+          `insert into public.${table} (${keys.map((key) => `"${key}"`).join(', ')})
+           values (${keys.map((_, i) => `$${i + 1}`).join(', ')})
+           on conflict (${conflict.map((key) => `"${key}"`).join(', ')})
+           ${updates.length > 0 ? `do update set ${updates.join(', ')}` : 'do nothing'}`,
+          values,
+        );
+      }
+    },
+    async delete(table, query) {
+      const params: unknown[] = [];
+      await db.query(`delete from public.${table}${where(query, params)}`, params);
+    },
+  };
 }
 
 const publishable = QUESTION_BANK.filter(isPublishable);
@@ -252,6 +321,77 @@ describe('database schema', () => {
     await expect(insert(1, 0, 'correct', 'null')).rejects.toThrow(/check constraint/);
     await expect(insert(1, 0, 'incorrect', 'null')).rejects.toThrow(/check constraint/);
     await expect(insert(1, 1, 'unknown', 'null')).rejects.toThrow(/check constraint/);
+  });
+
+  it("AC-B.23 the app's sync writes rows the schema accepts, and reads them back unchanged", async () => {
+    await asAdmin();
+    await db.query(`insert into auth.users (id) values ($1)`, [CAROL]);
+    await asUser(CAROL);
+    const tables = pgUserTables();
+    const remote = createUserDataRemote(tables, CAROL, EXAM_ID);
+    const T0 = Date.UTC(2026, 9, 1, 9, 0, 0, 123);
+
+    const laptop = createAppStore({ driver: createMemoryDriver(), persistent: true });
+    const sync = createSyncEngine({ store: laptop, remote, driver: createMemoryDriver() });
+    laptop.recordAnswer({ questionId: 'q-1', isCorrect: true, at: T0, sessionId: 's-1' });
+    laptop.recordAnswer({ questionId: 'q-2', isCorrect: false, at: T0 + 1, sessionId: 's-1' });
+    laptop.toggleBookmark('q-1', T0 + 2);
+    laptop.addSessionSummary({
+      id: 's-1',
+      label: 'Domain 1',
+      startedAt: T0,
+      finishedAt: T0 + 3,
+      total: 2,
+      answered: 2,
+      correct: 1,
+      byDomain: { D1: { answered: 2, correct: 1 } },
+      incorrectQuestionIds: ['q-2'],
+    });
+    laptop.setPreferences({ theme: 'light' });
+    const first = examQuestion(0);
+    const exam = makeExam({
+      id: 'exam-1',
+      startedAt: T0,
+      actions: [
+        { type: 'select', questionId: first.id, optionId: first.correctOptionIds[0] ?? '', at: T0 },
+        { type: 'logIntegrity', event: { type: 'tab-hidden', at: T0 + 5 } },
+      ],
+    });
+    laptop.startExam(exam);
+    laptop.completeExam(makeAttempt(exam), EXAM_QUESTIONS);
+    laptop.startExam(makeExam({ id: 'exam-2', startedAt: T0 + 60_000 }));
+    expect(await sync.flush()).toBe(true);
+
+    const phone = createAppStore({ driver: createMemoryDriver(), persistent: true });
+    const phoneSync = createSyncEngine({ store: phone, remote, driver: createMemoryDriver() });
+    expect(await phoneSync.pull()).toBe(true);
+    const pick = (store: typeof laptop) => {
+      const { progress, bookmarks, sessions, attempts, activeExam, preferenceOverrides } =
+        store.getSnapshot().data;
+      return { progress, bookmarks, sessions, attempts, activeExam, preferenceOverrides };
+    };
+    expect(pick(phone)).toEqual(pick(laptop));
+
+    // Sending the same data again updates rows instead of failing on their keys.
+    laptop.clearIntegrityLog('exam-1');
+    expect(await sync.flush()).toBe(true);
+    laptop.resetAll();
+    expect(await sync.flush()).toBe(true);
+    for (const table of [
+      'question_progress',
+      'bookmarks',
+      'practice_sessions',
+      'exam_attempts',
+      'exam_attempt_questions',
+      'active_exams',
+      'user_preferences',
+    ]) {
+      expect(await count(`public.${table}`)).toBe(0);
+    }
+    sync.dispose();
+    phoneSync.dispose();
+    await asAdmin();
+    await db.query('delete from auth.users where id = $1', [CAROL]);
   });
 
   it('AC-B.2 deleting an account removes all of its data', async () => {

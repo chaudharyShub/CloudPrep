@@ -14,7 +14,13 @@
       // Apply the saved theme before first paint, so light-theme users don't see a dark flash.
       // The app applies the same setting again once it loads (src/lib/theme.ts).
       try {
-        var saved = JSON.parse(localStorage.getItem('cloudprep:preferences') || 'null');
+        // A signed-in user's copy (src/storage/account.ts) wins over guest settings.
+        var owner = JSON.parse(localStorage.getItem('cloudprep-account:owner') || 'null');
+        var key =
+          owner && owner.data && owner.data.signedIn
+            ? 'cloudprep-account:cloudprep:preferences'
+            : 'cloudprep:preferences';
+        var saved = JSON.parse(localStorage.getItem(key) || 'null');
         var theme = saved && saved.data && saved.data.theme;
         if (theme === 'system') {
           theme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';

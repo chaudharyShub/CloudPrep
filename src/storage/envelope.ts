@@ -193,3 +193,42 @@ export function writeArea<T>(
     return { ok: false, reason: isQuotaError(error) ? 'quota' : 'error' };
   }
 }
+
+/**
+ * Reads a small value saved under its own key (outside the store's areas) with the same
+ * envelope, migrations and parser. Unusable values read as the fallback; they're
+ * re-derivable bookkeeping (sync lists, flags), so no backup is kept.
+ */
+export function readKeyed<T>(driver: StorageDriver, key: string, area: AreaDefinition<T>): T {
+  try {
+    const raw = driver.getItem(key);
+    if (raw === null) return area.fallback();
+    const envelope: unknown = JSON.parse(raw);
+    if (!isRecord(envelope) || envelope['app'] !== APP_ID) return area.fallback();
+    const decoded = decodeArea(area, envelope['schemaVersion'], envelope['data']);
+    return decoded.status === 'ok' ? decoded.value : area.fallback();
+  } catch {
+    return area.fallback();
+  }
+}
+
+/** Saves a value under its own key in an envelope. Returns false if it couldn't be stored. */
+export function writeKeyed<T>(
+  driver: StorageDriver,
+  key: string,
+  area: AreaDefinition<T>,
+  value: T,
+): boolean {
+  const envelope: Envelope = {
+    app: APP_ID,
+    schemaVersion: area.currentVersion,
+    savedAt: new Date().toISOString(),
+    data: value,
+  };
+  try {
+    driver.setItem(key, JSON.stringify(envelope));
+    return true;
+  } catch {
+    return false;
+  }
+}

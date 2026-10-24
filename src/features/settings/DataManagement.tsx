@@ -20,6 +20,7 @@ import { downloadText, formatBytes } from '@/lib/download';
 import { formatDateTime } from '@/lib/format';
 import { useAppStore } from '@/state/StoreProvider';
 import { useUserData } from '@/state/hooks';
+import { useUserDataScope } from '@/state/UserDataProvider';
 import type { BackupInfo, ImportMode } from '@/storage/store';
 import {
   AREA_LABELS,
@@ -47,6 +48,8 @@ const SOURCE_LABELS: Record<string, string> = {
 /** Data location, export/import, recovery backups, and separate clear actions. */
 export function DataManagement() {
   const store = useAppStore();
+  const { scope } = useUserDataScope();
+  const clearCopy = scope === 'account' ? ACCOUNT_CLEAR_COPY : CLEAR_COPY;
   // Subscribing re-renders this section whenever stored data changes.
   const data = useUserData();
   const { showToast } = useToast();
@@ -114,7 +117,7 @@ export function DataManagement() {
     if (action === 'learning') store.clearLearningProgress();
     if (action === 'history') store.clearExamHistory();
     if (action === 'all') store.resetAll();
-    showToast({ title: CLEAR_COPY[action].done, tone: 'success' });
+    showToast({ title: clearCopy[action].done, tone: 'success' });
   }
 
   const preview = ready?.preview;
@@ -129,12 +132,21 @@ export function DataManagement() {
               ? `Saved in this browser on this device · about ${formatBytes(usage)}`
               : 'Not being saved: this browser is blocking storage (for example in a private window).'}
           </p>
-          <p>
-            CloudPrep has no account or server. Your progress, history and settings exist only in
-            this browser on this device. They aren&apos;t synced to other browsers or devices, and
-            clearing your browsing data (or closing a private window) removes them. Export a copy
-            regularly if you want a backup.
-          </p>
+          {scope === 'account' ? (
+            <p>
+              You&apos;re signed in, so your progress, history and settings are saved to your
+              account and follow you to every device where you sign in. This browser keeps a copy so
+              CloudPrep stays fast and works offline; changes made offline are saved to your account
+              when you&apos;re back online.
+            </p>
+          ) : (
+            <p>
+              You&apos;re not signed in, so your progress, history and settings exist only in this
+              browser on this device. They aren&apos;t synced to other browsers or devices, and
+              clearing your browsing data (or closing a private window) removes them. Sign in to
+              save them to an account, or export a copy regularly if you want a backup.
+            </p>
+          )}
         </CardBody>
       </Card>
 
@@ -342,7 +354,7 @@ export function DataManagement() {
         <CardBody>
           <ul className="divide-y divide-border">
             {(['exam', 'learning', 'history', 'all'] as const).map((action) => {
-              const copy = CLEAR_COPY[action];
+              const copy = clearCopy[action];
               const disabled =
                 (action === 'exam' && !hasExam) ||
                 (action === 'learning' &&
@@ -395,9 +407,9 @@ export function DataManagement() {
       />
       <ConfirmDialog
         open={clearing !== null}
-        title={clearing ? CLEAR_COPY[clearing].confirmTitle : ''}
-        description={clearing ? CLEAR_COPY[clearing].confirmBody : ''}
-        confirmLabel={clearing ? CLEAR_COPY[clearing].button : ''}
+        title={clearing ? clearCopy[clearing].confirmTitle : ''}
+        description={clearing ? clearCopy[clearing].confirmBody : ''}
+        confirmLabel={clearing ? clearCopy[clearing].button : ''}
         tone="danger"
         {...(clearing === 'all' ? { confirmationText: 'RESET' } : {})}
         onCancel={() => {
@@ -425,17 +437,16 @@ export function DataManagement() {
   );
 }
 
-const CLEAR_COPY: Record<
-  ClearAction,
-  {
-    title: string;
-    summary: string;
-    button: string;
-    confirmTitle: string;
-    confirmBody: string;
-    done: string;
-  }
-> = {
+interface ClearCopy {
+  title: string;
+  summary: string;
+  button: string;
+  confirmTitle: string;
+  confirmBody: string;
+  done: string;
+}
+
+const CLEAR_COPY: Record<ClearAction, ClearCopy> = {
   exam: {
     title: 'Exam in progress',
     summary: 'Discard the exam you are taking. It won’t be scored or saved to history.',
@@ -473,5 +484,27 @@ const CLEAR_COPY: Record<
     confirmBody:
       'Everything CloudPrep stores in this browser is deleted, including backups. This can’t be undone.',
     done: 'All data was reset',
+  },
+};
+
+/** Signed in: clearing applies to the account on every device (D-047). */
+const ACCOUNT_CLEAR_COPY: Record<ClearAction, ClearCopy> = {
+  exam: CLEAR_COPY.exam,
+  learning: {
+    ...CLEAR_COPY.learning,
+    confirmBody:
+      'Practice answers, mistakes and session summaries are deleted from your account, on every device. This can’t be undone; export your data first if you want a copy.',
+  },
+  history: {
+    ...CLEAR_COPY.history,
+    confirmBody:
+      'All submitted exam results are deleted from your account, on every device. This can’t be undone; export your data first if you want a copy.',
+  },
+  all: {
+    ...CLEAR_COPY.all,
+    summary:
+      'All your CloudPrep data: progress, history, bookmarks, settings and any exam in progress, on every device, plus the backups in this browser. Your account itself stays.',
+    confirmBody:
+      'Everything in your CloudPrep account is deleted on every device, and so are the backups in this browser. You stay signed in. This can’t be undone.',
   },
 };

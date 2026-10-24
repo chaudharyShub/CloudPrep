@@ -21,7 +21,11 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 
 - Email sign-in is switched off until custom SMTP is set up (D-045); the site offers Google only.
 - Sign-in links work once, expire after an hour, and only in the browser that asked for them. Opening the email on another device won't sign you in there; request a link on that device instead, or use Google.
-- Signing in doesn't move your data yet: progress, exam history and settings stay in this browser and are shared by everyone who uses it, signed in or not. Saving them to your account is the next step.
+- Signed in, your progress, exam history and settings are saved to your account and follow you to other devices. Changes made offline are saved when you're back online; if you sign out before that, they're kept in this browser and saved the next time you sign in there.
+- If you use the same account on two devices at the same time, the most recent change to each item wins (for example, answering the same question on both).
+- Progress from before you signed in stays in the browser as guest data. You're asked once whether to add it to your account; you can also do it later in Settings.
+- On a new device, a past exam taken with an older version of a question is reviewed with the current version (with a note), because the old wording is only kept in the browser where you took it.
+- There's no button to delete your account itself; "Reset everything" deletes all its data. Ask the person who shared CloudPrep to remove the account.
 - Mock exams, the dashboard, exam history and progress need an account; Learning mode, bookmarks and settings don't.
 
 ## Questions
@@ -31,7 +35,7 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 
 ## Your data
 
-- Everything is stored in **this browser on this device** (`localStorage`). It isn't synced between devices or browsers.
+- Without signing in, everything is stored in **this browser on this device** (`localStorage`). It isn't synced between devices or browsers. Signed in, your data is saved to your account and this browser keeps a copy.
 - **Clearing browser data, private/incognito windows, and some browser storage-cleanup policies remove it.** Safari may delete site data after a period without use. Export your data regularly from Settings.
 - Storage is limited (usually about 5 MB per site). CloudPrep warns you if a save fails.
 - If two tabs are open, they share the same data and stay in sync. Taking the same exam in two tabs at once works, but isn't recommended.

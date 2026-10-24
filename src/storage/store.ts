@@ -40,7 +40,7 @@ import {
 } from './transfer';
 
 /** Raw values of each storage area. */
-interface StoredData {
+export interface StoredData {
   readonly progress: ProgressMap;
   readonly bookmarks: Bookmarks;
   readonly sessions: readonly PracticeSessionSummary[];
@@ -59,7 +59,16 @@ export interface UserData extends StoredData {
   readonly preferences: Preferences;
 }
 
-type AreaName = keyof StoredData;
+export type AreaName = keyof StoredData;
+
+/** A change made in this tab (not one loaded from another tab or the server). */
+export type LocalChange = {
+  [K in AreaName]: {
+    readonly area: K;
+    readonly previous: StoredData[K];
+    readonly next: StoredData[K];
+  };
+}[AreaName];
 
 export type StorageNotice =
   | { readonly id: string; readonly kind: 'unavailable' }
@@ -149,6 +158,11 @@ export interface AppStore {
   dismissNotice: (id: string) => void;
   /** Re-reads storage after another tab changed it (`storage` event). */
   handleExternalChange: (key: string | null) => void;
+
+  /** Called for every change made through this store, after it is applied (used by sync). */
+  onLocalChange: (listener: (change: LocalChange) => void) => () => void;
+  /** Replaces areas with data from the server. Doesn't count as a local change. */
+  applyRemote: (data: Partial<StoredData>) => void;
 }
 
 const AREAS: { [K in AreaName]: AreaDefinition<StoredData[K]> } = {
@@ -189,6 +203,7 @@ export function createAppStore({
   now = Date.now,
 }: CreateAppStoreOptions): AppStore {
   const listeners = new Set<() => void>();
+  const changeListeners = new Set<(change: LocalChange) => void>();
   const readOnly = new Set<AreaName>();
   let notices: StorageNotice[] = persistent ? [] : [{ id: 'unavailable', kind: 'unavailable' }];
 
@@ -225,8 +240,20 @@ export function createAppStore({
     for (const listener of listeners) listener();
   }
 
-  /** Saves one area. Returns false if the write failed (the in-memory value still updates). */
+  function notifyChange<K extends AreaName>(area: K, previous: StoredData[K], next: StoredData[K]) {
+    if (previous === next) return;
+    const change = { area, previous, next } as LocalChange;
+    for (const listener of changeListeners) listener(change);
+  }
+
+  /** Saves one area as a local change. The in-memory value updates even if the write fails. */
   function save<K extends AreaName>(area: K, value: StoredData[K]): void {
+    const previous = stored[area];
+    write(area, value);
+    notifyChange(area, previous, value);
+  }
+
+  function write<K extends AreaName>(area: K, value: StoredData[K]): void {
     stored = { ...stored, [area]: value };
     if (readOnly.has(area)) return;
     const result = writeArea(driver, AREAS[area], value, now());
@@ -241,6 +268,7 @@ export function createAppStore({
   }
 
   function removeArea(area: AreaName) {
+    const previous = stored[area];
     readOnly.delete(area);
     notices = notices.filter((notice) => !('area' in notice) || notice.area !== area);
     try {
@@ -249,6 +277,7 @@ export function createAppStore({
       // The in-memory reset still applies.
     }
     stored = { ...stored, [area]: EMPTY[area] };
+    notifyChange(area, previous, EMPTY[area]);
   }
 
   function transferData(): TransferData {
@@ -483,13 +512,28 @@ export function createAppStore({
       notices = notices.filter((notice) => notice.id !== id);
       emit();
     },
-    handleExternalChange(key) {
+    handleExternalChange(physicalKey) {
       // `null` means another tab cleared all storage.
+      const key = physicalKey === null || !driver.ownKey ? physicalKey : driver.ownKey(physicalKey);
+      if (physicalKey !== null && key === null) return;
       const changed = AREA_NAMES.filter(
         (area) => key === null || key === storageKey(AREAS[area].name),
       );
       if (changed.length === 0) return;
       for (const area of changed) stored = { ...stored, [area]: load(area) };
+      emit();
+    },
+
+    onLocalChange(listener) {
+      changeListeners.add(listener);
+      return () => {
+        changeListeners.delete(listener);
+      };
+    },
+    applyRemote(data) {
+      const areas = AREA_NAMES.filter((area) => data[area] !== undefined);
+      if (areas.length === 0) return;
+      for (const area of areas) write(area, data[area] as StoredData[typeof area]);
       emit();
     },
   };
