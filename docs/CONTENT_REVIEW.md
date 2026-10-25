@@ -1,6 +1,6 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-25.1` · 2,000 questions · 1,337 `checked`, 663 `unverified`, none `approved` yet.
+> Bank version `2026-10-25.1` · 2,000 questions · 1,377 `checked`, 623 `unverified`, none `approved` yet.
 >
 > Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
 
@@ -43,6 +43,7 @@ Batches in `src/content/questions/batches/` are reviewed one file (about 30 ques
 | `d3-06` (3.7 AI/ML and analytics) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0235` notes AWS will discontinue support for the Amazon Q Developer IDE plugins on 30 April 2027 (AWS points to Kiro). AI service purposes (Polly, Transcribe, Translate, Comprehend, Rekognition, Textract, Lex, Bedrock, SageMaker AI) and analytics services (Athena, Glue, EMR, Kinesis, Data Firehose, Quick Sight, OpenSearch Service, MSK, Lake Formation, Data Exchange) were confirmed on their pages. |
 | `d3-07` (3.8 other in-scope categories) | 2026-10-25 | All 40 checked; no changes to questions or answers. The AppStream 2.0 page now presents the service as Amazon WorkSpaces Applications, which `clf-d3-0264` already says. Messaging (SNS, SQS, EventBridge, Step Functions), business applications (SES, Connect), end user computing, IoT Core and developer tools (CodeBuild, CodePipeline, X-Ray) facts were confirmed. |
 | `d3-08` (3.3 compute scenarios) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0315` notes the App Runner closure to new customers; `0298` says Lambda charges for requests and run time instead of "costs nothing when idle"; `0311` also cites the Outposts guide (EKS nodes on Outposts). |
+| `d3-09` (3.4 database scenarios) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0347` notes the Timestream for LiveAnalytics end-of-support notice; `0359` and `0370` cite the DynamoDB and RDS encryption pages. |
 
 Each question was written for CloudPrep from the AWS pages it cites, and every cited URL was confirmed to load (HTTP 200) on 2026-10-21. Key facts were checked against the live pages (six advantages, Well-Architected pillars, CAF perspectives, 7 Rs, root-user tasks, shared responsibility, AZ definition, security groups vs network ACLs, S3 storage classes and Glacier, instance store persistence, Spot, Savings Plans, consolidated billing, Budgets, Artifact, Shield Standard, Trusted Advisor, Support plans).
 
