@@ -250,6 +250,10 @@ export const REFS = {
     title: 'Amazon EC2 billing and purchasing options',
     url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-purchasing-options.html',
   },
+  ec2Tenancy: {
+    title: 'Amazon EC2 Dedicated Instances',
+    url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/dedicated-instance.html',
+  },
   ec2UserGuide: {
     title: 'What is Amazon EC2?',
     url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html',
@@ -773,6 +777,11 @@ export const REFS = {
   waPurposeBuiltDb: {
     title: 'PERF03-BP01 Use a purpose-built data store',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/perf_data_use_purpose_built_data_store.html',
+  },
+  waRelBackupTest: {
+    title:
+      'REL09-BP04 Perform periodic recovery of the data to verify backup integrity and processes',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_backing_up_data_periodic_recovery_testing_data.html',
   },
   waRelChange: {
     title: 'Well-Architected Framework: Reliability change management',
