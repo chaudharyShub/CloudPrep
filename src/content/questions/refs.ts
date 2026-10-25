@@ -14,6 +14,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html',
   },
   acm: { title: 'AWS Certificate Manager', url: 'https://aws.amazon.com/certificate-manager/' },
+  acmPricing: {
+    title: 'AWS Certificate Manager pricing',
+    url: 'https://aws.amazon.com/certificate-manager/pricing/',
+  },
   amazonQ: { title: 'Amazon Q', url: 'https://aws.amazon.com/q/' },
   amis: {
     title: 'Amazon Machine Images (AMIs)',
@@ -260,6 +264,10 @@ export const REFS = {
     title: 'Amazon EBS pricing',
     url: 'https://aws.amazon.com/ebs/pricing/',
   },
+  ebsSnapshotBpa: {
+    title: 'Block public access for Amazon EBS snapshots',
+    url: 'https://docs.aws.amazon.com/ebs/latest/userguide/block-public-access-snapshots.html',
+  },
   ec2: { title: 'Amazon EC2', url: 'https://aws.amazon.com/ec2/' },
   ec2InfraSecurity: {
     title: 'Infrastructure security in Amazon EC2',
@@ -287,6 +295,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html',
   },
   ecr: { title: 'Amazon Elastic Container Registry', url: 'https://aws.amazon.com/ecr/' },
+  ecrEnhancedScanning: {
+    title: 'Scan images for OS and programming language package vulnerabilities in Amazon ECR',
+    url: 'https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning-enhanced.html',
+  },
   ecs: { title: 'Amazon Elastic Container Service', url: 'https://aws.amazon.com/ecs/' },
   edgeLocations: {
     title: 'Amazon CloudFront key features (edge locations)',
@@ -695,6 +707,10 @@ export const REFS = {
     title: 'Amazon WorkSpaces Secure Browser',
     url: 'https://aws.amazon.com/workspaces/secure-browser/',
   },
+  securityBulletins: {
+    title: 'AWS Security Bulletins',
+    url: 'https://aws.amazon.com/security/security-bulletins/',
+  },
   securityGroups: {
     title: 'Control traffic to your AWS resources using security groups',
     url: 'https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html',
@@ -722,6 +738,10 @@ export const REFS = {
   shieldFeatures: {
     title: 'AWS Shield features',
     url: 'https://aws.amazon.com/shield/features/',
+  },
+  shieldPricing: {
+    title: 'AWS Shield pricing',
+    url: 'https://aws.amazon.com/shield/pricing/',
   },
   siteToSiteVpn: {
     title: 'AWS Site-to-Site VPN',
@@ -788,6 +808,10 @@ export const REFS = {
     title: 'AWS Trusted Advisor',
     url: 'https://aws.amazon.com/premiumsupport/technology/trusted-advisor/',
   },
+  trustedAdvisorChecks: {
+    title: 'AWS Trusted Advisor check reference',
+    url: 'https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor-check-reference.html',
+  },
   trustedAdvisorDocs: {
     title: 'AWS Trusted Advisor check reference',
     url: 'https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor-check-reference.html',
@@ -798,6 +822,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html',
   },
   vpn: { title: 'AWS VPN', url: 'https://aws.amazon.com/vpn/' },
+  vulnerabilityReporting: {
+    title: 'AWS vulnerability reporting',
+    url: 'https://aws.amazon.com/security/vulnerability-reporting/',
+  },
   waAbuse: {
     title: 'AWS response to abuse and compromise',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/abuse-and-compromise.html',
@@ -833,6 +861,10 @@ export const REFS = {
   waFramework: {
     title: 'AWS Well-Architected Framework',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html',
+  },
+  wafRateBased: {
+    title: 'Using rate-based rule statements in AWS WAF',
+    url: 'https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-rate-based.html',
   },
   waGameDays: {
     title: 'REL12-BP05 Conduct game days regularly',
