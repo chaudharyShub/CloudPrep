@@ -151,6 +151,10 @@ export const REFS = {
   },
   dataExchange: { title: 'AWS Data Exchange', url: 'https://aws.amazon.com/data-exchange/' },
   dataFirehose: { title: 'Amazon Data Firehose', url: 'https://aws.amazon.com/firehose/' },
+  dataPrivacyFaq: {
+    title: 'AWS Data Privacy FAQ',
+    url: 'https://aws.amazon.com/compliance/data-privacy-faq/',
+  },
   dataSync: { title: 'AWS DataSync', url: 'https://aws.amazon.com/datasync/' },
   dataTransferPricing: {
     title: 'Amazon EC2 On-Demand pricing (data transfer)',
@@ -648,6 +652,11 @@ export const REFS = {
     title: 'What is cloud computing?',
     url: 'https://aws.amazon.com/what-is-cloud-computing/',
   },
+  whatIsIaas: {
+    title: 'What is IaaS (Infrastructure as a Service)?',
+    url: 'https://aws.amazon.com/what-is/iaas/',
+  },
+
   whitepapers: { title: 'AWS Whitepapers & Guides', url: 'https://aws.amazon.com/whitepapers/' },
   workspaces: { title: 'Amazon WorkSpaces', url: 'https://aws.amazon.com/workspaces/' },
   xray: { title: 'AWS X-Ray', url: 'https://aws.amazon.com/xray/' },

@@ -1,8 +1,16 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-22.1` · 2,000 questions · 44 `checked`, 1,956 `unverified`, none `approved` yet.
+> Bank version `2026-10-25.1` · 2,000 questions · 73 `checked`, 1,927 `unverified`, none `approved` yet.
 >
 > Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
+
+## Reviewing the unverified batches
+
+Batches in `src/content/questions/batches/` are reviewed one file (about 30 questions) at a time: each question is read against the AWS pages it cites, facts that the pages don't support are fixed or re-sourced, and the file is marked `status: 'checked'` with the `checked` date. A question that can't be confirmed from an AWS page keeps `st: 'unverified'` (with a comment saying why) while the rest of its file is checked. A question whose meaning changes gets a new revision.
+
+| Batch | Checked | Result |
+|---|---|---|
+| `d1-01` (1.1 benefits of the cloud) | 2026-10-25 | 29 checked, 1 left unverified. `clf-d1-0019` (scalability vs elasticity): no AWS page defines the difference. Fixes: `clf-d1-0027` explanation misquoted the hybrid page ("most common" refers to cloud + on-premises hybrids); `clf-d1-0028`–`0030` re-sourced, because "Types of cloud computing" no longer covers IaaS/PaaS/SaaS (now "What is IaaS?" and the shared responsibility model, which states EC2 is IaaS and the customer manages the guest OS; the IaaS page's own table marks the OS as provider-managed, which contradicts it); `clf-d1-0024` now cites the Data Privacy FAQ for customer choice of Region; `clf-d1-0025` dropped an unconfirmed aside about inbound data transfer and cites Cloud Economics (the pricing whitepaper doesn't render); wording aligned with the pages in `clf-d1-0029` and `clf-d1-0038`. |
 
 Each question was written for CloudPrep from the AWS pages it cites, and every cited URL was confirmed to load (HTTP 200) on 2026-10-21. Key facts were checked against the live pages (six advantages, Well-Architected pillars, CAF perspectives, 7 Rs, root-user tasks, shared responsibility, AZ definition, security groups vs network ACLs, S3 storage classes and Glacier, instance store persistence, Spot, Savings Plans, consolidated billing, Budgets, Artifact, Shield Standard, Trusted Advisor, Support plans).
 
