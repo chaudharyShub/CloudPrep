@@ -30,6 +30,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/application-discovery/latest/userguide/what-is-appdiscovery.html',
   },
   appRunner: { title: 'AWS App Runner', url: 'https://aws.amazon.com/apprunner/' },
+  appRunnerDocs: {
+    title: 'What is AWS App Runner?',
+    url: 'https://docs.aws.amazon.com/apprunner/latest/dg/what-is-apprunner.html',
+  },
   appStream: { title: 'Amazon AppStream 2.0', url: 'https://aws.amazon.com/appstream2/' },
   appSync: { title: 'AWS AppSync', url: 'https://aws.amazon.com/appsync/' },
   artifact: { title: 'AWS Artifact', url: 'https://aws.amazon.com/artifact/' },
@@ -184,6 +188,10 @@ export const REFS = {
   computeOptimizer: {
     title: 'AWS Compute Optimizer',
     url: 'https://aws.amazon.com/compute-optimizer/',
+  },
+  computeOptimizerDocs: {
+    title: 'What is AWS Compute Optimizer?',
+    url: 'https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html',
   },
   config: { title: 'AWS Config', url: 'https://aws.amazon.com/config/' },
   configDocs: {
@@ -531,6 +539,10 @@ export const REFS = {
   lambdaRuntimeUpdates: {
     title: 'Understanding how Lambda manages runtime version updates',
     url: 'https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html',
+  },
+  lambdaTimeout: {
+    title: 'Configure Lambda function timeout',
+    url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html',
   },
   largeMigrationPhases: {
     title: 'Phases of a large migration',
