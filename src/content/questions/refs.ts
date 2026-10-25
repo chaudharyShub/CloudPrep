@@ -445,6 +445,10 @@ export const REFS = {
     title: 'IAM JSON policy element reference',
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html',
   },
+  iamPolicyEval: {
+    title: 'Policy evaluation logic',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html',
+  },
   iamRoles: {
     title: 'IAM roles',
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html',
