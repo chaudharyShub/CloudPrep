@@ -1,6 +1,6 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-25.1` · 2,000 questions · 989 `checked`, 1,011 `unverified`, none `approved` yet.
+> Bank version `2026-10-25.1` · 2,000 questions · 1,017 `checked`, 983 `unverified`, none `approved` yet.
 >
 > Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
 
@@ -34,6 +34,7 @@ Batches in `src/content/questions/batches/` are reviewed one file (about 30 ques
 | `d2-12` (Domain 2 "which service" scenarios) | 2026-10-25 | All 40 checked; no answers changed. `clf-d2-0460` and `0492` note the Audit Manager closure; `0476` and `0489` add the Security Hub CSPM note; `0458` and `0473` cite the IAM credential report and IAM Access Analyzer. |
 | `d2-13` (Domain 2 concept checks) | 2026-10-25 | All 40 checked; no answers changed. `clf-d2-0518` and `0525` add the Security Hub CSPM note. Questions now cite Lambda runtime updates (`0495`), S3 and DynamoDB encryption at rest (`0503`), IAM Access Analyzer (`0511`), DynamoDB resource-based policies (`0512`), the Trusted Advisor check reference (`0518`), the GovCloud guide (`0529`, FedRAMP High and ITAR), the WorkSpaces FAQ (`0530`) and CloudTrail SSE-KMS encryption (`0532`). |
 | `d2-14` (Domain 2 scenario practice) | 2026-10-25 | All 40 checked; no answers changed. `clf-d2-0566` adds the Security Hub CSPM note and `0571` the Audit Manager closure. Questions now cite the KMS overview (`0537`), temporary credentials (`0545`), ABAC (`0550`) and S3 Block Public Access (`0553`). |
+| `d2-15` (Domain 2 service definitions) | 2026-10-25 | All 28 checked; no answers changed. `clf-d2-0597` lists Trusted Advisor's current categories (resilience, not fault tolerance); `0576` adds the Security Hub CSPM note; `0590` notes the Audit Manager closure; definitions of GuardDuty, Inspector, Macie, Security Hub, Shield and KMS also cite their user guides or feature pages. |
 
 Each question was written for CloudPrep from the AWS pages it cites, and every cited URL was confirmed to load (HTTP 200) on 2026-10-21. Key facts were checked against the live pages (six advantages, Well-Architected pillars, CAF perspectives, 7 Rs, root-user tasks, shared responsibility, AZ definition, security groups vs network ACLs, S3 storage classes and Glacier, instance store persistence, Spot, Savings Plans, consolidated billing, Budgets, Artifact, Shield Standard, Trusted Advisor, Support plans).
 
