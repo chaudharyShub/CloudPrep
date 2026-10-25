@@ -423,6 +423,10 @@ export const REFS = {
     title: 'AWS Global Infrastructure',
     url: 'https://aws.amazon.com/about-aws/global-infrastructure/',
   },
+  globalNetworkFaq: {
+    title: 'AWS Global Network FAQs',
+    url: 'https://aws.amazon.com/about-aws/global-infrastructure/global-network/faqs/',
+  },
   glue: { title: 'AWS Glue', url: 'https://aws.amazon.com/glue/' },
   glueDocs: {
     title: 'What is AWS Glue?',

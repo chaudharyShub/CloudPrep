@@ -1,6 +1,6 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-25.1` · 2,000 questions · 1,755 `checked`, 245 `unverified`, none `approved` yet.
+> Bank version `2026-10-25.1` · 2,000 questions · 1,795 `checked`, 205 `unverified`, none `approved` yet.
 >
 > Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
 
@@ -54,6 +54,7 @@ Batches in `src/content/questions/batches/` are reviewed one file (about 30 ques
 | `d3-17` (Domain 3 architecture scenarios) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0692` notes the Timestream for LiveAnalytics end-of-support notice. Architecture combinations (serverless API, static site, fan-out, CI/CD, hybrid connectivity, analytics pipelines) use facts confirmed in earlier batches. |
 | `d3-18` (Domain 3 service definitions) | 2026-10-25 | All 40 checked; no changes to questions or answers. Definitions match the service pages confirmed in earlier batches; `clf-d3-0697` and `0698` also cite the License Manager and Compute Optimizer guides. |
 | `d3-19` (Domain 3 core service definitions) | 2026-10-25 | All 18 checked; no changes to questions or answers. Definitions match the service pages confirmed in earlier batches; `clf-d3-0745` also cites the S3 storage classes page. Domain 3 review complete. |
+| `d4-01` (4.1 pricing models) | 2026-10-25 | All 40 checked; no answers changed. Questions that cited the pricing whitepaper (which doesn't render) now cite the AWS pricing page (pay as you go, save when you commit, pay less by using more) and the AWS Global Network FAQ for data transfer (no charge for data ingress; charges for transfer out, between AZs and between Regions; 100 GB free transfer out per month): `clf-d4-0016`, `0017`, `0019`, `0027`, `0031`, `0039`. `0026` no longer says "shared tenancy is usually cheaper" (unsourced); it uses the Dedicated Hosts FAQ (pay for the whole host). EC2 purchase options, Spot (up to 90% off, two-minute notice), Savings Plans types, Reserved Instance terms and payment options, Capacity Reservations and public IPv4 charges were confirmed. |
 
 Each question was written for CloudPrep from the AWS pages it cites, and every cited URL was confirmed to load (HTTP 200) on 2026-10-21. Key facts were checked against the live pages (six advantages, Well-Architected pillars, CAF perspectives, 7 Rs, root-user tasks, shared responsibility, AZ definition, security groups vs network ACLs, S3 storage classes and Glacier, instance store persistence, Spot, Savings Plans, consolidated billing, Budgets, Artifact, Shield Standard, Trusted Advisor, Support plans).
 
