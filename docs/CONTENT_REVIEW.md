@@ -1,6 +1,6 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-25.1` · 2,000 questions · 1,737 `checked`, 263 `unverified`, none `approved` yet.
+> Bank version `2026-10-25.1` · 2,000 questions · 1,755 `checked`, 245 `unverified`, none `approved` yet.
 >
 > Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
 
@@ -53,6 +53,7 @@ Batches in `src/content/questions/batches/` are reviewed one file (about 30 ques
 | `d3-16` (Domain 3 feature details) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0651` no longer says "isolation is provided by the Nitro System" or "dedicated options cost more" (neither on a checked page); it cites EC2 infrastructure security (host isolation) and Dedicated Instances. `0633` cites S3 Block Public Access and default encryption. Lambda packaging, ECS task definitions, Aurora replicas, Redshift Serverless, ALB targets, Route 53 alias records, S3 versioning states, EBS Multi-Attach, SQS dead-letter queues and AWS Backup Vault Lock were confirmed. |
 | `d3-17` (Domain 3 architecture scenarios) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0692` notes the Timestream for LiveAnalytics end-of-support notice. Architecture combinations (serverless API, static site, fan-out, CI/CD, hybrid connectivity, analytics pipelines) use facts confirmed in earlier batches. |
 | `d3-18` (Domain 3 service definitions) | 2026-10-25 | All 40 checked; no changes to questions or answers. Definitions match the service pages confirmed in earlier batches; `clf-d3-0697` and `0698` also cite the License Manager and Compute Optimizer guides. |
+| `d3-19` (Domain 3 core service definitions) | 2026-10-25 | All 18 checked; no changes to questions or answers. Definitions match the service pages confirmed in earlier batches; `clf-d3-0745` also cites the S3 storage classes page. Domain 3 review complete. |
 
 Each question was written for CloudPrep from the AWS pages it cites, and every cited URL was confirmed to load (HTTP 200) on 2026-10-21. Key facts were checked against the live pages (six advantages, Well-Architected pillars, CAF perspectives, 7 Rs, root-user tasks, shared responsibility, AZ definition, security groups vs network ACLs, S3 storage classes and Glacier, instance store persistence, Spot, Savings Plans, consolidated billing, Budgets, Artifact, Shield Standard, Trusted Advisor, Support plans).
 
