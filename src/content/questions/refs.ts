@@ -37,6 +37,10 @@ export const REFS = {
     title: 'What is AWS Artifact?',
     url: 'https://docs.aws.amazon.com/artifact/latest/ug/what-is-aws-artifact.html',
   },
+  artifactDownload: {
+    title: 'Downloading reports in AWS Artifact',
+    url: 'https://docs.aws.amazon.com/artifact/latest/ug/downloading-documents.html',
+  },
   athena: { title: 'Amazon Athena', url: 'https://aws.amazon.com/athena/' },
   athenaDocs: {
     title: 'What is Amazon Athena?',
@@ -189,6 +193,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html',
   },
   controlTower: { title: 'AWS Control Tower', url: 'https://aws.amazon.com/controltower/' },
+  controlTowerAccountFactory: {
+    title: 'Provision and manage accounts with Account Factory',
+    url: 'https://docs.aws.amazon.com/controltower/latest/userguide/account-factory.html',
+  },
   controlTowerControls: {
     title: 'About controls in AWS Control Tower',
     url: 'https://docs.aws.amazon.com/controltower/latest/controlreference/controls.html',
@@ -388,6 +396,10 @@ export const REFS = {
   guardDutyDocs: {
     title: 'What is Amazon GuardDuty?',
     url: 'https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html',
+  },
+  guardDutyMalware: {
+    title: 'GuardDuty Malware Protection for EC2',
+    url: 'https://docs.aws.amazon.com/guardduty/latest/ug/malware-protection.html',
   },
   ha: {
     title: 'Reliability pillar: Design your workload to withstand component failures',
@@ -766,6 +778,10 @@ export const REFS = {
   shieldPricing: {
     title: 'AWS Shield pricing',
     url: 'https://aws.amazon.com/shield/pricing/',
+  },
+  shieldSrt: {
+    title: 'Shield Response Team (SRT) support',
+    url: 'https://docs.aws.amazon.com/waf/latest/developerguide/ddos-srt-support.html',
   },
   siteToSiteVpn: {
     title: 'AWS Site-to-Site VPN',
