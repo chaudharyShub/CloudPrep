@@ -59,6 +59,12 @@ describe('guest data and the account copy', () => {
     expect(accountOwner(base)).toBe(FAKE_USER.id);
 
     await user.click(screen.getAllByRole('button', { name: 'Sign out' })[0] as HTMLElement);
+    await user.click(
+      within(await screen.findByRole('dialog', { name: 'Sign out of CloudPrep?' })).getByRole(
+        'button',
+        { name: 'Sign out' },
+      ),
+    );
     expect(await screen.findByText(GUEST_QUESTION.stem)).toBeVisible();
     expect(screen.queryByText(ACCOUNT_QUESTION.stem)).toBeNull();
     await waitFor(() => {
@@ -94,6 +100,12 @@ describe('guest data and the account copy', () => {
     // Sign out straight after a change, before the batched send would run.
     await user.click(screen.getByRole('radio', { name: 'Light' }));
     await user.click(screen.getAllByRole('button', { name: 'Sign out' })[0] as HTMLElement);
+    await user.click(
+      within(await screen.findByRole('dialog', { name: 'Sign out of CloudPrep?' })).getByRole(
+        'button',
+        { name: 'Sign out' },
+      ),
+    );
     expect(await screen.findByText('Signed out')).toBeVisible();
     expect(tables.rows('user_preferences').map((row) => row['preferences'])).toEqual([
       { theme: 'light' },
@@ -170,6 +182,27 @@ describe('adding guest data to the account', () => {
 });
 
 describe('sync status', () => {
+  it('AC-B.25 the sign-out question says whether everything is saved to the account', async () => {
+    const tables = createFakeUserTables();
+    const { guest, accounts } = browser(tables);
+    accounts.markAskedToImport(FAKE_USER.id);
+    const { user } = renderApp('/settings', { store: guest, accounts });
+    await screen.findByText('Your progress, exam history and settings are saved to your account.');
+    await user.click(screen.getAllByRole('button', { name: 'Sign out' })[0] as HTMLElement);
+    expect(
+      await screen.findByRole('dialog', { name: 'Sign out of CloudPrep?' }),
+    ).toHaveAccessibleDescription(/Your progress is saved to your account/);
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    tables.failWith = 'Failed to fetch';
+    await user.click(screen.getByRole('radio', { name: 'Light' }));
+    await screen.findByText(/1 change is waiting to be saved/, {}, { timeout: 3000 });
+    await user.click(screen.getAllByRole('button', { name: 'Sign out' })[0] as HTMLElement);
+    expect(
+      await screen.findByRole('dialog', { name: 'Sign out of CloudPrep?' }),
+    ).toHaveAccessibleDescription(/haven't reached your account yet/);
+  });
+
   it('AC-B.22 Settings shows whether changes are saved to the account', async () => {
     const tables = createFakeUserTables();
     const { guest, accounts } = browser(tables);

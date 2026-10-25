@@ -67,6 +67,10 @@ test.describe('as a guest first', () => {
 
     // The Account card's button (the navigation has one too).
     await page.getByRole('button', { name: 'Sign out' }).filter({ visible: true }).last().click();
+    await page
+      .getByRole('dialog', { name: 'Sign out of CloudPrep?' })
+      .getByRole('button', { name: 'Sign out' })
+      .click();
     await expect(page.getByText('Signed out')).toBeVisible();
     const accountKeys = await page.evaluate(() =>
       Object.keys(window.localStorage).filter((key) => key.startsWith('cloudprep-account:')),

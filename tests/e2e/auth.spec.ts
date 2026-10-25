@@ -54,6 +54,10 @@ test.describe('as a guest', () => {
     // The desktop sidebar and the phone drawer both show the account; use the visible one.
     await expect(page.getByText('Test Learner').filter({ visible: true })).toBeVisible();
     await page.getByRole('button', { name: 'Sign out' }).filter({ visible: true }).click();
+    await page
+      .getByRole('dialog', { name: 'Sign out of CloudPrep?' })
+      .getByRole('button', { name: 'Sign out' })
+      .click();
     await expect(page).toHaveURL(/\/sign-in\?next=%2Fhistory$/);
     await page.reload();
     await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();

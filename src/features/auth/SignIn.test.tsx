@@ -139,6 +139,12 @@ describe('sign-in', () => {
     expect(card.getByText('Test Learner')).toBeVisible();
 
     await user.click(card.getByRole('button', { name: 'Sign out' }));
+    await user.click(
+      within(await screen.findByRole('dialog', { name: 'Sign out of CloudPrep?' })).getByRole(
+        'button',
+        { name: 'Sign out' },
+      ),
+    );
     expect(await screen.findByText('Signed out')).toBeVisible();
     expect(await screen.findByText(/using CloudPrep as a guest/)).toBeVisible();
   });
@@ -150,10 +156,29 @@ describe('sign-in', () => {
     const nav = screen.getAllByRole('button', { name: 'Sign out' })[0];
     expect(nav).toBeDefined();
     await user.click(nav as HTMLElement);
+    await user.click(
+      within(await screen.findByRole('dialog', { name: 'Sign out of CloudPrep?' })).getByRole(
+        'button',
+        { name: 'Sign out' },
+      ),
+    );
     await waitFor(() => {
       expect(router.state.location.pathname).toBe('/sign-in');
     });
     expect(screen.getAllByRole('link', { name: 'Sign in' }).length).toBeGreaterThan(0);
+  });
+
+  it('AC-B.25 asks before signing out, and Cancel keeps you signed in', async () => {
+    const auth = createFakeAuthClient({ user: FAKE_USER });
+    const { user } = renderApp('/history', { auth });
+    await screen.findByRole('heading', { level: 1, name: 'Exam history' });
+    await user.click(screen.getAllByRole('button', { name: 'Sign out' })[0] as HTMLElement);
+    const dialog = await screen.findByRole('dialog', { name: 'Sign out of CloudPrep?' });
+    expect(dialog).toHaveAccessibleDescription('You can sign in again at any time.');
+    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    expect(screen.queryByRole('dialog', { name: 'Sign out of CloudPrep?' })).toBeNull();
+    expect(await auth.getUser()).toEqual(FAKE_USER);
+    expect(screen.getByRole('heading', { level: 1, name: 'Exam history' })).toBeVisible();
   });
 
   it('AC-B.10 a signed-in visitor to the sign-in page goes to the dashboard', async () => {
