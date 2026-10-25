@@ -315,6 +315,7 @@ Step 4 acceptance criteria:
 
 Follow-up to step 2 (D-045):
 - AC-B.17 Email sign-in is offered only when `VITE_EMAIL_SIGN_IN` is `true`; otherwise the sign-in page offers Google alone.
+- AC-B.25 Signing out (navigation or Settings) asks for confirmation first; Cancel keeps the user signed in. The question says whether everything is already saved to the account.
 
 ## P10 — Optional features (v1.x, pick à la carte)
 

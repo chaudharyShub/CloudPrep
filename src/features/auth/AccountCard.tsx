@@ -7,12 +7,12 @@ import { useAuth } from '@/state/AuthProvider';
 import { useToast } from '@/components/ui/Toast';
 import { useSyncStatus } from '@/state/UserDataProvider';
 import { describeGuestData, useGuestImport } from './useGuestImport';
-import { useSignOut } from './useSignOut';
+import { useSignOutConfirmation } from './useSignOutConfirmation';
 
 /** Settings: the signed-in account, or how to sign in. */
 export function AccountCard() {
   const { state, client } = useAuth();
-  const signOut = useSignOut();
+  const signOut = useSignOutConfirmation();
 
   if (state.status === 'loading' || !client.available) return null;
 
@@ -34,9 +34,10 @@ export function AccountCard() {
             </dl>
             <SyncStatusLine />
             <GuestDataOffer />
-            <Button variant="secondary" size="sm" icon={LogOut} onClick={() => void signOut()}>
+            <Button variant="secondary" size="sm" icon={LogOut} onClick={signOut.request}>
               Sign out
             </Button>
+            {signOut.dialog}
           </>
         ) : (
           <>

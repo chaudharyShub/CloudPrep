@@ -3,12 +3,12 @@ import { LogIn, LogOut } from 'lucide-react';
 import { IconButton } from '@/components/ui/Button';
 import { buttonClasses } from '@/components/ui/buttonStyles';
 import { useAuth } from '@/state/AuthProvider';
-import { useSignOut } from './useSignOut';
+import { useSignOutConfirmation } from './useSignOutConfirmation';
 
 /** Navigation footer: who is signed in, with sign-out, or a sign-in link for guests. */
 export function AccountNav({ onNavigate }: { onNavigate?: () => void }) {
   const { state, client } = useAuth();
-  const signOut = useSignOut();
+  const signOut = useSignOutConfirmation();
 
   if (state.status === 'loading' || !client.available) return null;
 
@@ -32,7 +32,8 @@ export function AccountNav({ onNavigate }: { onNavigate?: () => void }) {
         <p className="truncate font-medium text-fg">{name ?? email ?? 'Signed in'}</p>
         {name && email && <p className="truncate text-fg-muted">{email}</p>}
       </div>
-      <IconButton label="Sign out" icon={LogOut} size="sm" onClick={() => void signOut()} />
+      <IconButton label="Sign out" icon={LogOut} size="sm" onClick={signOut.request} />
+      {signOut.dialog}
     </div>
   );
 }
