@@ -140,6 +140,10 @@ export const REFS = {
   codeDeploy: { title: 'AWS CodeDeploy', url: 'https://aws.amazon.com/codedeploy/' },
   codePipeline: { title: 'AWS CodePipeline', url: 'https://aws.amazon.com/codepipeline/' },
   cognito: { title: 'Amazon Cognito', url: 'https://aws.amazon.com/cognito/' },
+  cognitoDocs: {
+    title: 'What is Amazon Cognito?',
+    url: 'https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html',
+  },
   compliance: {
     title: 'AWS Compliance Programs',
     url: 'https://aws.amazon.com/compliance/programs/',
@@ -528,6 +532,10 @@ export const REFS = {
   qDeveloper: { title: 'Amazon Q Developer', url: 'https://aws.amazon.com/q/developer/' },
   quickSight: { title: 'Amazon Quick Sight', url: 'https://aws.amazon.com/quicksight/' },
   ram: { title: 'AWS Resource Access Manager', url: 'https://aws.amazon.com/ram/' },
+  ramDocs: {
+    title: 'What is AWS Resource Access Manager?',
+    url: 'https://docs.aws.amazon.com/ram/latest/userguide/what-is.html',
+  },
   rds: { title: 'Amazon RDS', url: 'https://aws.amazon.com/rds/' },
   rdsOracleLicensing: {
     title: 'RDS for Oracle licensing options',
