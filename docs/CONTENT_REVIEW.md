@@ -1,6 +1,6 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-25.1` · 2,000 questions · 1,457 `checked`, 543 `unverified`, none `approved` yet.
+> Bank version `2026-10-25.1` · 2,000 questions · 1,497 `checked`, 503 `unverified`, none `approved` yet.
 >
 > Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
 
@@ -46,6 +46,7 @@ Batches in `src/content/questions/batches/` are reviewed one file (about 30 ques
 | `d3-09` (3.4 database scenarios) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0347` notes the Timestream for LiveAnalytics end-of-support notice; `0359` and `0370` cite the DynamoDB and RDS encryption pages. |
 | `d3-10` (3.5 network scenarios) | 2026-10-25 | All 40 checked; no changes to questions or answers. `clf-d3-0397` matches CloudFront's stated "zero fees for data transfer out from AWS origins"; `0381` and `0402` now cite the CloudFront caching and VPC Flow Logs pages. |
 | `d3-11` (3.6 storage scenarios) | 2026-10-25 | All 40 checked. Fix: `clf-d3-0418` correct option said S3 objects can be up to 5 TB; the S3 guide now says multipart upload handles objects up to 50 TB (single PUT up to 5 GB), so the option and explanation are updated (revision 2). `0433` cites the Object Lock page. Other storage facts (Glacier classes, EBS types, EFS, FSx, Storage Gateway, Express One Zone) were confirmed. |
+| `d3-12` (3.7 AI/ML and analytics scenarios) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0476` notes the Q Developer IDE plugin end of support (30 April 2027, Kiro). Rekognition's availability page was checked: only Streaming Video and Bulk Image Analysis closed to new customers (30 April 2026), so Custom Labels (`0460`) and stored-video moderation (`0484`) remain valid. |
 
 Each question was written for CloudPrep from the AWS pages it cites, and every cited URL was confirmed to load (HTTP 200) on 2026-10-21. Key facts were checked against the live pages (six advantages, Well-Architected pillars, CAF perspectives, 7 Rs, root-user tasks, shared responsibility, AZ definition, security groups vs network ACLs, S3 storage classes and Glacier, instance store persistence, Spot, Savings Plans, consolidated billing, Budgets, Artifact, Shield Standard, Trusted Advisor, Support plans).
 

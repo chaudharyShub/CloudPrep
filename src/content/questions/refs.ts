@@ -723,6 +723,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html',
   },
   rekognition: { title: 'Amazon Rekognition', url: 'https://aws.amazon.com/rekognition/' },
+  rekognitionAvailability: {
+    title: 'Amazon Rekognition feature availability changes',
+    url: 'https://docs.aws.amazon.com/rekognition/latest/dg/rekognition-availability-changes.html',
+  },
   repost: { title: 'AWS re:Post', url: 'https://repost.aws/' },
   reservedInstances: {
     title: 'Amazon EC2 Reserved Instances',
