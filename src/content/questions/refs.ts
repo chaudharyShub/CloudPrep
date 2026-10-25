@@ -702,6 +702,10 @@ export const REFS = {
     title: 'Regions and Availability Zones',
     url: 'https://aws.amazon.com/about-aws/global-infrastructure/regions_az/',
   },
+  regionsAzsDocs: {
+    title: 'AWS Regions and Availability Zones (Global Infrastructure guide)',
+    url: 'https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html',
+  },
   rekognition: { title: 'Amazon Rekognition', url: 'https://aws.amazon.com/rekognition/' },
   repost: { title: 'AWS re:Post', url: 'https://repost.aws/' },
   reservedInstances: {
