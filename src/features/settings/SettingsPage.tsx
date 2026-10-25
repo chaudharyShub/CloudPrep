@@ -50,7 +50,7 @@ export function SettingsPage() {
       <PageHeader
         title="Settings"
         icon={PAGE_ICONS.settings}
-        description="Preferences and the data stored in this browser. Changes save automatically."
+        description="Your preferences and the data CloudPrep saves for you. Changes save automatically."
       />
 
       <div className="flex max-w-prose flex-col gap-6">

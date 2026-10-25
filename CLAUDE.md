@@ -6,14 +6,14 @@ CloudPrep is an unofficial AWS Certified Cloud Practitioner (CLF-C02) exam simul
 
 ## Current status
 
-All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring, awaiting review) and steps 1–4 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script; D-045: sign-in; D-046: questions from the database; D-047: progress in the database). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
+All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring) and steps 1–4 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script; D-045: sign-in; D-046: questions from the database; D-047: progress in the database), plus analytics (D-048), the logo (D-050) and a full review of the question bank (1,995 `checked`, 5 `unverified`; `docs/CONTENT_REVIEW.md`). The app version is in `package.json` (2.0.0 = the Supabase backend). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
 
 ## Commands
 
 ```
 npm run dev                 # local dev server
 npm run build / preview     # production build / serve it
-npm run typecheck           # tsc --noEmit
+npm run typecheck           # tsc -b (type check only; the tsconfigs set noEmit)
 npm run lint                # eslint
 npm test                    # vitest (unit + component + question-bank validation)
 npm run test:e2e            # playwright (builds dist-e2e/ via build:e2e, with a fake sign-in)

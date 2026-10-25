@@ -12,10 +12,9 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 ## Question bank
 
 - The bank has **2,000 questions** (400 / 600 / 753 / 247 across the four domains), so the full 65-question, 90-minute exam is available. The shorter exam only appears if the bank is ever too small.
-- **1,956 questions are `unverified`** (D-041): written from the cited AWS pages but not yet re-checked one by one. Only the original 44 are `checked`, and none is `approved`. Learning mode labels unverified questions; treat their facts with care. See `docs/CONTENT_REVIEW.md`.
+- **1,995 questions are `checked`** against the AWS pages they cite (reviewed on 2026-10-25), and **5 are still `unverified`** because no current AWS page confirms them (D-041). None is `approved` yet: the checks were done by the author, without a second human review. Learning mode notes with the feedback when a question is `unverified` or only `checked`. See `docs/CONTENT_REVIEW.md`.
 - Some questions overlap in topic. An automated check (`node scripts/check-duplicates.mjs 0.3`) flags about 15 pairs with similar wording; these were reviewed and test different points, but the bank was not deduplicated by hand.
-- The question bank is bundled into the main script (about 1.6 MB, 430 KB compressed), so the first load is slower than before.
-- AWS services and support plans change. Each question records the date it was checked. AWS Support plan changes taking effect on 1 January 2027 will need a content review.
+- AWS services and support plans change. Each question records the date it was checked. Questions note services that AWS has closed to new customers or is ending (for example Snowball and Business Support); AWS Support plan changes taking effect on 1 January 2027 will need another content review.
 
 ## Accounts
 
@@ -78,5 +77,5 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 
 - First-visit onboarding or a welcome tour.
 - A side-by-side comparison of two exam attempts.
-- Sync, accounts or sharing results with others.
+- Sharing results with others, or deleting your own account from inside the app.
 - Offline install (PWA). After the first visit the browser caches files, but offline use isn't guaranteed.

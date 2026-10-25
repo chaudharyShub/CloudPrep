@@ -1,27 +1,30 @@
 # CloudPrep — Product Specification
 
-> Status: **Draft for approval** · Last updated: 2026-10-21
+> Status: **Describes the app as built** (version 2.0.0) · Last updated: 2026-10-26
 > CloudPrep is an unofficial practice tool. It is not affiliated with, endorsed by, or sponsored by Amazon Web Services.
+>
+> This replaces the first draft of 2026-10-21. What changed from that plan is in IMPLEMENTATION_PLAN.md ("Changes from the original plan") and the reasons are in DECISIONS.md.
 
 ## 1. Purpose
 
-CloudPrep is a browser-based practice simulator for the **AWS Certified Cloud Practitioner (CLF-C02)** exam. It is built for one person's preparation and is shared with a small group of friends as a static website. Each person's data stays in their own browser.
+CloudPrep is a browser-based practice simulator for the **AWS Certified Cloud Practitioner (CLF-C02)** exam. It was built for one person's preparation and is shared with a small group of friends as a website.
 
 ### 1.1 Goals
 
 1. Simulate the real exam's format, length, timing and pressure as closely as a browser allows.
 2. Help the learner find and fix weak areas by domain and task statement.
 3. Teach through high-quality, original, source-cited explanations.
-4. Work entirely in the browser: no account, no server, no cost.
+4. Cost nothing to run: a static site on Vercel and a free-tier Supabase project, with no paid APIs.
+5. Let anyone practise straight away as a guest, and let signed-in users keep their progress on every device.
 
-### 1.2 Non-goals (v1)
+### 1.2 Non-goals
 
-- A backend, accounts, sync between devices, or leaderboards.
+- Leaderboards, sharing results, or any social features.
 - A tamper-proof or certified exam environment.
 - Reproducing AWS's scaled-scoring algorithm, which is proprietary.
-- Using real, leaked or "dump" exam questions.
+- Using real, leaked or "dump" exam questions (D-042).
 - AI-generated questions or explanations at runtime.
-- Other AWS certifications. The data model leaves room for them, but they are not built.
+- Other AWS certifications for now. The database is ready for them (`exam_id` on every table, D-044), but the app is CLF-C02 only.
 
 ## 2. Verified exam facts (source of truth)
 
@@ -31,11 +34,11 @@ Source: the official CLF-C02 exam guide, <https://docs.aws.amazon.com/aws-certif
 |---|---|---|
 | Total questions | 65 | A full mock has 65 questions |
 | Scored / unscored | 50 scored, 15 unscored, not identified | All 65 are scored for practice. No question is labelled "unscored". |
-| Duration | 90 minutes | Default timer is 90:00 |
+| Duration | 90 minutes | The timer is 90:00 |
 | Multiple choice | 1 correct + 3 distractors (4 options) | Enforced by the validator |
 | Multiple response | 2 or more correct out of 5 or more options | Enforced by the validator |
 | Unanswered | Scored as incorrect; no penalty for guessing | Same rule |
-| Result | Pass/fail; scaled score 100–1,000; passing is 700 | Not reproduced. We show an unofficial practice score (see §6). |
+| Result | Pass/fail; scaled score 100–1,000; passing is 700 | Not reproduced. CloudPrep shows an unofficial practice score (§6). |
 | Scoring model | Compensatory: you don't need to pass each section | Pass/fail uses only the overall practice score |
 | Domain weights (of scored content) | D1 24% · D2 30% · D3 34% · D4 12% | Used to balance question selection (§5.3) |
 
@@ -48,86 +51,83 @@ Source: the official CLF-C02 exam guide, <https://docs.aws.amazon.com/aws-certif
 | **3. Cloud Technology and Services (34%)** | 3.1 Deploying and operating · 3.2 Global infrastructure · 3.3 Compute · 3.4 Database · 3.5 Network · 3.6 Storage · 3.7 AI/ML and analytics · 3.8 Other in-scope service categories |
 | **4. Billing, Pricing, and Support (12%)** | 4.1 Pricing models · 4.2 Billing, budget and cost management · 4.3 Technical resources and AWS Support options |
 
-> **Content freshness:** the current guide uses newer names such as *AWS Business Support+*, *AWS Unified Operations*, *Amazon SageMaker AI*, *Amazon Quick Sight* and *Amazon WorkSpaces Secure Browser*. Questions must use the names in the current guide and documentation, not older study material.
+> **Content freshness:** the current guide uses newer names such as *AWS Business Support+*, *AWS Unified Operations*, *Amazon SageMaker AI*, *Amazon Quick Sight* and *Amazon WorkSpaces Secure Browser*. Questions use the names in the current guide and documentation, and note services AWS has closed or is ending (for example Snowball, and the Support plan changes on 1 January 2027).
 
 ## 3. Users
 
 | User | Needs |
 |---|---|
-| **Primary: the owner** | Realistic mocks, focused weak-area practice, progress over weeks |
-| **Friends** | Open a link and practise immediately, with no setup or sign-up; their progress stays private |
+| **Primary: the owner** | Realistic mocks, focused weak-area practice, progress over weeks, on more than one device |
+| **Friends** | Open a link and practise immediately as a guest; sign in with Google for mock exams and synced progress; their data stays private |
 
-Assumption: users have a modern evergreen browser (the latest two versions of Chrome, Edge, Firefox or Safari) on desktop, tablet or phone.
+Assumption: a current version of Chrome, Edge, Firefox or Safari on desktop, tablet or phone (KNOWN_LIMITATIONS.md lists what is tested).
 
-## 4. Feature scope
+## 4. Features
 
-Priority: **Core** = required for v1 · **Optional** = v1.x if time allows · **Deferred** = not planned for v1.
+### 4.1 Guests and accounts
 
-### 4.1 Core
+| | Guest | Signed in (Google; email links once SMTP is set up, D-045) |
+|---|---|---|
+| Learning mode, bookmarks | Yes, saved in this browser | Yes, saved to the account |
+| Settings, privacy page | Yes | Yes |
+| Dashboard, mock exams, results, exam history, progress | Sign-in required | Yes |
+| Where data lives | `localStorage` in this browser | Supabase, with a copy in this browser that works offline (D-047) |
 
-| Area | Feature |
+`/` opens the dashboard, so guests land on the sign-in page, which offers "Continue as a guest". After signing in on a browser with guest data, the user is asked once whether to add it to the account; Settings offers it again later. Guest data is never changed by this. Signing out asks for confirmation and says whether everything is saved yet.
+
+### 4.2 Pages
+
+| Page | What it does |
 |---|---|
-| Onboarding | Welcome screen on first visit, an unofficial-tool disclaimer that must be acknowledged, and a short "how it works" |
-| Dashboard | Readiness summary, per-domain accuracy, recent attempts, quick actions, and empty states for new users |
-| Exam Mode | Instructions → 65-question timed session → review screen → submit → results |
-| Exam Mode | Single-answer (radio) and multiple-response (checkbox, "Choose TWO" style) questions |
-| Exam Mode | Question navigator grid, previous/next, flag for review, answered/unanswered/flagged states |
-| Exam Mode | Timestamp-based 90-minute timer, low-time warnings, auto-submit at 0, one submission only |
-| Exam Mode | Restores the in-progress exam after a refresh or crash, including when it expired while closed |
-| Results | Practice score, pass/fail against the benchmark, per-domain breakdown, time used |
-| Results | Question-by-question review with your answer, the correct answer, per-option explanations and source links |
-| History | List of past attempts, comparison of two attempts, score trend |
-| Learning Mode | Practice by domain or task statement, with immediate feedback and explanations |
-| Learning Mode | Mistakes review (questions currently answered wrong), bookmarks, per-question progress |
-| Settings | Practice pass benchmark, option shuffling, default practice session length, reduced motion |
-| Data | Export to a JSON file; import a validated JSON file with a preview and confirmation; reset with confirmation |
-| Quality | Responsive design, keyboard operable, WCAG 2.2 AA contrast, visible focus |
-| Legal | About page with the disclaimer, sources and limitations of the practice score |
+| Dashboard (`/dashboard`) | Latest mock exam, recent attempts, practice by domain and quick actions, with empty states for new users |
+| Learning mode (`/practice`) | Practice by domain, topic (task statement) and difficulty, 5 / 10 / 20 / all questions, optionally unanswered only; "Practise mistakes" and "Practise bookmarks" |
+| Mock exam (`/exam`) | Rules, scoring explanation, integrity mode, start / resume / abandon; full exam (65 questions, 90 minutes) |
+| Check-in (`/exam/check-in`) | AI-proctored exams only: rules, camera and microphone, room check, calibration (§9) |
+| Exam session and review (`/exam/session`, `/exam/review`) | The exam itself and the final review before submitting |
+| Results (`/results/:id`) | Practice score, benchmark outcome, domain performance, weak areas, recommended next steps, integrity log |
+| Answer review (`/results/:id/review`) | Every question with your answer, the correct answer, explanations and sources; filters: all, correct, incorrect, unanswered |
+| Exam history (`/history`) | All submitted attempts, including shorter and proctor-ended ones |
+| Progress (`/progress`) | Practice readiness (D-033), recent exam scores, domain strengths and weaknesses, frequently missed topics, questions you keep missing, practice coverage |
+| Bookmarks (`/bookmarks`) | Bookmarked questions, with practice from the list |
+| Settings (`/settings`) | Preferences, account, data management (§8) |
+| Privacy (`/privacy`) | What is stored, what is monitored, analytics, how to delete records |
+| Sign-in (`/sign-in`, `/auth/callback`) | Google sign-in (and email links when enabled), return to the requested page |
 
-### 4.2 Optional (v1.x)
+### 4.3 Not built
 
-- Light theme. The app is dark-first; light theme comes later.
-- Exam time accommodation setting (+30 minutes), mirroring AWS's ESL accommodation. It is labelled as a preference.
-- Keyboard shortcuts in the exam (next/previous/flag/select options), with a help sheet.
-- Custom-length timed quizzes, for example 20 questions in 28 minutes, scaled to the real pace.
-- Analytics by task statement.
-- **Proctoring-lite** (opt-in): fullscreen reminder, logging when the tab is hidden or loses focus, and an integrity-event timeline on the results page.
-- **AI-proctored exams** (opt-in, added in Phase 7, D-043): check-in, then a strict on-device AI proctor (camera and microphone) that warns twice and then ends the exam. Nothing is recorded or stored except event types and times.
+- A welcome or onboarding flow, and an About page. The unofficial-tool note is in the sidebar and mobile menu; the scoring explanation is on the exam and results pages.
+- Comparing two attempts side by side.
+- Exam time accommodation (+30 minutes), keyboard shortcuts, custom-length quizzes.
+- Installable offline app (PWA): icons and "Add to Home Screen" exist, but there's no service worker.
+- Spaced repetition, an in-app question editor, other certifications, other languages.
+- Server-side scoring (Phase 8 step 5: answers are still downloaded with the questions).
+- Deleting your own account from inside the app ("Reset everything" deletes its data).
 
-### 4.3 Deferred
-
-- Merging imported data into existing data (v1 import replaces it).
-- Installable PWA / offline use.
-- Spaced-repetition scheduling.
-- An in-app editor for the question bank.
-- Other certifications, i18n, cloud sync.
-
-## 5. Exam Mode specification
+## 5. Exam Mode
 
 ### 5.1 Rules
 
-- 65 questions and 90:00, using only questions with `review.status = "reviewed"`.
-- No pause. The real exam has none, and the timer keeps running while the tab is closed.
-- Answers save instantly. The learner can change answers until submission.
-- No feedback, correctness hints or explanations until the exam is submitted.
+- 65 questions and 90:00, using questions with status `unverified`, `checked` or `approved` (D-041).
+- No pause (D-013). The timer keeps running while the tab is closed.
+- Answers save instantly, in the browser and to the account. The learner can change answers until submission.
+- No feedback, correctness hints or explanations until the exam is submitted. Exam pages receive question views without correct answers or explanations.
 - Unanswered questions count as incorrect.
-- Multiple-response questions are all-or-nothing: the selection must match the correct set exactly. This is an assumption; the guide does not describe partial credit.
-- Multiple-response UI states the required number ("Choose TWO") and stops more than that number being selected. It shows a hint if fewer are selected.
-- Only one active exam at a time. Starting a new one while one is in progress asks whether to resume or abandon it.
+- Multiple-response questions are all-or-nothing (D-012). The question says how many to select ("Select two"), more than that can't be selected, and a partly answered question is shown as such (D-027).
+- Flag questions, move with previous/next or the question grid, and review all, answered, unanswered, partly answered or flagged questions before submitting. The finish dialog shows how many are unanswered.
+- Only one exam at a time. Starting a new one while one is in progress offers to resume it or abandon it (with confirmation).
+- If the bank can't supply a full exam, a shorter timed exam at the real pace is offered instead (D-025). With the current bank this doesn't happen.
 
-### 5.2 Timer behaviour
+### 5.2 Timer
 
-- Timing is based on `endsAt = startedAt + duration` (epoch milliseconds), stored with the session.
-- The time remaining is always `endsAt − now`. A 1-second interval only triggers re-renders and is never the source of truth.
-- The timer recalculates on `visibilitychange`, `focus` and page load, so it handles background-tab throttling and sleep.
-- Warnings appear at 10 minutes and 5 minutes. They are announced politely to screen readers once each, not every second.
-- At 0 the exam auto-submits once. A status guard (`in_progress → submitted`) makes repeated submission impossible.
-- On reload after `endsAt`, the exam is submitted with the saved answers and the reason `expired_while_away`. A notice explains what happened.
-- Limitation, documented in the app: the timer trusts the device clock. Changing the system clock affects it. This is acceptable for a self-practice tool.
+- The session stores `startedAt`, `endsAt` and `durationMs`. Time remaining is always `endsAt − now`; a 1-second interval only triggers re-renders (D-028).
+- It recalculates on `visibilitychange` and `focus`, so background-tab throttling and sleep don't matter.
+- Low-time warnings at 10 and 5 minutes (can be turned off in Settings), announced to screen readers once each.
+- At 0 the exam is submitted once, on any page, by the app-wide `ExamWatcher`. An exam found expired when the app opens is submitted with reason `expired_while_away`, once sign-in and questions have loaded.
+- The timer trusts the device clock.
 
-### 5.3 Question selection (blueprint)
+### 5.3 Question selection
 
-The domain weights apply to the **50 scored** questions on the real exam. CloudPrep applies them to all 65 questions using the largest-remainder method:
+The domain weights apply to the **50 scored** questions on the real exam. CloudPrep applies them to all 65 with the largest-remainder method (D-007):
 
 | Domain | Weight | Exact share of 65 | Allocated |
 |---|---|---|---|
@@ -137,69 +137,80 @@ The domain weights apply to the **50 scored** questions on the real exam. CloudP
 | D4 Billing, Pricing & Support | 12% | 7.8 | **8** |
 | **Total** | 100% | 65 | **65** |
 
-This is an approximation. The real distribution of the 15 unscored questions is unknown.
-
-Inside each domain:
-- Spread questions across task statements as evenly as the bank allows.
-- Prefer questions the learner hasn't seen in exam mode, then the ones seen least recently.
-- Include multiple-response questions where available. Their real share is not published, so CloudPrep targets roughly 10–20% as a practice assumption and does not enforce it.
-- Shuffle question order, and option order if that setting is on, with a seeded random generator. The seed is stored so the session can be restored exactly.
-
-**Bank too small:** if any domain has fewer reviewed questions than its quota, the full mock is disabled. The page explains why and shows per-domain counts. Learning Mode still works.
+Within each domain, questions not used in earlier exams come first, spread across task statements by round-robin. Question order and option order (if that setting is on) are shuffled with a seeded generator, and the seed is stored with the session (D-026).
 
 ## 6. Scoring (unofficial)
 
-- **Practice score** = correct ÷ total questions, shown as a percentage, for example "78% (51/65)".
-- **Practice benchmark** = a configurable pass threshold. The default is **70%** and the range is 50–90%.
-- **Per-domain accuracy** is shown as information only. Pass/fail ignores it, matching the compensatory model.
-- Every result screen and the About page explain this:
-  > "AWS reports a scaled score from 100–1,000 with 700 to pass, computed with a proprietary method across 50 scored questions. CloudPrep's practice score is simple percent-correct across all 65 questions. It is not a prediction of your real score."
-- CloudPrep will **not** show a number out of 1,000. A fake scaled score would suggest accuracy it doesn't have. See DECISIONS.md, D-008.
+- **Practice score** = correct ÷ total questions, shown as a percentage.
+- **Practice benchmark** = a pass threshold, 70% by default, 50–90% in steps of 5 in Settings. The benchmark in effect at submission is stored with the attempt.
+- **Per-domain results** are information only; pass/fail ignores them, like the compensatory model.
+- The exam and results pages explain that AWS reports a scaled score from 100 to 1,000 (700 to pass) with an unpublished method, and that CloudPrep's score is simple percent-correct. CloudPrep never shows a number out of 1,000 (D-008).
+- Attempts ended by the AI proctor are void: they never meet the benchmark and are left out of readiness, but keep their score for review (D-043).
+- **Readiness** (Progress page) uses explicit criteria over the last three exams and never says "ready" (D-033).
 
-## 7. Learning Mode specification
+## 7. Learning Mode
 
-- **Setup:** pick all domains, one domain, or specific task statements; choose a length of 5, 10 or 20 questions or "all"; optionally restrict to unseen questions, mistakes or bookmarks.
-- **Per question:** select answer(s) → **Check answer** → correct/incorrect state, the correct option(s) highlighted, the overall explanation, per-option explanations and source links → **Next**.
-- **Bookmark** button on every question, in practice and in post-exam review.
-- **Session summary:** score, list of missed questions, "Practise these again".
-- **Mistakes:** a question is "in mistakes" when its most recent answer, in either practice or an exam, was incorrect. It leaves the list when answered correctly in practice.
-- **Progress:** each question tracks attempts, number correct, last result and last answered time. Per-domain and per-task-statement accuracy are calculated from this.
+- **Setup:** domain, topic (task statement), difficulty, length 5 / 10 / 20 / all (default from Settings), optionally unanswered only. Or practise mistakes, bookmarks, or one domain from the dashboard.
+- **Per question:** select answer(s) → **Check answer** (enabled once the required number is selected) → correct/incorrect, the correct option(s), the overall explanation, an explanation for every option, source links and, for `unverified` and `checked` questions, a note on how they were checked → **Next**.
+- **Bookmark** on every question, in practice and in answer review.
+- **Session summary:** score, missed questions, "Retry incorrect". Sessions aren't restored after a reload (D-010), but every checked answer is saved.
+- **Mistakes:** questions whose latest answer, in practice or an exam, was incorrect. A correct answer clears them.
+- **Statistics** are question-level: "answered" counts unique questions, and accuracy uses each question's latest answer (D-019, D-023). Submitted exams add their answered questions (D-029).
 
-## 8. Core user journeys
+## 8. Settings and data
 
-Each journey lists its main path and the states it must handle.
+- **Preferences:** theme (dark, light, system), motion (system, reduce), practice benchmark, low-time warnings, option shuffling, default practice length. Only changed values are saved (D-034).
+- **Account:** who is signed in, whether changes are saved or waiting, sign out, add guest data.
+- **Export / import:** a JSON file of all data except the exam in progress. Import checks the file strictly (5 MB limit, same parsers as storage), shows a preview, and then merges or replaces. A full backup is made first (D-035).
+- **Recovery:** backups and copies of unreadable data can be downloaded, restored (full backups) or deleted.
+- **Clear:** exam in progress, learning progress, exam history, or everything (type RESET). Signed in, these delete the data from the account on every device.
 
-| # | Journey | Main path | Required states |
+## 9. Practice integrity (opt-in)
+
+Chosen per exam on the exam page (D-036, D-043):
+
+- **Standard:** nothing is monitored.
+- **Strict practice:** asks for fullscreen and logs tab, focus and fullscreen changes. It never judges and can be stopped at any time.
+- **AI-proctored:** a check-in like an online proctored exam, then an on-device proctor (MediaPipe face and object models, microphone loudness) watching the face, head, eyes and mouth, phones, other people, books and screens, the pointer, shortcuts and extra displays. Two warnings, then the third strike ends the exam; a phone, another person, a second display or a lost camera or microphone ends it at once.
+
+Only `{type, at}` events are stored, never frames, audio or images. The results page shows the log.
+
+## 10. Core user journeys
+
+| # | Journey | Main path | States handled |
 |---|---|---|---|
-| J1 | First visit | `/` → Welcome (disclaimer + how it works) → "Get started" → Dashboard | Storage unavailable warning (app still works, nothing persists) |
-| J2 | Start mock | Dashboard → "Full mock exam" → Instructions (rules, time, question types, no-pause) → "Start exam" | Bank too small (disabled + reason); existing in-progress exam (Resume / Abandon with confirmation) |
-| J3 | Take exam | Answer → flag → navigate via grid → "Review" screen (all / unanswered / flagged filters) → Submit → confirm dialog (shows unanswered count) | Save failure toast; leave-page warning (`beforeunload`) |
-| J4 | Time expires | Timer hits 0 → auto-submit → Results with a "Time expired" notice | Expired while tab hidden or browser closed (submitted on next load) |
-| J5 | Review results | Results → per-question review (filter: all / incorrect / flagged / by domain) → Dashboard | Question removed from bank since attempt ("no longer available" placeholder) |
-| J6 | Domain practice | Dashboard / Practice → choose domain or task → session → summary → "Review mistakes" | Domain with no questions; session interrupted (not restored in v1, by design) |
-| J7 | Bookmarks | Bookmarks page → list by domain → "Practise bookmarks" | Empty state with a hint for adding bookmarks |
-| J8 | History | History → list of attempts → select two → side-by-side comparison (score, per-domain, time) | Empty; only one attempt (comparison disabled with explanation) |
-| J9 | Settings / data | Settings → change prefs (saves instantly) → Export (downloads `.json`) / Import (file → validate → preview → confirm replace) / Reset (type-to-confirm) | Invalid file, wrong app, newer schema version, file too large |
-| J10 | Refresh mid-exam | Reload → session restored to the same question with answers, flags and remaining time | Corrupt saved session (keeps a backup copy, explains, offers to discard); expired session (J4) |
+| J1 | First visit | Link → sign-in page → "Continue as a guest" (Learning mode) or "Continue with Google" | Sign-in not set up; storage unavailable (works, nothing saved); questions downloading or failed ("Try again") |
+| J2 | Start mock | Mock exam → rules and integrity mode → start (or check-in for proctored) | Exam in progress (resume / abandon); browser can't proctor (mode disabled) |
+| J3 | Take exam | Answer → flag → grid → review → finish dialog (unanswered count) → submit | Save failure notice; offline (saved locally, synced later) |
+| J4 | Time expires | Timer hits 0 → submitted → results with "Time ran out" | Expired while closed (submitted on next load) |
+| J5 | Review results | Results → answer review (filters) → bookmark questions | Question changed since the attempt (archived wording, or current with a note) |
+| J6 | Domain practice | Learning mode → setup → session → summary → "Retry incorrect" | No matching questions (empty state); reload (answers kept, session not restored) |
+| J7 | Bookmarks and mistakes | Bookmarks page or Learning mode cards → practise them | Empty states with hints |
+| J8 | History and progress | Exam history → attempt; Progress → readiness and weak areas | No exams yet; fewer than three exams (readiness explains) |
+| J9 | Settings and data | Preferences (save instantly) → export / import (preview, merge or replace) / clear | Invalid file, wrong app, newer format, too large |
+| J10 | Refresh mid-exam | Reload → same question, answers, flags, remaining time | Corrupt saved exam (backed up, explained); proctored exam (strike, proctor restart) |
+| J11 | Second device | Sign in elsewhere → same progress, history and exam in progress | Offline changes on the first device (sent later; last change per record wins) |
 
-## 9. Acceptance criteria (product level)
+## 11. Product requirements
 
-- AC-P1: A new user can go from first visit to a started mock exam in 3 clicks or fewer, plus the disclaimer.
-- AC-P2: A full mock always contains exactly 65 unique, reviewed questions in a 16/19/22/8 domain split.
-- AC-P3: After a reload, the remaining time is within ±1 second of the expected value, and no answers are lost.
-- AC-P4: Auto-submission happens exactly once, even if several triggers fire at the same time.
-- AC-P5: No correctness information is visible anywhere in Exam Mode before submission, including in the DOM and in ARIA text.
-- AC-P6: Every question in the bank passes automated validation, and the build fails if one doesn't.
-- AC-P7: Every screen is fully operable by keyboard and passes automated axe checks with no serious or critical issues.
-- AC-P8: Exported data can be imported into a fresh browser and reproduces history, bookmarks, progress and preferences.
-- AC-P9: Corrupt or unavailable storage never crashes the app or causes silent data loss. Corrupt values are backed up before defaults are used.
-- AC-P10: The unofficial-tool disclaimer appears on the Welcome page and the About page, and in the footer of the results page.
+- R-1: A full mock always has exactly 65 unique, eligible questions in a 16 / 19 / 22 / 8 split.
+- R-2: After a reload the remaining time is correct and no answers are lost.
+- R-3: An exam is submitted exactly once, even if several triggers fire at once.
+- R-4: No correctness information is in the exam pages before submission, including the DOM and ARIA text.
+- R-5: Every question passes automated validation; `npm test` and `npm run validate:questions` fail otherwise.
+- R-6: Every page is keyboard operable and passes axe with no serious or critical issues, in both themes.
+- R-7: Exported data imports into a fresh browser and reproduces history, bookmarks, progress and settings.
+- R-8: Corrupt or unavailable storage never crashes the app or loses data silently; unreadable values are backed up first.
+- R-9: Each user can read and change only their own data (Row Level Security); the secret key never reaches the app.
+- R-10: The unofficial-tool note is visible on every app page (sidebar or mobile menu), and the scoring explanation on the exam and results pages.
 
-## 10. Content policy for questions
+TEST_PLAN.md says which tests cover these.
 
-- Every question is original and written in CloudPrep's own words from public AWS documentation and the exam guide.
-- Every question cites at least one `docs.aws.amazon.com` or `aws.amazon.com` URL.
-- Every question has an overall explanation, and every incorrect option has its own explanation.
-- Questions start as `draft`. A question becomes `reviewed` only after a human checks it against the cited sources, and only reviewed questions appear in exams. Drafts can appear in dev builds for authoring.
-- No "all of the above" or "none of the above", because options are shuffled.
-- Questions are added in reviewed batches. The bank is never padded to make the app look complete.
+## 12. Content policy for questions
+
+- Every question is original and written in CloudPrep's own words from public AWS documentation and the exam guide. No imported, scraped or dump questions (D-042).
+- Every question cites at least one https `docs.aws.amazon.com` or `aws.amazon.com` page (`scripts/check-references.mjs` checks they still load).
+- Every question has an overall explanation and an explanation for every option, correct ones included (D-022).
+- Single answer = exactly 4 options; multiple response = 5 or more options with 2 or more correct. No "all of the above" or "none of the above".
+- Statuses: `draft` (never shown) → `unverified` (written from the cited pages, not yet re-checked) → `checked` (verified against the cited pages) → `approved` (human sign-off; only the owner sets it) → `retired` (ID never reused). Learning and Exam modes show `unverified`, `checked` and `approved`, and Learning mode notes with the feedback when a question is `unverified` or only `checked`.
+- Questions live in the repo and are published to Supabase; the live app only sees published questions.
