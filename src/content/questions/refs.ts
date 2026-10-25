@@ -650,13 +650,29 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html',
   },
   vpn: { title: 'AWS VPN', url: 'https://aws.amazon.com/vpn/' },
+  waAvailability: {
+    title: 'Reliability pillar: Availability',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/availability.html',
+  },
   waCost: {
     title: 'Cost Optimization Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html',
   },
+  waCostAware: {
+    title: 'Well-Architected Framework: Expenditure and usage awareness',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-aware.html',
+  },
+  waCostBestPractices: {
+    title: 'Well-Architected Framework: Cost optimization best practices',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-bp.html',
+  },
   waCostDesign: {
     title: 'Well-Architected Framework: Cost optimization design principles',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-dp.html',
+  },
+  waCostOptimizeOverTime: {
+    title: 'Well-Architected Framework: Optimize over time',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-opti.html',
   },
   waDefinitions: {
     title: 'Well-Architected Framework: Definitions',
@@ -665,6 +681,18 @@ export const REFS = {
   waFramework: {
     title: 'AWS Well-Architected Framework',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html',
+  },
+  waImmutable: {
+    title: 'Reliability pillar: REL08-BP04 Deploy using immutable infrastructure',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_tracking_change_management_immutable_infrastructure.html',
+  },
+  waLensCatalog: {
+    title: 'AWS Well-Architected Tool: Lens Catalog',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/userguide/lens-catalog.html',
+  },
+  waLenses: {
+    title: 'AWS Well-Architected Tool: Using lenses',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/userguide/lenses.html',
   },
   waLooseCoupling: {
     title: 'Reliability pillar: REL04-BP02 Implement loosely coupled dependencies',
@@ -690,6 +718,10 @@ export const REFS = {
     title: 'Well-Architected Framework: The pillars of the framework',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html',
   },
+  waRelChange: {
+    title: 'Well-Architected Framework: Reliability change management',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel-chg-mgmt.html',
+  },
   waReliability: {
     title: 'Reliability Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html',
@@ -697,6 +729,14 @@ export const REFS = {
   waReliabilityDesign: {
     title: 'Well-Architected Framework: Reliability design principles',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel-dp.html',
+  },
+  waResiliency: {
+    title: 'Reliability pillar: Resiliency, and the components of reliability',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/resiliency-and-the-components-of-reliability.html',
+  },
+  waSecDataProtection: {
+    title: 'Well-Architected Framework: Security data protection',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sec-dataprot.html',
   },
   waSecurity: {
     title: 'Security Pillar',
@@ -713,6 +753,10 @@ export const REFS = {
   waSustainabilityDesign: {
     title: 'Well-Architected Framework: Sustainability design principles',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sus-design-principles.html',
+  },
+  waSustainabilityRevisions: {
+    title: 'Sustainability Pillar: Document revisions',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/sustainability-pillar/document-revisions.html',
   },
   waTool: {
     title: 'AWS Well-Architected Tool',
