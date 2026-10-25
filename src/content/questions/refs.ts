@@ -315,6 +315,10 @@ export const REFS = {
     title: 'AWS Firewall Manager',
     url: 'https://aws.amazon.com/firewall-manager/',
   },
+  flowLogs: {
+    title: 'Logging IP traffic using VPC Flow Logs',
+    url: 'https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html',
+  },
   forecast: { title: 'Amazon Forecast', url: 'https://aws.amazon.com/forecast/' },
   fraudDetector: { title: 'Amazon Fraud Detector', url: 'https://aws.amazon.com/fraud-detector/' },
   freeTier: { title: 'AWS Free Tier', url: 'https://aws.amazon.com/free/' },
@@ -407,6 +411,10 @@ export const REFS = {
   kmsDocs: {
     title: 'AWS Key Management Service concepts',
     url: 'https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html',
+  },
+  kmsOverview: {
+    title: 'AWS Key Management Service overview',
+    url: 'https://docs.aws.amazon.com/kms/latest/developerguide/overview.html',
   },
   knowledgeCenter: { title: 'AWS Knowledge Center', url: 'https://repost.aws/knowledge-center' },
   lakeFormation: { title: 'AWS Lake Formation', url: 'https://aws.amazon.com/lake-formation/' },
@@ -655,6 +663,10 @@ export const REFS = {
     title: 'AWS Shield',
     url: 'https://docs.aws.amazon.com/waf/latest/developerguide/shield-chapter.html',
   },
+  shieldFeatures: {
+    title: 'AWS Shield features',
+    url: 'https://aws.amazon.com/shield/features/',
+  },
   siteToSiteVpn: {
     title: 'AWS Site-to-Site VPN',
     url: 'https://aws.amazon.com/vpn/site-to-site-vpn/',
@@ -730,6 +742,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html',
   },
   vpn: { title: 'AWS VPN', url: 'https://aws.amazon.com/vpn/' },
+  waAbuse: {
+    title: 'AWS response to abuse and compromise',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/abuse-and-compromise.html',
+  },
   waAvailability: {
     title: 'Reliability pillar: Availability',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/availability.html',
