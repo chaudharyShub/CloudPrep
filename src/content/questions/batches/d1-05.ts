@@ -777,8 +777,8 @@ export default defineQuestions(
           'Correct. HA keeps services available most of the time.',
         ],
         [
-          'Fault tolerance aims for no service interruption even when components fail',
-          'Correct. Fault-tolerant systems continue without interruption.',
+          'Fault tolerance is the ability to withstand subsystem failure and maintain availability',
+          'Correct. A spare (redundant) subsystem picks up the work, typically almost seamlessly.',
         ],
         [
           'High availability means a system can never fail',
@@ -788,11 +788,10 @@ export default defineQuestions(
         ['Neither concept applies to cloud workloads', 'Both apply to cloud designs.'],
       ],
       a: ['a', 'b'],
-      x: 'Fault tolerance usually costs more than high availability.',
-      r: ['waReliability', 'ha'],
+      x: 'Fault tolerance uses spare capacity that can take over all the work of a failed subsystem, so weigh the cost of pre-provisioned capacity against availability goals.',
+      r: ['faultTolerance', 'waAvailability', 'ha'],
       tags: ['High availability', 'Fault tolerance'],
-      // Review 2026-10-25: AWS defines availability but not fault tolerance, or that it costs more than high availability.
-      st: 'unverified',
+      rev: 2,
     },
     {
       n: 199,

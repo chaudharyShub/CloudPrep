@@ -279,6 +279,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html',
   },
   fargate: { title: 'AWS Fargate', url: 'https://aws.amazon.com/fargate/' },
+  faultTolerance: {
+    title: 'Fault tolerance and fault isolation',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/availability-and-beyond-improving-resilience/fault-tolerance-and-fault-isolation.html',
+  },
   firewallManager: {
     title: 'AWS Firewall Manager',
     url: 'https://aws.amazon.com/firewall-manager/',
@@ -769,6 +773,10 @@ export const REFS = {
   waSecurityDesign: {
     title: 'Well-Architected Framework: Security design principles',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sec-design.html',
+  },
+  waStateless: {
+    title: 'REL05-BP06 Make systems stateless where possible',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_mitigate_interaction_failure_stateless.html',
   },
   waSustainability: {
     title: 'Sustainability Pillar',
