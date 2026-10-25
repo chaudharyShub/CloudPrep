@@ -1,6 +1,6 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-25.1` · 2,000 questions · 1,995 `checked`, 5 `unverified`, none `approved` yet.
+> Bank version `2026-10-25.2` · 2,000 questions · 1,995 `checked`, 5 `unverified`, none `approved` yet.
 >
 > Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
 
