@@ -130,9 +130,17 @@ export const REFS = {
     title: 'What is AWS CloudTrail?',
     url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html',
   },
+  cloudTrailEventHistory: {
+    title: 'Working with CloudTrail event history',
+    url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/view-cloudtrail-events.html',
+  },
   cloudTrailLake: {
     title: 'Working with AWS CloudTrail Lake',
     url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-lake.html',
+  },
+  cloudTrailOrgTrail: {
+    title: 'Creating a trail for an organization',
+    url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html',
   },
   cloudTrailValidation: {
     title: 'Validating CloudTrail log file integrity',
@@ -184,6 +192,10 @@ export const REFS = {
   controlTowerControls: {
     title: 'About controls in AWS Control Tower',
     url: 'https://docs.aws.amazon.com/controltower/latest/controlreference/controls.html',
+  },
+  controlTowerRegionDeny: {
+    title: 'Configure the Region deny control',
+    url: 'https://docs.aws.amazon.com/controltower/latest/userguide/region-deny.html',
   },
   costAllocationTags: {
     title: 'Organizing and tracking costs using AWS cost allocation tags',
@@ -393,6 +405,10 @@ export const REFS = {
     title: 'How AWS Pricing Works',
     url: 'https://docs.aws.amazon.com/whitepapers/latest/how-aws-pricing-works/',
   },
+  iamAbac: {
+    title: 'Define permissions based on attributes with ABAC authorization',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction_attribute-based-access-control.html',
+  },
   iamBestPractices: {
     title: 'Security best practices in IAM',
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html',
@@ -583,6 +599,10 @@ export const REFS = {
     title: 'Penetration Testing',
     url: 'https://aws.amazon.com/security/penetration-testing/',
   },
+  permissionsBoundaries: {
+    title: 'Permissions boundaries for IAM entities',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html',
+  },
   permissionSets: {
     title: 'Manage AWS accounts with permission sets',
     url: 'https://docs.aws.amazon.com/singlesignon/latest/userguide/permissionsetsconcept.html',
@@ -655,6 +675,10 @@ export const REFS = {
   },
   s3: { title: 'Amazon S3', url: 'https://aws.amazon.com/s3/' },
   s3BlockPublic: {
+    title: 'Blocking public access to your Amazon S3 storage',
+    url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html',
+  },
+  s3BlockPublicDocs: {
     title: 'Blocking public access to your Amazon S3 storage',
     url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html',
   },
