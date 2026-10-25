@@ -1,107 +1,95 @@
 # CloudPrep — Test Plan
 
-> Status: **Draft for approval** · Last updated: 2026-10-21
+> Status: **Describes the tests as built** (version 2.0.0) · Last updated: 2026-10-26
+> This replaces the first draft of 2026-10-21, which planned spec files and a fixture flag that were never created.
 
 ## 1. Strategy at a glance
 
 | Layer | Tool | What it covers | Where |
 |---|---|---|---|
-| Unit | Vitest | Pure domain logic: blueprint, selection, scoring, timer, reducers, progress, validator, migrations, envelope | `src/**/*.test.ts` |
-| Content | Vitest + `validate:questions` | Every question in the real bank against the validator rules | `src/content/questions/bank.test.ts` |
-| Component | Vitest + jsdom + RTL + user-event | UI primitives, feature components, hooks with an in-memory store | `src/**/*.test.tsx` |
-| End-to-end | Playwright (Chromium, WebKit, mobile viewport) | User journeys J1–J10, timer and refresh behaviour, multi-tab, import/export | `tests/e2e/*.spec.ts` |
-| Accessibility | `@axe-core/playwright` + jsx-a11y lint + manual | Every route, dialogs, exam flow | E2E + manual |
-| Static | `tsc --noEmit`, ESLint, Prettier | Types, `any`, layering rules, a11y lint | CI / `npm run check` |
+| Unit | Vitest | Domain logic (blueprint, selection, session reducer, timer, scoring, attempts, practice, progress, readiness, proctor rules, validator, PRNG), storage (envelope, areas, migrations, store, sync, transfer, account copy, question cache), backend mappers and adapters | `src/**/*.test.ts` |
+| Content | Vitest + `validate:questions` | Every question in the real bank against the validator | `src/content/questions/bank.test.ts`, `scripts/validate-questions.mjs` |
+| Database | Vitest + PGlite | Migrations, RLS, grants, constraints, publish rows and a real sync round trip | `src/backend/schema.test.ts` |
+| Component | Vitest + jsdom + Testing Library + user-event | UI primitives and whole pages rendered through `renderApp` | `src/**/*.test.tsx` |
+| End-to-end | Playwright (Chromium, WebKit, Pixel 7) | User journeys against a production-like build with a fake sign-in | `tests/e2e/*.spec.ts` |
+| Accessibility | `@axe-core/playwright`, jsx-a11y lint | Every page in both themes, exam and dialog states, keyboard-only flows | E2E + lint |
+| Static | `tsc -b`, ESLint, Prettier | Types, `any`, layering and import rules, formatting | `npm run check` |
+| Content tools (manual) | Node scripts | Reference URLs still load; near-duplicate questions | `scripts/check-references.mjs`, `scripts/check-duplicates.mjs 0.3` |
+| Published bank (manual) | Node script | The live bank equals the repo's | `npm run check:published` |
 
-Test philosophy: test behaviour, not implementation. Query by role and label. Never use snapshot tests for UI. Never skip or loosen a failing test to get a green build; any intentional skip needs a linked reason in the test.
+Test philosophy: test behaviour, not implementation. Query by role and label. No snapshot tests for UI. Never skip, delete or loosen a failing test to get a green build.
 
-## 2. Test data
+## 2. Test data and helpers
 
-- **Fixture bank** (`src/test/fixtures/bank.ts`): about 30 clearly fake questions covering all 4 domains, all 19 task statements (at least one each), and both question types. It is used by all unit, component and E2E tests that don't specifically test the real bank. E2E runs inject it through a build-time flag (`VITE_USE_FIXTURE_BANK=1`), so tests stay stable as real content changes.
-- **Large fixture generator**: creates N valid synthetic questions for selection and allocation tests (for example, 200 questions).
-- **Storage fixtures**: valid v1 envelopes for each key, malformed JSON, wrong envelopes, a newer `schemaVersion`, and a v0 legacy shape for migration tests.
-- **Seeded randomness**: all randomness goes through `domain/lib/random.ts` with an explicit seed, so tests are deterministic.
-- **Time**: unit tests pass `now` explicitly. Component tests use `vi.useFakeTimers()` + `vi.setSystemTime()`. E2E tests use Playwright `page.clock.install()` / `fastForward()` / `setFixedTime()`.
+- **Test bank** (`src/test/bank.ts`, `src/test/fixtures/`): a small fixture bank for most unit and component tests. `FullExam.test.tsx` and `ExamUnavailable.test.tsx` swap in a generated or tiny bank with `vi.mock` (D-040).
+- **`renderApp(path, options)`** (`src/test/renderApp.tsx`): renders the real routes with an in-memory store, a ready question bank, and a fake sign-in that is signed in by default. Pass `createFakeAuthClient()` for a guest, a loader to test question loading, or `accounts` (`createAccountManager` with `createFakeUserTables`) to test sync and guest data.
+- **E2E build:** `npm run test:e2e` builds `dist-e2e/` with `vite build --mode e2e`. That build uses the bundled questions and a fake sign-in that reads `cloudprep-e2e-auth` from `localStorage`; production builds contain neither (D-045, D-046).
+- **E2E fixtures** (`tests/e2e/support/fixtures.ts`): import `test` / `expect` from here. Signed in by default; `test.use({ signedIn: false })` for guests; `test.use({ sync: true })` adds a fake server. Specs that seed storage while signed in use the `cloudprep-account:` keys.
+- **AI proctor:** unit tests use fake readings and devices; E2E tests script the models through `window.__cloudprepProctorAnalyzer`, with Chromium's fake camera and a silent fake microphone (`tests/e2e/fixtures/silence.wav`).
+- **Randomness:** everything goes through the seeded PRNG in `src/domain/lib/random.ts`.
+- **Time:** unit tests pass `now` explicitly; component tests use fake timers; E2E tests use Playwright's `page.clock`.
 
-## 3. Unit test matrix (domain)
+## 3. End-to-end specs
 
-| Module | Key cases |
+| Spec | Covers |
 |---|---|
-| `blueprint` | 65 → 16/19/22/8; sum invariant for n = 1…200; ties resolved deterministically |
-| `select` | Exact quotas; unique IDs; only `reviewed` questions; deterministic per seed; prefers unseen and then least recently seen; even task-statement spread; `insufficient` result with shortfalls |
-| `scoring` | Single correct/incorrect/unanswered; multiple exact match, subset, superset, disjoint; per-domain breakdown; benchmark edges (69.9% vs 70%) |
-| `timer` | remaining clamps at 0; warning thresholds at 10:00/5:00 boundaries; formatting `mm:ss` and `h:mm:ss` |
-| `session` reducer | start; answer replaces (single) or toggles (multiple, capped at N); flag toggle; goTo bounds; visited tracking; post-submit actions are ignored; double submit does nothing |
-| `practice` / `progress` | Attempts/correct counters; lastResult transitions; mistakes in and out; accuracy by domain/task; handles unknown question IDs |
-| `validate` | One failing fixture per rule (about 15 rules) with stable error codes; an aggregate report lists all issues, not just the first |
-| `random` | Same seed gives the same sequence; shuffle is a permutation and doesn't change its input |
-| Storage `envelope` / `migrations` / `driver` / `transfer` | AC-3.1–3.5 and AC-8.4 cases; quota error; unavailable storage; backup-key pruning (keep 3) |
+| `app-shell.spec.ts` | Every page passes axe (dark and light), not-found page, sidebar vs menu drawer, skip link, keyboard navigation, dialog focus |
+| `auth.spec.ts` | Guests are sent to sign-in and keep Learning mode; email link request; Google sign-in returns to the page; sign-out (AC-B.6–B.10) |
+| `learning-mode.spec.ts` | Domain practice, checking answers, bookmarks, progress after reload, session summary, keyboard-only answers, phone layout, recovery from corrupt saved progress |
+| `exam.spec.ts` | Full exam (answer, flag, review, confirm, results), restore after reload with absolute timing, low-time warnings and auto-submit at zero, expired while closed, mobile layout |
+| `integrity.spec.ts` | Strict practice (fullscreen, exit warning, neutral report); proctored check-in, warnings, ended by a phone; blocked copy and forced proctor restart after reload (AC-7.x); the real models load and analyse the camera (`@real-models`, its own project) |
+| `data.spec.ts` | Settings persist; export, reset everything, import; malformed file rejected |
+| `sync.spec.ts` | Progress saved to the account and shown on another device; guest data added on request; sign-out removes the copy (AC-B.18, B.20, B.21) |
+| `qa-journeys.spec.ts` | The QA pass journeys: first visit and empty states, Learning mode with both question types, old results after a new attempt, migrated old-format data and clearing one category, camera permission declined, strict-practice log, reduced motion, keyboard-only exam with visible focus, tablet layout with axe |
 
-Coverage gates (Vitest, enforced in `test:coverage`): `src/domain/**` and `src/storage/**` need ≥ 95% lines and ≥ 90% branches. There is no global gate for UI; behaviour coverage comes from E2E tests.
+Projects: `chromium`, `webkit` and `mobile` (Pixel 7) run everything except `@real-models`; `real-models` runs that test in Chromium.
 
-## 4. Component tests
+## 4. Where the main requirements are tested
 
-| Component | Key behaviours |
+| Requirement (PRODUCT_SPEC §11) | Tests |
 |---|---|
-| Button / IconButton | Variants render; disabled state; IconButton requires an accessible label (type-level + test) |
-| Dialog / ConfirmDialog | Opens/closes; Esc; focus returns; confirm/cancel callbacks; type-to-confirm variant |
-| AnswerOptions | Radio vs checkbox by type; "Choose N" cap with an accessible message; keyboard arrows (radio) and space (checkbox); no correctness classes in exam mode |
-| QuestionNavigator | Shows answered/unanswered/flagged/current states with text, not colour alone; activating an item navigates |
-| ExamTimer | Displays from `endsAt`; warning styles at thresholds; live region announces only at thresholds |
-| ExplanationPanel | Shows the correct option(s), per-option explanations and links with `rel` attributes |
-| Dashboard cards | Empty vs populated states from a fixture store |
-| DataManagement | Import preview counts; error messages per failure type; reset requires the exact text |
-| Storage banners | Unavailable / recovered / newer-schema notices render and can be dismissed |
+| R-1 Full mock: 65 unique questions, 16 / 19 / 22 / 8 | `blueprint.test.ts`, `select.test.ts`, `FullExam.test.tsx` |
+| R-2 Correct time and answers after a reload | `timer.test.ts`, `exam.spec.ts` (restore after reload) |
+| R-3 Submitted exactly once | `session.test.ts`, `Exam.test.tsx` ("submits once…", auto-submit, expired while closed) |
+| R-4 No answers in exam pages | `session.test.ts` (no correct answers in the session), `Exam.test.tsx` ("never puts correct answers or explanations in the page…") |
+| R-5 Every question valid | `validate.test.ts` (one case per rule), `bank.test.ts`, `npm run validate:questions` |
+| R-6 Keyboard and axe | `app-shell.spec.ts`, keyboard tests in `learning-mode.spec.ts` and `qa-journeys.spec.ts`, jsx-a11y lint |
+| R-7 Export / import round trip | `transfer.test.ts`, `DataManagement.test.tsx`, `data.spec.ts` |
+| R-8 Corrupt or unavailable storage | `storage.test.ts`, `driver.test.ts`, `examStorage.test.ts`, `historyStorage.test.ts`, `learning-mode.spec.ts` (corrupt progress) |
+| R-9 Users see only their own data | `schema.test.ts` (RLS and grants, AC-B.2, B.3) |
+| R-10 Disclaimer and scoring note | No automated test; checked by hand (§6) |
 
-## 5. End-to-end specs (Playwright)
+## 5. Acceptance-criteria tags
 
-| Spec | Journey | Highlights |
-|---|---|---|
-| `onboarding.spec` | J1 | First visit → welcome → dashboard; persists after reload; storage-blocked variant shows the banner |
-| `exam-happy-path.spec` | J2, J3, J5 | Start → answer all (mixed types) → flag → review → submit → results → review explanations |
-| `exam-timer.spec` | J4 | `page.clock` fast-forward to 10:00/5:00 warnings → 0 → single auto-submit → results notice |
-| `exam-restore.spec` | J10 | Answer 5 questions, flag 2, reload → same question, answers and flags; remaining time ±1s |
-| `exam-expired-away.spec` | J4/J10 | Close page, advance clock past `endsAt`, reopen → submitted as `expired_while_away` |
-| `exam-double-submit.spec` | J3 | Double-click submit + timer expiry at the same moment → exactly 1 history entry |
-| `exam-keyboard.spec` | J3 | Complete a short exam using only the keyboard |
-| `exam-no-leak.spec` | J3 | The exam page HTML contains no correct-answer markers |
-| `exam-multitab.spec` | J10 | A second tab with the same session becomes read-only |
-| `practice.spec` | J6 | Domain practice → wrong answer → appears in Mistakes → correct → removed |
-| `bookmarks.spec` | J7 | Bookmark from practice and review → list → practise bookmarks |
-| `history-compare.spec` | J8 | Two attempts → compare → correct changes |
-| `data-transfer.spec` | J9 | Export → new context → import → identical dashboard; invalid file rejected; reset flow |
-| `responsive.spec` | All | Key pages at 375/768/1280: no horizontal overflow; nav pattern correct |
-| `a11y.spec` | All | axe on every route (plus exam/review/dialog states): zero serious or critical issues |
+Criteria from Phase 7 (AI proctoring, `AC-7.x`) and Phase 8 (backend, `AC-B.x`) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
 
-Browsers: Chromium and WebKit run the full suite, and a mobile Chromium viewport runs the core flows. Firefox is optional because it is slower on Windows; add it if time allows.
+## 6. Manual checks (each release)
 
-## 6. Acceptance-criteria traceability
+- [ ] Screen reader smoke test (NVDA with Chrome or Firefox): sign in, start an exam, answer single and multiple-response questions, flag, review, submit, read the results. Not done yet (KNOWN_LIMITATIONS.md).
+- [ ] Zoom to 200% and 400% on the exam page without losing content.
+- [ ] Real phone: exam navigator, timer visible, no accidental submit.
+- [ ] Background tab for 10+ minutes during an exam, and laptop sleep: on return the timer is correct or the exam was submitted.
+- [ ] Safari private window: storage-unavailable behaviour is acceptable.
+- [ ] Two devices signed in to the same account: progress and history appear on both.
+- [ ] A proctored exam with a real camera and microphone.
+- [ ] After a question change: `npm run publish:questions`, `npm run check:published`.
+- [ ] Occasionally: `node scripts/check-references.mjs` (every cited page loads) and `node scripts/check-duplicates.mjs 0.3`.
+- [ ] The unofficial-tool note shows in the sidebar and mobile menu, and the scoring explanation on the exam and results pages.
+- [ ] The deployment smoke test in DEPLOYMENT.md.
 
-Every acceptance criterion in IMPLEMENTATION_PLAN.md is tagged in its test's title, for example `test('AC-5.5 creates exactly one attempt on double submit', …)`. Search for `AC-` to map criteria to tests. Criteria that can only be checked manually are listed in §7 with a recorded result in each phase report.
-
-## 7. Manual QA checklist (each release)
-
-- [ ] Screen reader smoke test (NVDA + Firefox/Chrome on Windows): welcome, start exam, answer single and multiple questions, flag, review, submit, read results.
-- [ ] Keyboard-only full mock with no mouse.
-- [ ] Zoom to 200% and 400% (reflow) on the exam page without losing content.
-- [ ] Real-device mobile check: exam navigator sheet, timer visible, no accidental submit.
-- [ ] Background tab for 10+ minutes during an exam; on return, the timer is correct.
-- [ ] Laptop sleep during an exam; on wake, the timer is correct or the exam has auto-submitted.
-- [ ] Safari private window: the storage-unavailable or limited behaviour is acceptable.
-- [ ] Spot-check 10 random reviewed questions against their source links.
-- [ ] Disclaimer text present on Welcome, About and Results.
-
-## 8. Commands
+## 7. Commands
 
 | Command | Purpose |
 |---|---|
-| `npm test` | Unit + component (+ content validation) once |
+| `npm test` | Unit, component, content and database tests once |
 | `npm run test:watch` | Watch mode |
-| `npm run test:coverage` | With coverage gates |
-| `npm run test:e2e` | Playwright (builds + previews first) |
-| `npm run validate:questions` | Content validator with a readable report |
-| `npm run check` | typecheck + lint + test + build + e2e |
+| `npm run test:coverage` | With a coverage report (v8). No minimum is enforced |
+| `npm run test:e2e` | Builds `dist-e2e/` and runs Playwright |
+| `npm run validate:questions` | Validator with a coverage report per task statement |
+| `npm run check` | typecheck, lint, format check, validate, unit tests, build, E2E. Must pass before merging |
 
-## 9. Reporting
+First-time E2E setup: `npx playwright install chromium webkit`. Time limits are sized for a parallel run on a 4-core machine (D-049); close other dev servers while `npm run check` runs.
 
-Each phase report states which commands were run and their results, including failures. It lists any manual checks performed and any criteria not yet verified. "Implemented" and "verified" are reported separately.
+## 8. Reporting
+
+Each change report states which commands were run and their results, including failures, lists any manual checks, and keeps "implemented" separate from "verified".

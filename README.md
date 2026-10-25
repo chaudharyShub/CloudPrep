@@ -16,7 +16,7 @@ An unofficial practice simulator for the **AWS Certified Cloud Practitioner (CLF
 - **AI-proctored exams (opt-in):** a check-in like an online proctored exam, then a strict AI proctor that runs on your device (MediaPipe face and object models plus microphone loudness). It watches your face, head, eyes and mouth, looks for phones, other people, books and screens, and blocks shortcuts. Two warnings, then the exam ends; a phone or another person ends it at once. Nothing is recorded or uploaded.
 - **Installable look:** CloudPrep has its own logo, home-screen icons ("Add to Home Screen") and a link preview with an image and description when the site is shared.
 
-The bank has **2,000 original questions** (400 / 600 / 753 / 247 across the four domains), written from public AWS documentation and the official exam guide. Most are marked `unverified` (written from the cited pages, not yet re-checked one by one). Read [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) before relying on it.
+The bank has **2,000 original questions** (400 / 600 / 753 / 247 across the four domains), written from public AWS documentation and the official exam guide. 1,995 are `checked` against the AWS pages they cite and 5 are still `unverified` (see [docs/CONTENT_REVIEW.md](docs/CONTENT_REVIEW.md)); none has had a second, human sign-off (`approved`) yet. Read [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) before relying on it.
 
 **Privacy in short:** accounts and synced data are stored with Supabase, and each user can read only their own data. The live site counts page views with Vercel Web Analytics (no cookies, no personal data). Details are on the in-app Privacy page.
 
@@ -59,12 +59,15 @@ Setting up the database, Google sign-in and redirect URLs is covered step by ste
 | `npm run lint`                    | ESLint (zero warnings allowed)                                                                              |
 | `npm run format` / `format:check` | Prettier                                                                                                    |
 | `npm test`                        | Unit and component tests (Vitest), including question-bank validation and database schema checks            |
+| `npm run test:watch`              | Unit and component tests in watch mode                                                                      |
+| `npm run test:coverage`           | Unit and component tests with a coverage report (no minimum is enforced)                                    |
 | `npm run test:e2e`                | End-to-end tests in Chromium, WebKit and a phone viewport (Playwright), against a build with a fake sign-in |
 | `npm run validate:questions`      | Validates the question bank and prints a coverage report                                                    |
 | `npm run check`                   | Everything above, in order. This must pass before a change is merged                                        |
 | `npm run publish:questions`       | Publishes the question bank to Supabase (`-- --dry-run` to only validate and count)                         |
 | `npm run check:published`         | Confirms the published questions match the repo                                                             |
 | `npm run db:push`                 | Applies `supabase/migrations/` to the linked Supabase project (run `supabase link` first)                   |
+| `npm run setup:proctor`           | Prepares the AI proctor's files in `public/proctor/` (also runs before `dev` and `build`)                   |
 | `npm run brand:assets`            | Redraws the PNG app icons and link-preview image from the logo                                              |
 
 First-time setup for end-to-end tests: `npx playwright install chromium webkit`.

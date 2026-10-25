@@ -1,6 +1,8 @@
 # CloudPrep — Implementation Plan
 
-> Status: **In progress** · Last updated: 2026-10-21
+> Status: **In progress** · Last updated: 2026-10-26
+>
+> The phase sections below (P0–P10, C1–C3) are the original plan from 2026-10-21, kept for history; the Progress table and "Changes from the original plan" say what was actually built. For how the app works today, see PRODUCT_SPEC.md and ARCHITECTURE.md.
 
 ## Progress
 
@@ -8,25 +10,34 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 
 | User phase | Covers plan phases | Status |
 |---|---|---|
-| Phase 1: foundation & design system | P0, P1 | Done (awaiting review) |
-| Phase 2: question bank & Learning Mode | P2 (questions, validation, practice logic), P3 (storage for progress, bookmarks, sessions), C1 (44 questions), P7 | Done (awaiting review) |
-| Phase 3: timed practice exam | P2 exam parts (blueprint, selection, timer, exam reducer), P3 active exam + exam history, P5, most of P6 (results, answer review, basic history list) | Done (awaiting review) |
-| Phase 4: results, review, history, readiness | Rest of P6 (scoring module, answer review page, history schema v2, question archive) and readiness analytics (/progress) | Done (awaiting review) |
-| Phase 5: persistence, settings, export/import | P3 preferences, P8 (export/import, recovery, separate clear actions) | Done (awaiting review) |
-| Phase 6: practice integrity | P10 "proctoring-lite" (focus, fullscreen, optional webcam via built-in FaceDetector, retired in Phase 7) and a privacy page | Done (awaiting review) |
+| Phase 1: foundation & design system | P0, P1 | Done, merged and live |
+| Phase 2: question bank & Learning Mode | P2 (questions, validation, practice logic), P3 (storage for progress, bookmarks, sessions), C1 (44 questions), P7 | Done, merged and live |
+| Phase 3: timed practice exam | P2 exam parts (blueprint, selection, timer, exam reducer), P3 active exam + exam history, P5, most of P6 (results, answer review, basic history list) | Done, merged and live |
+| Phase 4: results, review, history, readiness | Rest of P6 (scoring module, answer review page, history schema v2, question archive) and readiness analytics (/progress) | Done, merged and live |
+| Phase 5: persistence, settings, export/import | P3 preferences, P8 (export/import, recovery, separate clear actions) | Done, merged and live |
+| Phase 6: practice integrity | P10 "proctoring-lite" (focus, fullscreen, optional webcam via built-in FaceDetector, retired in Phase 7) and a privacy page | Done, merged and live |
 | QA pass | Journeys A–G, responsive and accessibility checks, defect fixes | Done |
 | Release preparation | P9: visual clean-up, Vercel configuration, performance review, README / DEPLOYMENT / KNOWN_LIMITATIONS | Done (deployment itself is a manual step) |
-| Phase 7: AI proctoring | Strict AI-proctored exam mode replacing the built-in FaceDetector webcam option (D-043); acceptance criteria below | Done (awaiting review) |
-| Phase 8: backend (Supabase, D-044–D-047) | Step 1: schema, RLS, publish script. Step 2: sign-in. Step 3: questions from the database, cached in IndexedDB. Step 4: signed-in users' data synced to the database. Step 5 (server scoring) not started | Steps 1–4 done (awaiting review) |
-| Not started | P4 (welcome/onboarding), attempt-to-attempt comparison view, C2–C3 content (more questions) | — |
+| Phase 7: AI proctoring | Strict AI-proctored exam mode replacing the built-in FaceDetector webcam option (D-043); acceptance criteria below | Done, merged and live |
+| Phase 8: backend (Supabase, D-044–D-047) | Step 1: schema, RLS, publish script. Step 2: sign-in. Step 3: questions from the database, cached in IndexedDB. Step 4: signed-in users' data synced to the database. Step 5 (server scoring) not started | Steps 1–4 done, merged and live |
+| Extras (2026-10-24 and 25) | Vercel Web Analytics (D-048), reliable test runs (D-049), logo, icons and link preview (D-050), sign-out confirmation (AC-B.25) | Done, merged and live |
+| Content review | All 2,000 questions checked against their cited AWS pages: 1,995 `checked`, 5 left `unverified` (CONTENT_REVIEW.md), published as bank `2026-10-25.2` | Done; `approved` needs the user's sign-off |
+| Docs audit (D-051) | Docs brought in line with the app; version 2.0.0 | Done |
+| Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring, then multi-exam UI) | — |
 
-Changes from the original plan so far:
-- No tablet icon rail: the sidebar shows from 1024px; below that a drawer is used (simpler, no tooltips needed).
-- No ExamLayout or Welcome page yet (they arrive with Exam Mode / P4).
-- Storage validation is hand-written instead of Zod (D-005, interim).
-- C1 has 44 questions (plan said 40) and is skewed to easy: 24 easy / 18 medium / 2 hard.
-- Settings preferences are still not persisted; only practice progress, bookmarks and session summaries are.
-- Phase 3: the full exam can't start until the bank has 16 / 19 / 22 / 8 questions; a shorter timed exam is offered meanwhile (D-025). No `beforeunload` leave-page warning: a reload restores the exam, so it isn't needed. Results show a basic history list; comparing two attempts is still to do (P6).
+Changes from the original plan:
+- **No backend was planned;** one was added in Phase 8 (D-044–D-047). Guests keep Learning mode, bookmarks and settings in the browser; the dashboard, mock exams, results, history and progress need sign-in.
+- **No welcome page, onboarding or About page** (P4). `/` opens the dashboard (or sign-in for guests); the unofficial-tool note is in the sidebar and mobile menu, and the scoring explanation is on the exam and results pages.
+- **No Mistakes page:** the Learning mode page has a Mistakes card ("Practise mistakes"), and Progress lists the questions you keep missing.
+- **No attempt comparison** (AC-6.4): exam history is a list, and Progress shows recent scores and per-domain results.
+- No tablet icon rail: the sidebar shows from 1024px; below that a drawer is used.
+- Storage validation is hand-written instead of Zod (D-005).
+- Light and system themes were built in Phase 1 (D-017 superseded).
+- Settings are saved, storing only changed values (D-034).
+- The bank grew from 44 questions (C1) to 2,000 (D-041) instead of the C2–C3 batches, with a new `unverified` status; the review statuses are `draft` → `unverified` → `checked` → `approved` → `retired`, not `reviewed`.
+- The full exam is available; a shorter timed exam is offered only if the bank is too small (D-025). No `beforeunload` leave-page warning: a reload restores the exam, so it isn't needed. No multi-tab read-only guard: tabs share the same exam and stay in sync.
+- Proctoring-lite (P10) became strict practice, and the webcam option became the AI proctor (Phase 7, D-043).
+- **Test tags:** only Phase 7 and Phase 8 criteria are tagged in test names (`AC-7.x`, `AC-B.x`); P0–P9 criteria were verified by the tests listed in TEST_PLAN.md, without tags (D-051).
 
 ## Principles
 
@@ -145,6 +156,8 @@ P0 Scaffold ─► P1 Design system & shell ─► P2 Domain core ─► P3 Pers
 
 ## C1 / C2 / C3 — Question bank content (parallel track)
 
+> **Replaced:** C1 shipped 44 questions; the bank then grew to 2,000 (D-041) and was reviewed in full on 2026-10-25 (CONTENT_REVIEW.md). Statuses are now `unverified` / `checked` / `approved` instead of `reviewed`.
+
 **Depends on:** P2 (types and validator)
 
 Process for each question: write it from the cited AWS documentation → run the validator → **human review** (you) checks facts against the sources → set `review.status = 'reviewed'` and `lastVerified`.
@@ -166,6 +179,8 @@ Each batch covers **every** task statement, includes about 15% multiple-response
 ---
 
 ## P4 — Welcome and Dashboard
+
+> **Built in part:** the dashboard exists; the Welcome page, onboarding redirect and About page were not built.
 
 **Depends on:** P1, P3
 
@@ -217,16 +232,18 @@ Each batch covers **every** task statement, includes about 15% multiple-response
 
 ## P7 — Learning Mode
 
+> These criteria are numbered `AC-L.x`, because `AC-7.x` is used by Phase 7 (AI proctoring) below (D-051). Built without a separate Mistakes page: the Learning mode page has a Mistakes card with "Practise mistakes".
+
 **Depends on:** P3, P6 (shared question rendering), C1
 
 **Scope:** Practice setup (domain / task statement / length / filters); session with Check → feedback → Next; bookmark toggle; session summary; Mistakes page; Bookmarks page; "practise these" entry points.
 
 **Acceptance criteria**
-- AC-7.1 A session only contains questions matching the chosen filters. Empty filter results show an empty state, not an empty session.
-- AC-7.2 "Check answer" is disabled until the required number of options is selected. After checking, the options are locked and feedback is announced to screen readers.
-- AC-7.3 Answering updates progress immediately. A wrong answer adds the question to Mistakes, and a later correct answer in practice removes it.
-- AC-7.4 Bookmarks persist across reloads and can be toggled from practice, review and lists.
-- AC-7.5 Bookmarks and Mistakes have empty states with guidance.
+- AC-L.1 A session only contains questions matching the chosen filters. Empty filter results show an empty state, not an empty session.
+- AC-L.2 "Check answer" is disabled until the required number of options is selected. After checking, the options are locked and feedback is announced to screen readers.
+- AC-L.3 Answering updates progress immediately. A wrong answer adds the question to Mistakes, and a later correct answer in practice removes it.
+- AC-L.4 Bookmarks persist across reloads and can be toggled from practice, review and lists.
+- AC-L.5 Bookmarks and Mistakes have empty states with guidance.
 
 ---
 
@@ -319,14 +336,14 @@ Follow-up to step 2 (D-045):
 
 ## P10 — Optional features (v1.x, pick à la carte)
 
-| Feature | Notes |
-|---|---|
-| Light theme | Tokens already structured for a second palette |
-| Exam time accommodation (+30 min) | Preference applied when the exam starts |
-| Keyboard shortcuts + help sheet | Must not interfere with screen readers; can be turned off |
-| Custom-length timed quiz | Reuses the exam engine with `n` and a proportional duration |
-| Task-statement analytics | Derived from progress |
-| Proctoring-lite | ARCHITECTURE §13; opt-in; neutral language |
+| Feature | Notes | Status |
+|---|---|---|
+| Light theme | Tokens already structured for a second palette | Built (dark, light, system) |
+| Exam time accommodation (+30 min) | Preference applied when the exam starts | Not built |
+| Keyboard shortcuts + help sheet | Must not interfere with screen readers; can be turned off | Not built |
+| Custom-length timed quiz | Reuses the exam engine with `n` and a proportional duration | Not built (only the automatic shorter exam, D-025) |
+| Task-statement analytics | Derived from progress | Built in part (Progress: frequently missed topics, practice coverage) |
+| Proctoring-lite | Opt-in; neutral language | Built as strict practice (D-036), plus the AI proctor (D-043) |
 
 Deferred features are listed in PRODUCT_SPEC §4.3.
 

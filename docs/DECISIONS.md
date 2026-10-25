@@ -1,27 +1,28 @@
 # CloudPrep — Decision Log
 
-> Lightweight ADRs. Status: **Proposed** (awaiting approval) · **Accepted** · **Superseded**.
-> Last updated: 2026-10-23 (backend step 3)
+> Lightweight ADRs. Status: **Accepted** · **Superseded** (replaced by a later decision; the entry is kept for history).
+> Early entries were written as proposals before the app existed; on 2026-10-26 every status was checked against the code (D-051). Entries keep their original text, with updates noted.
+> Last updated: 2026-10-26
 
 | ID | Decision | Status |
 |---|---|---|
 | D-001 | Greenfield project; no migration needed | Accepted |
-| D-002 | npm as package manager | Proposed |
+| D-002 | npm as package manager | Accepted |
 | D-003 | Static SPA, no backend; data in localStorage | Superseded by D-044 (being replaced step by step) |
 | D-004 | BrowserRouter + SPA-fallback host: Vercel | Accepted |
 | D-005 | Runtime validation of stored data and imports: hand-written parsers, no Zod | Accepted |
-| D-006 | Questions as typed TypeScript modules + build-time validator | Proposed |
-| D-007 | Full mock allocation 16/19/22/8 (largest remainder over 65) | Proposed |
-| D-008 | Practice score = percent correct; default benchmark 70%; no fake /1000 score | **Needs input** |
-| D-009 | Store per-question correctness snapshot in exam history | Proposed |
-| D-010 | Practice sessions not restored after refresh in v1 | Proposed |
-| D-011 | Inter Variable via @fontsource (self-hosted) | Proposed |
-| D-012 | Multiple-response scoring is all-or-nothing | Proposed |
-| D-013 | No pause in Exam Mode | Proposed |
-| D-014 | Native `<dialog>` and native inputs instead of a UI library | Proposed |
-| D-015 | `useSyncExternalStore` store + Context; no state library | Proposed |
-| D-016 | Review workflow: draft → checked → approved; practice shows checked + approved | Accepted (interim) |
-| D-017 | Dark theme only in v1; light theme optional later | Proposed |
+| D-006 | Questions as typed TypeScript modules + build-time validator | Accepted (loading changed by D-046) |
+| D-007 | Full mock allocation 16/19/22/8 (largest remainder over 65) | Accepted |
+| D-008 | Practice score = percent correct; default benchmark 70%; no fake /1000 score | Accepted (option A) |
+| D-009 | Store per-question correctness snapshot in exam history | Accepted (extended by D-032) |
+| D-010 | Practice sessions not restored after refresh | Accepted |
+| D-011 | Inter Variable via @fontsource (self-hosted) | Accepted |
+| D-012 | Multiple-response scoring is all-or-nothing | Accepted |
+| D-013 | No pause in Exam Mode | Accepted |
+| D-014 | Native `<dialog>` and native inputs instead of a UI library | Accepted |
+| D-015 | `useSyncExternalStore` store + Context; no state library | Accepted |
+| D-016 | Review workflow: draft → checked → approved; practice shows checked + approved | Superseded by D-041 |
+| D-017 | Dark theme only in v1; light theme optional later | Superseded (light and system themes built, D-024, D-034) |
 | D-018 | Strict option counts: single = 4, multiple ≥ 5 (mirrors exam guide) | Accepted |
 | D-019 | Practice statistics: attempt counts + question-level latest result | Accepted |
 | D-020 | Tool versions: TypeScript 6.0 and ESLint 9 (not 7 / 10) | Accepted |
@@ -29,20 +30,20 @@
 | D-022 | Every answer option needs an explanation (not only incorrect ones) | Accepted |
 | D-023 | Practice sessions are idempotent per session; one attempt per question per session | Accepted |
 | D-024 | Colour tokens verified against WCAG 2.2 AA | Accepted |
-| D-025 | Shorter timed exam offered when the bank can't supply a full exam | Accepted (pending review) |
+| D-025 | Shorter timed exam offered when the bank can't supply a full exam | Accepted |
 | D-026 | Exam question selection: unseen first, spread by task statement, seeded | Accepted |
 | D-027 | Partly answered multiple-response questions are shown as "partly answered" and scored incorrect | Accepted |
 | D-028 | Exam timer: absolute end time; auto-submit from an app-wide watcher | Accepted |
 | D-029 | Submitted exams update practice progress for answered questions only | Accepted |
-| D-030 | Exams accept `checked` questions until questions are approved | Accepted (interim) |
+| D-030 | Exams accept `checked` questions until questions are approved | Superseded by D-041 |
 | D-031 | Question archive: question content stored once per revision for past attempts | Accepted |
 | D-032 | Attempts store score, counts and domain breakdown (schema v2) | Accepted |
 | D-033 | Readiness guidance: explicit criteria, 3+ exams, never "ready" | Accepted |
 | D-034 | Settings: defaults in code, only explicit choices saved (schema v2) | Accepted |
 | D-035 | Export/import: same validation as storage; merge and replace rules; backup first | Accepted |
-| D-036 | Practice-integrity monitoring: opt-in, local, type + timestamp only, no verdicts | Accepted |
-| D-037 | Face detection: built-in browser FaceDetector only; no ML library | Accepted |
-| D-038 | Vercel configuration: SPA fallback except /assets, immutable asset caching | Accepted |
+| D-036 | Practice-integrity monitoring: opt-in, local, type + timestamp only, no verdicts | Accepted (webcam level retired by D-043) |
+| D-037 | Face detection: built-in browser FaceDetector only; no ML library | Superseded by D-043 |
+| D-038 | Vercel configuration: SPA fallback except /assets, immutable asset caching | Accepted (also skips /_vercel, D-048) |
 | D-039 | Apply the saved theme before first paint with a small inline script | Accepted |
 | D-040 | Full 65-question exam journey tested with a generated bank | Accepted |
 | D-041 | Large generated bank with an `unverified` status | Accepted |
@@ -55,6 +56,7 @@
 | D-048 | Vercel Web Analytics for page views, production builds only | Accepted |
 | D-049 | Test time limits sized for a parallel run on a 4-core machine; effect-timing races fixed | Accepted |
 | D-050 | CloudPrep logo (circuit cloud), app icons, link preview and page icons | Accepted |
+| D-051 | Docs brought in line with the app; version 2.0.0 | Accepted |
 
 ---
 
@@ -92,11 +94,15 @@ _Original question:_
 **Options:** JSON files + runtime validation; TS modules.
 **Decision:** TS modules (`satisfies Question[]`) so the compiler catches structural errors as you type, plus `validateBank()` for semantic rules, run in Vitest and `validate:questions`. The bank is lazy-loaded as its own chunk.
 **Trade-off:** Non-developers can't edit it easily. That's acceptable for v1, and an editor UI is deferred.
+**Update (D-046):** the modules are still the source of truth, but they are now published to Supabase and the app downloads them at runtime; the bank is no longer in any app chunk.
 
 ### D-007 Domain allocation for 65 questions
 The official weights apply to 50 scored questions; the distribution of the 15 unscored ones is unknown. Applying the weights to 65 with the largest-remainder method gives 15.6/19.5/22.1/7.8 → **16/19/22/8**. (Applying them to 50 would give 12/15/17/6 + 15 unknown.) This is documented in the UI as an approximation.
 
-### D-008 Unofficial practice score — **needs your input**
+### D-008 Unofficial practice score — **resolved: option A**
+**Update:** option A is what was built: percent correct, a benchmark of 70% by default (50–90% in Settings), and no number out of 1,000 anywhere in the app.
+
+_Original question:_
 **Context:** AWS reports a proprietary scaled score of 100–1,000, with 700 to pass.
 **Options:**
 - **A. Percent correct + configurable benchmark (default 70%)**, with no /1000 number. Honest and easy to understand. *Recommended.*
@@ -125,7 +131,9 @@ Native `<dialog>`, radio, checkbox and `<select>` give accessibility (focus trap
 ### D-015 State management
 A small external store (cache + subscribe) read through `useSyncExternalStore`. Components re-render only for the slice they use, cross-tab sync is straightforward, and tests can inject an in-memory store through Context. The exam session uses `useReducer` with a pure reducer from `domain/`.
 
-### D-016 Content review gate — **interim decision**
+### D-016 Content review gate — **superseded by D-041**
+**Update:** D-041 added the `unverified` status, and Learning and Exam modes both show `unverified`, `checked` and `approved` questions. Only the user sets `approved`.
+
 **Update (Phase 2):** Without a decision, the bank uses a four-step status: `draft` (never shown), `checked` (author verified against the cited AWS pages), `approved` (a human reviewer signed off), `retired`. Learning Mode shows `checked` and `approved` questions, with a visible note on `checked` ones that they haven't had a second review. **Proposed for exams:** only `approved`, which needs your sign-off (Option A below) — to be confirmed before the exam phase.
 
 **Original context:**
@@ -135,7 +143,9 @@ A small external store (cache + subscribe) read through `useSyncExternalStore`. 
 - B. I draft, self-check and mark them reviewed; you spot-check (faster, more risk).
 - C. You supply questions, and I validate their structure and check their facts.
 
-### D-017 Dark-only v1
+### D-017 Dark-only v1 — **superseded**
+**Update:** the light theme was built in Phase 1 (contrast checked in both themes, D-024), and Settings offers dark, light and system (D-034).
+
 The brief asks for dark-first. Tokens are named by role (`--color-surface`, not `--gray-900`), so a light palette can be added later with no component changes.
 
 ### D-018 Strict option counts
@@ -161,6 +171,8 @@ Each practice session has an id. `recordAnswer` ignores a second record for the 
 Every text/background token pair was computed against WCAG 2.2 AA in both themes (script run during Phase 1). Lowest results: dark — fg-subtle on surface-3 4.96:1, danger text on danger-subtle 4.54:1, control borders 3.62:1; light — subtle on surface-3 4.98:1, danger on danger-subtle 4.72:1, control borders 3.42:1. Four light-theme colours were darkened to pass (fg-subtle, success, warning, control border). Axe checks in the E2E suite cover both themes.
 
 ### D-025 Shorter timed exam when the bank is too small
+**Update:** since the 2,000-question bank (D-041) the full exam is always available; the shorter exam remains for a bank that can't supply 16 / 19 / 22 / 8 questions. The numbers below are from when the bank had 44 questions.
+
 The full exam (65 questions, 90 minutes) needs 16 / 19 / 22 / 8 questions; the bank has 10 / 12 / 15 / 7. CloudPrep never duplicates a question or starts a partial "full" exam. The exam page explains the shortfall per domain and offers two alternatives: Learning Mode, and a **shorter timed exam** using the same rules and domain balance at the real pace. Its size is the largest balanced exam the bank can supply (`maxBalancedQuestionCount`, currently 41) and its time is `ceil(n × 90 / 65)` minutes (currently 57). It's labelled "Shorter exam" everywhere and in history. The full exam stays the default and becomes available automatically once the bank is large enough. A shorter exam isn't offered below 10 questions.
 
 ### D-026 Exam question selection
@@ -175,7 +187,9 @@ The session stores `startedAt`, `endsAt` and `durationMs`. Remaining time is alw
 ### D-029 Exams and practice progress
 On submission, each **answered** exam question is recorded in practice progress (attempt id = session id, so it's idempotent). Unanswered questions aren't recorded, so running out of time doesn't flood Mistakes with unseen questions.
 
-### D-030 Exam eligibility (interim)
+### D-030 Exam eligibility (interim) — **superseded by D-041**
+**Update:** `EXAM_ELIGIBLE_STATUSES` is now `['unverified', 'checked', 'approved']`, the same as Learning mode.
+
 `EXAM_ELIGIBLE_STATUSES` is `['checked', 'approved']`, because no question is approved yet (D-016). Change it to `['approved']` in `src/domain/exam/config.ts` once questions are reviewed.
 
 ### D-005 (final) Hand-written validation instead of Zod
@@ -208,7 +222,9 @@ Opt-in per exam:
 
 Only `{type, at}` is stored, capped at 500 events, in the session and then copied to the attempt. The learner can stop monitoring or turn the camera off at any time. Monitoring stops and all camera tracks are released when the exam ends or the exam layout unmounts. Results show a neutral timeline with plain-language explanations and "action needed" text: no score, percentage or verdict. Each attempt has a "Delete log" action. Monitoring never affects scoring, and a damaged log is dropped without invalidating its exam.
 
-### D-037 Face detection evaluation
+### D-037 Face detection evaluation — **superseded by D-043**
+**Update:** the FaceDetector webcam option was removed; strict AI proctoring with self-hosted MediaPipe models replaced it (D-043). `webcam` stays a valid mode only so old logs load.
+
 Options evaluated:
 - face-api.js: unmaintained since 2020.
 - TensorFlow.js with BlazeFace: about 1 MB or more of JS plus a model.
@@ -226,6 +242,8 @@ Verified on 2026-10-21: Playwright Chromium and WebKit both lack `FaceDetector`,
 `index.html` hard-coded `data-theme="dark"`, so light-theme users saw a dark flash on every load. A small inline script reads `cloudprep:preferences` and applies `light` (or the system preference when "System" is chosen) before the app loads. It is wrapped in try/catch and falls back to dark. The app then applies the same setting through `src/lib/theme.ts`.
 
 ### D-040 Full-exam journey with a generated bank (QA pass)
+**Update:** since D-041 the real bank supports the full exam, and the unit and E2E tests cover it against the real bank as well.
+
 The real bank is too small for a 65-question exam, so the full journey (65 unique questions in a 16 / 19 / 22 / 8 split, 90 minutes, change answers, flag and unflag, grid navigation, final review, submit and exact scoring) is tested in `src/features/exam/FullExam.test.tsx`. That test swaps in a generated bank with `vi.mock`. The shorter-exam journey runs end to end against the real bank in Playwright.
 
 ### D-041 Large generated bank with an `unverified` status
@@ -317,3 +335,10 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Branded waits:** `BrandLoading` (the logo pulsing, unless the system asks for reduced motion, plus a visible status message) replaces the skeleton while questions first download and the "Signing you in…" text. The 404 page keeps its compass icon inside the app layout, which already shows the logo.
 - **Not done:** icons on every card heading (about 39), which would make pages busy.
 
+### D-051 Docs brought in line with the app; version 2.0.0 (2026-10-26)
+- **Audit:** at the user's request, every doc was checked against the code. README, KNOWN_LIMITATIONS and DEPLOYMENT still described a browser-only app and an unreviewed bank. PRODUCT_SPEC, ARCHITECTURE and TEST_PLAN were the first drafts from before the app was built.
+- **User's choice:** rewrite PRODUCT_SPEC, ARCHITECTURE and TEST_PLAN to describe the app as it is, rather than keep them as historical plans. The original plan (phases P0–P10 and their criteria) stays in IMPLEMENTATION_PLAN.md with its changes noted, and this log keeps the reasons.
+- **Acceptance-criteria tags:** only the Phase 7 and Phase 8 criteria are tagged in test names (`AC-7.x`, `AC-B.x`). The earlier phases were verified by the tests listed in TEST_PLAN.md, without tags. Old tests weren't renamed, because matching about 60 old criteria to tests after the fact would claim more traceability than was ever checked. New criteria keep using tags. The plan's Learning Mode criteria were renamed `AC-L.x`, because `AC-7.x` belongs to Phase 7 (AI proctoring).
+- **Version:** `package.json` said `0.1.0`, although the first commit called the app v1.0.0. It is now **2.0.0**: the Supabase backend (accounts, sync, questions from the database) is a major change from the browser-only v1. The version isn't shown in the app, and no git tag was made.
+- **Dependencies:** patch and minor updates applied, still pinned exactly: `@supabase/supabase-js` 2.118.0, `@mediapipe/tasks-vision` 1.1.1 (the WebAssembly runtime is copied from the package; the model hashes are unchanged), `@electric-sql/pglite` 0.5.11 and the `supabase` CLI 2.122.0. Still held back: TypeScript 7 and ESLint 10 (D-020: typescript-eslint supports TypeScript below 6.1, and eslint-plugin-jsx-a11y doesn't support ESLint 10), and `@types/node` 26 (the project runs on Node 24). `npm audit` reports no vulnerabilities.
+- **In-app text:** the exam rules said answers were saved only in this browser, and that clearing browser data removes an exam in progress. Exams need sign-in, so they're also saved to the account. The Settings description no longer says the data is "stored in this browser".

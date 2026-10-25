@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { Clock, Flag, GraduationCap, HardDrive, Lock, Play, Timer, Trash2 } from 'lucide-react';
+import { Clock, Cloud, Flag, GraduationCap, Lock, Play, Timer, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Badge } from '@/components/ui/Badge';
@@ -36,8 +36,8 @@ const RULES = [
     text: 'When time runs out, the exam is submitted automatically with the answers you have given.',
   },
   {
-    icon: HardDrive,
-    text: 'Your answers are saved in this browser as you go. If you reload or reopen CloudPrep, you continue where you left off. Clearing browser data removes an exam in progress.',
+    icon: Cloud,
+    text: 'Your answers are saved as you go, in this browser and to your account. If you reload, reopen CloudPrep or sign in on another device, you continue where you left off.',
   },
 ] as const;
 
