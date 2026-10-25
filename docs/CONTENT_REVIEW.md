@@ -1,6 +1,6 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-25.1` · 2,000 questions · 1,537 `checked`, 463 `unverified`, none `approved` yet.
+> Bank version `2026-10-25.1` · 2,000 questions · 1,577 `checked`, 423 `unverified`, none `approved` yet.
 >
 > Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
 
@@ -48,6 +48,7 @@ Batches in `src/content/questions/batches/` are reviewed one file (about 30 ques
 | `d3-11` (3.6 storage scenarios) | 2026-10-25 | All 40 checked. Fix: `clf-d3-0418` correct option said S3 objects can be up to 5 TB; the S3 guide now says multipart upload handles objects up to 50 TB (single PUT up to 5 GB), so the option and explanation are updated (revision 2). `0433` cites the Object Lock page. Other storage facts (Glacier classes, EBS types, EFS, FSx, Storage Gateway, Express One Zone) were confirmed. |
 | `d3-12` (3.7 AI/ML and analytics scenarios) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0476` notes the Q Developer IDE plugin end of support (30 April 2027, Kiro). Rekognition's availability page was checked: only Streaming Video and Bulk Image Analysis closed to new customers (30 April 2026), so Custom Labels (`0460`) and stored-video moderation (`0484`) remain valid. |
 | `d3-13` (3.1/3.8 operations, management and integration) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0517` no longer says Connect charges "for the time agents use" it; it cites the pricing page ("pay only for what you use"). CloudFormation (change sets, drift detection, StackSets), Systems Manager, SQS (FIFO, 14-day retention), SNS filtering, EventBridge, IoT Core, AppSync, Device Farm and CI/CD facts were confirmed. |
+| `d3-14` (3.2 resilience scenarios) | 2026-10-25 | All 40 checked; no changes to questions or answers. `clf-d3-0563` now cites the AWS Fault Injection Service page and REL12-BP05 (game days). The Regions and AZs page confirms each Region has a minimum of three isolated AZs (`0550`); DR strategies, Local Zones, Wavelength, Global Accelerator and CloudFront origin failover were confirmed. |
 
 Each question was written for CloudPrep from the AWS pages it cites, and every cited URL was confirmed to load (HTTP 200) on 2026-10-21. Key facts were checked against the live pages (six advantages, Well-Architected pillars, CAF perspectives, 7 Rs, root-user tasks, shared responsibility, AZ definition, security groups vs network ACLs, S3 storage classes and Glacier, instance store persistence, Spot, Savings Plans, consolidated billing, Budgets, Artifact, Shield Standard, Trusted Advisor, Support plans).
 

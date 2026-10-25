@@ -399,6 +399,10 @@ export const REFS = {
     title: 'AWS Firewall Manager',
     url: 'https://aws.amazon.com/firewall-manager/',
   },
+  fis: {
+    title: 'AWS Fault Injection Service',
+    url: 'https://aws.amazon.com/fis/',
+  },
   flowLogs: {
     title: 'Logging IP traffic using VPC Flow Logs',
     url: 'https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html',
