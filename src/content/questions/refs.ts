@@ -60,6 +60,34 @@ export const REFS = {
     title: 'AWS Cloud Adoption Framework',
     url: 'https://aws.amazon.com/cloud-adoption-framework/',
   },
+  cafBusiness: {
+    title: 'AWS CAF: Business perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/business-perspective.html',
+  },
+  cafFoundational: {
+    title: 'AWS CAF: Foundational capabilities',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/foundational-capabilities.html',
+  },
+  cafGovernance: {
+    title: 'AWS CAF: Governance perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/governance-perspective.html',
+  },
+  cafOperations: {
+    title: 'AWS CAF: Operations perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/operations-perspective.html',
+  },
+  cafPeople: {
+    title: 'AWS CAF: People perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/people-perspective.html',
+  },
+  cafPlatform: {
+    title: 'AWS CAF: Platform perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/platform-perspective.html',
+  },
+  cafSecurity: {
+    title: 'AWS CAF: Security perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/security-perspective.html',
+  },
   cafWhitepaper: {
     title: 'An Overview of the AWS Cloud Adoption Framework',
     url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html',
@@ -404,6 +432,10 @@ export const REFS = {
     title: 'Amazon OpenSearch Service',
     url: 'https://aws.amazon.com/opensearch-service/',
   },
+  oracleMigrationStrategies: {
+    title: 'Oracle database migration strategies',
+    url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/migration-oracle-database/strategies.html',
+  },
   organizations: { title: 'AWS Organizations', url: 'https://aws.amazon.com/organizations/' },
   organizationsDocs: {
     title: 'What is AWS Organizations?',
@@ -589,6 +621,10 @@ export const REFS = {
   transferFamily: {
     title: 'AWS Transfer Family',
     url: 'https://aws.amazon.com/aws-transfer-family/',
+  },
+  transferFamilyDocs: {
+    title: 'What is AWS Transfer Family?',
+    url: 'https://docs.aws.amazon.com/transfer/latest/userguide/what-is-aws-transfer-family.html',
   },
   transitGateway: { title: 'AWS Transit Gateway', url: 'https://aws.amazon.com/transit-gateway/' },
   translate: { title: 'Amazon Translate', url: 'https://aws.amazon.com/translate/' },
