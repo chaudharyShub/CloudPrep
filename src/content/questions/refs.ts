@@ -17,6 +17,10 @@ export const REFS = {
   },
   amplify: { title: 'AWS Amplify', url: 'https://aws.amazon.com/amplify/' },
   apiGateway: { title: 'Amazon API Gateway', url: 'https://aws.amazon.com/api-gateway/' },
+  appDiscoveryDocs: {
+    title: 'What is AWS Application Discovery Service?',
+    url: 'https://docs.aws.amazon.com/application-discovery/latest/userguide/what-is-appdiscovery.html',
+  },
   appRunner: { title: 'AWS App Runner', url: 'https://aws.amazon.com/apprunner/' },
   appStream: { title: 'Amazon AppStream 2.0', url: 'https://aws.amazon.com/appstream2/' },
   appSync: { title: 'AWS AppSync', url: 'https://aws.amazon.com/appsync/' },
@@ -376,6 +380,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/lambda/latest/dg/welcome.html',
   },
   lambdaPricing: { title: 'AWS Lambda pricing', url: 'https://aws.amazon.com/lambda/pricing/' },
+  largeMigrationPhases: {
+    title: 'Phases of a large migration',
+    url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/phases.html',
+  },
   lex: { title: 'Amazon Lex', url: 'https://aws.amazon.com/lex/' },
   licenseManager: { title: 'AWS License Manager', url: 'https://aws.amazon.com/license-manager/' },
   licenseManagerDocs: {
