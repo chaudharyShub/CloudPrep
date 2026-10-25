@@ -771,6 +771,10 @@ export const REFS = {
     title: 'Amazon S3 storage classes',
     url: 'https://aws.amazon.com/s3/storage-classes/',
   },
+  s3Upload: {
+    title: 'Uploading objects (Amazon S3)',
+    url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html',
+  },
   s3UserGuide: {
     title: 'What is Amazon S3?',
     url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html',
