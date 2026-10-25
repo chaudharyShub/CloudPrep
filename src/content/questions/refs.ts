@@ -122,6 +122,14 @@ export const REFS = {
     title: 'What is AWS CloudTrail?',
     url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html',
   },
+  cloudTrailLake: {
+    title: 'Working with AWS CloudTrail Lake',
+    url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-lake.html',
+  },
+  cloudTrailValidation: {
+    title: 'Validating CloudTrail log file integrity',
+    url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-intro.html',
+  },
   cloudTypes: {
     title: 'Overview of AWS: Types of cloud computing',
     url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html',
@@ -165,6 +173,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html',
   },
   controlTower: { title: 'AWS Control Tower', url: 'https://aws.amazon.com/controltower/' },
+  controlTowerControls: {
+    title: 'About controls in AWS Control Tower',
+    url: 'https://docs.aws.amazon.com/controltower/latest/controlreference/controls.html',
+  },
   costAllocationTags: {
     title: 'Organizing and tracking costs using AWS cost allocation tags',
     url: 'https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html',
@@ -282,6 +294,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html',
   },
   eks: { title: 'Amazon Elastic Kubernetes Service', url: 'https://aws.amazon.com/eks/' },
+  eksDocs: {
+    title: 'What is Amazon EKS?',
+    url: 'https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html',
+  },
   elasticDr: {
     title: 'AWS Elastic Disaster Recovery',
     url: 'https://aws.amazon.com/disaster-recovery/',
@@ -416,6 +432,10 @@ export const REFS = {
     title: 'AWS Key Management Service overview',
     url: 'https://docs.aws.amazon.com/kms/latest/developerguide/overview.html',
   },
+  kmsRotation: {
+    title: 'Rotate AWS KMS keys',
+    url: 'https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html',
+  },
   knowledgeCenter: { title: 'AWS Knowledge Center', url: 'https://repost.aws/knowledge-center' },
   lakeFormation: { title: 'AWS Lake Formation', url: 'https://aws.amazon.com/lake-formation/' },
   lambda: { title: 'AWS Lambda', url: 'https://aws.amazon.com/lambda/' },
@@ -509,10 +529,18 @@ export const REFS = {
     title: 'What is AWS Organizations?',
     url: 'https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html',
   },
+  orgPolicies: {
+    title: 'Managing organization policies with AWS Organizations',
+    url: 'https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies.html',
+  },
   outposts: { title: 'AWS Outposts', url: 'https://aws.amazon.com/outposts/' },
   outpostsDocs: {
     title: 'What is AWS Outposts?',
     url: 'https://docs.aws.amazon.com/outposts/latest/userguide/what-is-outposts.html',
+  },
+  outpostsRackFaq: {
+    title: 'AWS Outposts racks FAQs',
+    url: 'https://aws.amazon.com/outposts/rack/faqs/',
   },
   partnerNetwork: { title: 'AWS Partner Network', url: 'https://aws.amazon.com/partners/' },
   penTesting: {
