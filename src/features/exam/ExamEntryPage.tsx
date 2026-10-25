@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Clock, Flag, GraduationCap, HardDrive, Lock, Play, Timer, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { buttonClasses } from '@/components/ui/buttonStyles';
@@ -87,6 +88,7 @@ export function ExamEntryPage() {
     <>
       <PageHeader
         title="Mock exam"
+        icon={PAGE_ICONS.exam}
         description="A full-length, timed practice exam in the format of the CLF-C02 exam."
       />
 

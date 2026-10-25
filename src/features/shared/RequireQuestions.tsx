@@ -3,7 +3,7 @@ import { RotateCcw } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Notice } from '@/components/ui/Notice';
-import { PageSkeleton } from '@/components/ui/Skeleton';
+import { BrandLoading } from '@/components/brand/BrandLoading';
 import { useQuestionBankState } from '@/state/QuestionBankProvider';
 
 /** Route guard for pages that use questions: waits for the bank, or explains why it failed. */
@@ -11,14 +11,7 @@ export function RequireQuestions() {
   const { state, retry } = useQuestionBankState();
   if (state.status === 'ready') return <Outlet />;
   if (state.status === 'loading') {
-    return (
-      <>
-        <p role="status" className="sr-only">
-          Loading questions…
-        </p>
-        <PageSkeleton />
-      </>
-    );
+    return <BrandLoading message="Loading questions…" />;
   }
   return (
     <>

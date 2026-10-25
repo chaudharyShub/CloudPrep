@@ -40,6 +40,7 @@ Deployment: static build in `dist/`; Vercel Web Analytics is mounted in `src/mai
 - **Persistence:** every persisted shape has a versioned envelope, a hand-written parser (D-005) and a migration path. Never overwrite a value you failed to parse without making a backup copy first.
 - **Native elements first:** radio/checkbox inputs, `<dialog>`, `<button>`, `<a>`. Every interactive element needs a visible focus style and an accessible name.
 - **Design system:** use tokens from `src/styles/index.css` and primitives from `src/components/ui/`. No one-off colours, radii or shadows in feature code.
+- **Brand (D-050):** the logo is `LogoMark`/`LogoTile` (`src/components/brand/`); page icons come from `PAGE_ICONS` (`src/components/layout/pageIcons.ts`, shared with the navigation). The logo's shapes live in `src/components/brand/logoPaths.ts`; after changing them, update `public/favicon.svg` and the paths in `scripts/generate-brand-assets.mjs`, then run `npm run brand:assets` to redraw the PNG icons and link preview.
 
 ## Question content rules
 

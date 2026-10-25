@@ -1,5 +1,6 @@
 import { isRouteErrorResponse, Link, useRouteError } from 'react-router';
 import { TriangleAlert } from 'lucide-react';
+import { LogoTile } from '@/components/brand/LogoMark';
 import { Button } from '@/components/ui/Button';
 import { buttonClasses } from '@/components/ui/buttonStyles';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
@@ -18,6 +19,10 @@ export function RouteErrorPage() {
   return (
     <main className="flex min-h-dvh items-center justify-center p-6">
       <div className="flex max-w-md flex-col items-center text-center">
+        <div className="mb-8 flex items-center gap-2.5">
+          <LogoTile size={32} />
+          <span className="text-sm font-semibold text-fg">CloudPrep</span>
+        </div>
         <span className="mb-4 flex size-12 items-center justify-center rounded-lg border border-border bg-surface-2 text-danger">
           <TriangleAlert size={22} strokeWidth={1.75} aria-hidden="true" />
         </span>

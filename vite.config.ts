@@ -1,10 +1,24 @@
 import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
 
+/**
+ * Link previews need absolute URLs (D-050). On Vercel the production address comes from its
+ * system variable; elsewhere the tags fall back to site-relative paths.
+ */
+function siteUrl(): Plugin {
+  const host = process.env['VERCEL_PROJECT_PRODUCTION_URL'];
+  const origin = host ? `https://${host}` : '';
+  return {
+    name: 'cloudprep-site-url',
+    transformIndexHtml: (html) => html.replaceAll('%SITE_URL%', origin),
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), siteUrl()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },

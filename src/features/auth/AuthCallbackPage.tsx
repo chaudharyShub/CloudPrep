@@ -1,3 +1,4 @@
+import { BrandLoading } from '@/components/brand/BrandLoading';
 import { Link, Navigate, useLocation, useSearchParams } from 'react-router';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { buttonClasses } from '@/components/ui/buttonStyles';
@@ -17,11 +18,7 @@ export function AuthCallbackPage() {
 
   if (state.status === 'signed-in') return <Navigate to={next} replace />;
   if (state.status === 'loading' && !error) {
-    return (
-      <p role="status" className="text-fg-muted">
-        Signing you in…
-      </p>
-    );
+    return <BrandLoading message="Signing you in…" />;
   }
 
   return (

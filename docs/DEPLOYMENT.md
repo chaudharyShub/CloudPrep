@@ -77,6 +77,10 @@ Note: free-tier projects pause after about a week without activity; resume them 
 2. Deploy as usual (merge the PR). The app loads Vercel's script only in production builds.
 3. **Check:** open the live site and visit a few pages, then look at *Analytics* in the Vercel dashboard; visits appear within a minute or so. Ad blockers can block the script, so test in a normal window without one. In the browser's network panel, `/_vercel/insights/script.js` should load with status 200.
 
+### Link previews (D-050)
+
+The preview image's address comes from Vercel's `VERCEL_PROJECT_PRODUCTION_URL` during the build, so nothing needs setting while *Settings → Environment Variables → Automatically expose System Environment Variables* is on (the default). **Check:** paste the live link into a chat app (WhatsApp, Slack) or a preview checker such as opengraph.xyz; it should show the CloudPrep image and title. Apps cache previews, so a link shared before the change may show the old one for a while.
+
 ## Other static hosts
 
 Any static host works if it can serve `index.html` for unknown paths:

@@ -10,6 +10,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Badge } from '@/components/ui/Badge';
 import { buttonClasses } from '@/components/ui/buttonStyles';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
@@ -95,6 +96,7 @@ export function DashboardPage() {
     <>
       <PageHeader
         title="Dashboard"
+        icon={PAGE_ICONS.dashboard}
         description="Your AWS Certified Cloud Practitioner (CLF-C02) preparation at a glance."
       />
 
