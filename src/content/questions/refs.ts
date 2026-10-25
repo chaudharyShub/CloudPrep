@@ -9,6 +9,10 @@ export const REFS = {
     title: 'Report Amazon AWS abuse',
     url: 'https://repost.aws/knowledge-center/report-aws-abuse',
   },
+  accessAnalyzer: {
+    title: 'Using AWS Identity and Access Management Access Analyzer',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html',
+  },
   acm: { title: 'AWS Certificate Manager', url: 'https://aws.amazon.com/certificate-manager/' },
   amazonQ: { title: 'Amazon Q', url: 'https://aws.amazon.com/q/' },
   amis: {
@@ -381,17 +385,33 @@ export const REFS = {
     title: 'Security best practices in IAM',
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html',
   },
+  iamCredentialReport: {
+    title: 'Generate credential reports for your AWS account',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html',
+  },
   iamGroups: {
     title: 'IAM user groups',
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups.html',
+  },
+  iamLastAccessed: {
+    title: 'Refine permissions in AWS using last accessed information',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_last-accessed.html',
   },
   iamPolicies: {
     title: 'Policies and permissions in IAM',
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html',
   },
+  iamPolicyElements: {
+    title: 'IAM JSON policy element reference',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html',
+  },
   iamRoles: {
     title: 'IAM roles',
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html',
+  },
+  iamTempCredentials: {
+    title: 'Temporary security credentials in IAM',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html',
   },
   iamWhatIs: {
     title: 'What is IAM?',
@@ -542,10 +562,18 @@ export const REFS = {
     title: 'AWS Outposts racks FAQs',
     url: 'https://aws.amazon.com/outposts/rack/faqs/',
   },
+  parameterStore: {
+    title: 'AWS Systems Manager Parameter Store',
+    url: 'https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html',
+  },
   partnerNetwork: { title: 'AWS Partner Network', url: 'https://aws.amazon.com/partners/' },
   penTesting: {
     title: 'Penetration Testing',
     url: 'https://aws.amazon.com/security/penetration-testing/',
+  },
+  permissionSets: {
+    title: 'Manage AWS accounts with permission sets',
+    url: 'https://docs.aws.amazon.com/singlesignon/latest/userguide/permissionsetsconcept.html',
   },
   personalize: { title: 'Amazon Personalize', url: 'https://aws.amazon.com/personalize/' },
   pinpoint: { title: 'Amazon Pinpoint', url: 'https://aws.amazon.com/pinpoint/' },
