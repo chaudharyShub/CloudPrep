@@ -138,6 +138,10 @@ export const REFS = {
     title: 'Working with CloudTrail event history',
     url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/view-cloudtrail-events.html',
   },
+  cloudTrailKms: {
+    title: 'Encrypting CloudTrail log files with AWS KMS keys (SSE-KMS)',
+    url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/encrypting-cloudtrail-log-files-with-aws-kms.html',
+  },
   cloudTrailLake: {
     title: 'Working with AWS CloudTrail Lake',
     url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-lake.html',
@@ -275,6 +279,14 @@ export const REFS = {
     title: 'What is Amazon DynamoDB?',
     url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html',
   },
+  dynamodbEncryption: {
+    title: 'DynamoDB encryption at rest',
+    url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/EncryptionAtRest.html',
+  },
+  dynamodbResourcePolicies: {
+    title: 'Using resource-based policies for DynamoDB',
+    url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/access-control-resource-based.html',
+  },
   ebs: { title: 'Amazon EBS', url: 'https://aws.amazon.com/ebs/' },
   ebsDocs: {
     title: 'Amazon EBS volumes',
@@ -395,6 +407,10 @@ export const REFS = {
   glueDocs: {
     title: 'What is AWS Glue?',
     url: 'https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html',
+  },
+  govCloud: {
+    title: 'What is AWS GovCloud (US)?',
+    url: 'https://docs.aws.amazon.com/govcloud-us/latest/UserGuide/whatis.html',
   },
   guardDuty: { title: 'Amazon GuardDuty', url: 'https://aws.amazon.com/guardduty/' },
   guardDutyDocs: {

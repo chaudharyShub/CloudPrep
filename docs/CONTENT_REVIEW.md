@@ -1,6 +1,6 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-25.1` · 2,000 questions · 909 `checked`, 1,091 `unverified`, none `approved` yet.
+> Bank version `2026-10-25.1` · 2,000 questions · 949 `checked`, 1,051 `unverified`, none `approved` yet.
 >
 > Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
 
@@ -32,6 +32,7 @@ Batches in `src/content/questions/batches/` are reviewed one file (about 30 ques
 | `d2-10` (Domain 2 short scenarios) | 2026-10-25 | All 40 checked; no answers changed. `clf-d2-0386` and `0404` add the Security Hub CSPM note. Questions now cite IAM policy evaluation logic (`0389`, `0392`), the KMS overview (`0405`), the Shield features page (`0406`) and the Trusted Advisor check reference (`0412`). |
 | `d2-11` (data protection, compliance programs, incident response) | 2026-10-25 | All 40 checked. Fixes: `clf-d2-0429` correct option said AWS "strongly recommends" root MFA; the IAM guide now says all account types (standalone, management and member) require MFA for the root user, so the option and explanation say so (revision 2); `0446` notes central configuration is a Security Hub CSPM feature. Questions now cite the PCI DSS Level 1 FAQ (`0413`), RDS encryption (`0424`, snapshots and replicas are encrypted), permission sets (`0425`) and EC2 data protection (`0443`, some Nitro instance types encrypt traffic between instances automatically). |
 | `d2-12` (Domain 2 "which service" scenarios) | 2026-10-25 | All 40 checked; no answers changed. `clf-d2-0460` and `0492` note the Audit Manager closure; `0476` and `0489` add the Security Hub CSPM note; `0458` and `0473` cite the IAM credential report and IAM Access Analyzer. |
+| `d2-13` (Domain 2 concept checks) | 2026-10-25 | All 40 checked; no answers changed. `clf-d2-0518` and `0525` add the Security Hub CSPM note. Questions now cite Lambda runtime updates (`0495`), S3 and DynamoDB encryption at rest (`0503`), IAM Access Analyzer (`0511`), DynamoDB resource-based policies (`0512`), the Trusted Advisor check reference (`0518`), the GovCloud guide (`0529`, FedRAMP High and ITAR), the WorkSpaces FAQ (`0530`) and CloudTrail SSE-KMS encryption (`0532`). |
 
 Each question was written for CloudPrep from the AWS pages it cites, and every cited URL was confirmed to load (HTTP 200) on 2026-10-21. Key facts were checked against the live pages (six advantages, Well-Architected pillars, CAF perspectives, 7 Rs, root-user tasks, shared responsibility, AZ definition, security groups vs network ACLs, S3 storage classes and Glacier, instance store persistence, Spot, Savings Plans, consolidated billing, Budgets, Artifact, Shield Standard, Trusted Advisor, Support plans).
 
