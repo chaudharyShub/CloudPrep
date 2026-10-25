@@ -97,6 +97,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html',
   },
   cdk: { title: 'AWS Cloud Development Kit', url: 'https://aws.amazon.com/cdk/' },
+  ceRightsizing: {
+    title: 'Optimizing your cost with rightsizing recommendations',
+    url: 'https://docs.aws.amazon.com/cost-management/latest/userguide/ce-rightsizing.html',
+  },
   cli: { title: 'AWS Command Line Interface', url: 'https://aws.amazon.com/cli/' },
   clientVpn: { title: 'AWS Client VPN', url: 'https://aws.amazon.com/vpn/client-vpn/' },
   cloudEconomics: { title: 'AWS Cloud Economics', url: 'https://aws.amazon.com/economics/' },
@@ -192,6 +196,10 @@ export const REFS = {
     url: 'https://aws.amazon.com/compliance/data-privacy-faq/',
   },
   dataSync: { title: 'AWS DataSync', url: 'https://aws.amazon.com/datasync/' },
+  dataSyncDocs: {
+    title: 'What is AWS DataSync?',
+    url: 'https://docs.aws.amazon.com/datasync/latest/userguide/what-is-datasync.html',
+  },
   dataTransferPricing: {
     title: 'Amazon EC2 On-Demand pricing (data transfer)',
     url: 'https://aws.amazon.com/ec2/pricing/on-demand/',
@@ -232,6 +240,10 @@ export const REFS = {
   ec2InstanceTypes: {
     title: 'Amazon EC2 Instance types',
     url: 'https://aws.amazon.com/ec2/instance-types/',
+  },
+  ec2OptimizeCpu: {
+    title: 'CPU options for Amazon EC2 instances',
+    url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-optimize-cpu.html',
   },
   ec2Pricing: { title: 'Amazon EC2 pricing', url: 'https://aws.amazon.com/ec2/pricing/' },
   ec2PurchaseOptions: {
@@ -470,6 +482,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html',
   },
   outposts: { title: 'AWS Outposts', url: 'https://aws.amazon.com/outposts/' },
+  outpostsDocs: {
+    title: 'What is AWS Outposts?',
+    url: 'https://docs.aws.amazon.com/outposts/latest/userguide/what-is-outposts.html',
+  },
   partnerNetwork: { title: 'AWS Partner Network', url: 'https://aws.amazon.com/partners/' },
   penTesting: {
     title: 'Penetration Testing',
@@ -710,6 +726,14 @@ export const REFS = {
     title: 'AWS Well-Architected Framework',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html',
   },
+  waGameDays: {
+    title: 'REL12-BP05 Conduct game days regularly',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_testing_resiliency_game_days_resiliency.html',
+  },
+  waGeneralDesign: {
+    title: 'AWS Well-Architected Framework: General design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/general-design-principles.html',
+  },
   waImmutable: {
     title: 'Reliability pillar: REL08-BP04 Deploy using immutable infrastructure',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_tracking_change_management_immutable_infrastructure.html',
@@ -746,6 +770,10 @@ export const REFS = {
     title: 'Well-Architected Framework: The pillars of the framework',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html',
   },
+  waPurposeBuiltDb: {
+    title: 'PERF03-BP01 Use a purpose-built data store',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/perf_data_use_purpose_built_data_store.html',
+  },
   waRelChange: {
     title: 'Well-Architected Framework: Reliability change management',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel-chg-mgmt.html',
@@ -757,6 +785,10 @@ export const REFS = {
   waReliabilityDesign: {
     title: 'Well-Architected Framework: Reliability design principles',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel-dp.html',
+  },
+  waRelQuotas: {
+    title: 'REL01-BP04 Monitor and manage quotas',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_manage_service_limits_monitor_manage_limits.html',
   },
   waResiliency: {
     title: 'Reliability pillar: Resiliency, and the components of reliability',
@@ -777,6 +809,14 @@ export const REFS = {
   waStateless: {
     title: 'REL05-BP06 Make systems stateless where possible',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_mitigate_interaction_failure_stateless.html',
+  },
+  waSusRegion: {
+    title: 'SUS01-BP01 Choose Region based on both business requirements and sustainability goals',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sus_sus_region_a2.html',
+  },
+  waSusScale: {
+    title: 'SUS02-BP01 Scale workload infrastructure dynamically',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sus_sus_user_a2.html',
   },
   waSustainability: {
     title: 'Sustainability Pillar',
