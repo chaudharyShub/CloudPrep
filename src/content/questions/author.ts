@@ -25,6 +25,10 @@ export interface QuestionSpec {
   readonly x: string;
   readonly r: readonly RefKey[];
   readonly tags?: readonly string[];
+  /** Overrides the batch status, e.g. a question that couldn't be confirmed during review. */
+  readonly st?: ReviewStatus;
+  /** Revision, raised when the question changes in substance (default 1). */
+  readonly rev?: number;
 }
 
 export interface BatchMeta {
@@ -32,6 +36,8 @@ export interface BatchMeta {
   /** YYYY-MM-DD the batch was written. */
   readonly written: string;
   readonly status?: ReviewStatus;
+  /** YYYY-MM-DD the batch was checked against its cited pages (becomes `lastVerified`). */
+  readonly checked?: string;
 }
 
 const DOMAIN_NUMBER: Record<DomainId, number> = { D1: 1, D2: 2, D3: 3, D4: 4 };
@@ -42,7 +48,7 @@ export function defineQuestions(meta: BatchMeta, specs: readonly QuestionSpec[])
     const correct = typeof spec.a === 'string' ? [spec.a] : [...spec.a];
     return {
       id: `clf-d${DOMAIN_NUMBER[meta.domain]}-${String(spec.n).padStart(4, '0')}`,
-      revision: 1,
+      revision: spec.rev ?? 1,
       type: correct.length > 1 ? 'multiple' : 'single',
       stem: spec.q,
       options: spec.o.map(([text, explanation], index) => ({
@@ -57,7 +63,9 @@ export function defineQuestions(meta: BatchMeta, specs: readonly QuestionSpec[])
       difficulty: LEVELS[spec.lv],
       tags: spec.tags ?? [],
       references: spec.r.map((key) => REFS[key]),
-      review: { status: meta.status ?? 'unverified', lastVerified: meta.written },
+      review: spec.st
+        ? { status: spec.st, lastVerified: meta.written }
+        : { status: meta.status ?? 'unverified', lastVerified: meta.checked ?? meta.written },
     };
   });
 }

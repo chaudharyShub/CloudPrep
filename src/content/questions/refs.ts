@@ -9,7 +9,15 @@ export const REFS = {
     title: 'Report Amazon AWS abuse',
     url: 'https://repost.aws/knowledge-center/report-aws-abuse',
   },
+  accessAnalyzer: {
+    title: 'Using AWS Identity and Access Management Access Analyzer',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html',
+  },
   acm: { title: 'AWS Certificate Manager', url: 'https://aws.amazon.com/certificate-manager/' },
+  acmPricing: {
+    title: 'AWS Certificate Manager pricing',
+    url: 'https://aws.amazon.com/certificate-manager/pricing/',
+  },
   amazonQ: { title: 'Amazon Q', url: 'https://aws.amazon.com/q/' },
   amis: {
     title: 'Amazon Machine Images (AMIs)',
@@ -17,13 +25,25 @@ export const REFS = {
   },
   amplify: { title: 'AWS Amplify', url: 'https://aws.amazon.com/amplify/' },
   apiGateway: { title: 'Amazon API Gateway', url: 'https://aws.amazon.com/api-gateway/' },
+  appDiscoveryDocs: {
+    title: 'What is AWS Application Discovery Service?',
+    url: 'https://docs.aws.amazon.com/application-discovery/latest/userguide/what-is-appdiscovery.html',
+  },
   appRunner: { title: 'AWS App Runner', url: 'https://aws.amazon.com/apprunner/' },
+  appRunnerDocs: {
+    title: 'What is AWS App Runner?',
+    url: 'https://docs.aws.amazon.com/apprunner/latest/dg/what-is-apprunner.html',
+  },
   appStream: { title: 'Amazon AppStream 2.0', url: 'https://aws.amazon.com/appstream2/' },
   appSync: { title: 'AWS AppSync', url: 'https://aws.amazon.com/appsync/' },
   artifact: { title: 'AWS Artifact', url: 'https://aws.amazon.com/artifact/' },
   artifactDocs: {
     title: 'What is AWS Artifact?',
     url: 'https://docs.aws.amazon.com/artifact/latest/ug/what-is-aws-artifact.html',
+  },
+  artifactDownload: {
+    title: 'Downloading reports in AWS Artifact',
+    url: 'https://docs.aws.amazon.com/artifact/latest/ug/downloading-documents.html',
   },
   athena: { title: 'Amazon Athena', url: 'https://aws.amazon.com/athena/' },
   athenaDocs: {
@@ -60,11 +80,43 @@ export const REFS = {
     title: 'AWS Cloud Adoption Framework',
     url: 'https://aws.amazon.com/cloud-adoption-framework/',
   },
+  cafBusiness: {
+    title: 'AWS CAF: Business perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/business-perspective.html',
+  },
+  cafFoundational: {
+    title: 'AWS CAF: Foundational capabilities',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/foundational-capabilities.html',
+  },
+  cafGovernance: {
+    title: 'AWS CAF: Governance perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/governance-perspective.html',
+  },
+  cafOperations: {
+    title: 'AWS CAF: Operations perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/operations-perspective.html',
+  },
+  cafPeople: {
+    title: 'AWS CAF: People perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/people-perspective.html',
+  },
+  cafPlatform: {
+    title: 'AWS CAF: Platform perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/platform-perspective.html',
+  },
+  cafSecurity: {
+    title: 'AWS CAF: Security perspective',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/security-perspective.html',
+  },
   cafWhitepaper: {
     title: 'An Overview of the AWS Cloud Adoption Framework',
     url: 'https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html',
   },
   cdk: { title: 'AWS Cloud Development Kit', url: 'https://aws.amazon.com/cdk/' },
+  ceRightsizing: {
+    title: 'Optimizing your cost with rightsizing recommendations',
+    url: 'https://docs.aws.amazon.com/cost-management/latest/userguide/ce-rightsizing.html',
+  },
   cli: { title: 'AWS Command Line Interface', url: 'https://aws.amazon.com/cli/' },
   clientVpn: { title: 'AWS Client VPN', url: 'https://aws.amazon.com/vpn/client-vpn/' },
   cloudEconomics: { title: 'AWS Cloud Economics', url: 'https://aws.amazon.com/economics/' },
@@ -74,6 +126,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html',
   },
   cloudFront: { title: 'Amazon CloudFront', url: 'https://aws.amazon.com/cloudfront/' },
+  cloudFrontCaching: {
+    title: 'Caching and availability (CloudFront)',
+    url: 'https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/ConfiguringCaching.html',
+  },
   cloudFrontDocs: {
     title: 'What is Amazon CloudFront?',
     url: 'https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html',
@@ -86,9 +142,33 @@ export const REFS = {
     title: 'What is AWS CloudTrail?',
     url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html',
   },
+  cloudTrailEventHistory: {
+    title: 'Working with CloudTrail event history',
+    url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/view-cloudtrail-events.html',
+  },
+  cloudTrailKms: {
+    title: 'Encrypting CloudTrail log files with AWS KMS keys (SSE-KMS)',
+    url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/encrypting-cloudtrail-log-files-with-aws-kms.html',
+  },
+  cloudTrailLake: {
+    title: 'Working with AWS CloudTrail Lake',
+    url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-lake.html',
+  },
+  cloudTrailOrgTrail: {
+    title: 'Creating a trail for an organization',
+    url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html',
+  },
+  cloudTrailValidation: {
+    title: 'Validating CloudTrail log file integrity',
+    url: 'https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-validation-intro.html',
+  },
   cloudTypes: {
     title: 'Overview of AWS: Types of cloud computing',
     url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html',
+  },
+  cloudVsOnPrem: {
+    title: 'What is the difference between cloud and on premises?',
+    url: 'https://aws.amazon.com/what-is/cloud-vs-on-premises/',
   },
   cloudWatch: { title: 'Amazon CloudWatch', url: 'https://aws.amazon.com/cloudwatch/' },
   cloudWatchDocs: {
@@ -100,6 +180,10 @@ export const REFS = {
   codeDeploy: { title: 'AWS CodeDeploy', url: 'https://aws.amazon.com/codedeploy/' },
   codePipeline: { title: 'AWS CodePipeline', url: 'https://aws.amazon.com/codepipeline/' },
   cognito: { title: 'Amazon Cognito', url: 'https://aws.amazon.com/cognito/' },
+  cognitoDocs: {
+    title: 'What is Amazon Cognito?',
+    url: 'https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html',
+  },
   compliance: {
     title: 'AWS Compliance Programs',
     url: 'https://aws.amazon.com/compliance/programs/',
@@ -109,18 +193,38 @@ export const REFS = {
     title: 'AWS Compute Optimizer',
     url: 'https://aws.amazon.com/compute-optimizer/',
   },
+  computeOptimizerDocs: {
+    title: 'What is AWS Compute Optimizer?',
+    url: 'https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html',
+  },
   config: { title: 'AWS Config', url: 'https://aws.amazon.com/config/' },
   configDocs: {
     title: 'What is AWS Config?',
     url: 'https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html',
   },
   connect: { title: 'Amazon Connect', url: 'https://aws.amazon.com/connect/' },
+  connectPricing: {
+    title: 'Amazon Connect pricing',
+    url: 'https://aws.amazon.com/connect/pricing/',
+  },
   console: { title: 'AWS Management Console', url: 'https://aws.amazon.com/console/' },
   consolidatedBilling: {
     title: 'Consolidated billing for AWS Organizations',
     url: 'https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html',
   },
   controlTower: { title: 'AWS Control Tower', url: 'https://aws.amazon.com/controltower/' },
+  controlTowerAccountFactory: {
+    title: 'Provision and manage accounts with Account Factory',
+    url: 'https://docs.aws.amazon.com/controltower/latest/userguide/account-factory.html',
+  },
+  controlTowerControls: {
+    title: 'About controls in AWS Control Tower',
+    url: 'https://docs.aws.amazon.com/controltower/latest/controlreference/controls.html',
+  },
+  controlTowerRegionDeny: {
+    title: 'Configure the Region deny control',
+    url: 'https://docs.aws.amazon.com/controltower/latest/userguide/region-deny.html',
+  },
   costAllocationTags: {
     title: 'Organizing and tracking costs using AWS cost allocation tags',
     url: 'https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html',
@@ -149,9 +253,21 @@ export const REFS = {
     title: 'AWS Cost and Usage Reports',
     url: 'https://docs.aws.amazon.com/cur/latest/userguide/what-is-cur.html',
   },
+  dataCenterControls: {
+    title: 'AWS data center controls',
+    url: 'https://aws.amazon.com/compliance/data-center/controls/',
+  },
   dataExchange: { title: 'AWS Data Exchange', url: 'https://aws.amazon.com/data-exchange/' },
   dataFirehose: { title: 'Amazon Data Firehose', url: 'https://aws.amazon.com/firehose/' },
+  dataPrivacyFaq: {
+    title: 'AWS Data Privacy FAQ',
+    url: 'https://aws.amazon.com/compliance/data-privacy-faq/',
+  },
   dataSync: { title: 'AWS DataSync', url: 'https://aws.amazon.com/datasync/' },
+  dataSyncDocs: {
+    title: 'What is AWS DataSync?',
+    url: 'https://docs.aws.amazon.com/datasync/latest/userguide/what-is-datasync.html',
+  },
   dataTransferPricing: {
     title: 'Amazon EC2 On-Demand pricing (data transfer)',
     url: 'https://aws.amazon.com/ec2/pricing/on-demand/',
@@ -179,26 +295,62 @@ export const REFS = {
     title: 'What is Amazon DynamoDB?',
     url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html',
   },
+  dynamodbEncryption: {
+    title: 'DynamoDB encryption at rest',
+    url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/EncryptionAtRest.html',
+  },
+  dynamodbResourcePolicies: {
+    title: 'Using resource-based policies for DynamoDB',
+    url: 'https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/access-control-resource-based.html',
+  },
   ebs: { title: 'Amazon EBS', url: 'https://aws.amazon.com/ebs/' },
   ebsDocs: {
     title: 'Amazon EBS volumes',
     url: 'https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volumes.html',
   },
+  ebsPricing: {
+    title: 'Amazon EBS pricing',
+    url: 'https://aws.amazon.com/ebs/pricing/',
+  },
+  ebsSnapshotBpa: {
+    title: 'Block public access for Amazon EBS snapshots',
+    url: 'https://docs.aws.amazon.com/ebs/latest/userguide/block-public-access-snapshots.html',
+  },
   ec2: { title: 'Amazon EC2', url: 'https://aws.amazon.com/ec2/' },
+  ec2DataProtection: {
+    title: 'Data protection in Amazon EC2',
+    url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/data-protection.html',
+  },
+  ec2InfraSecurity: {
+    title: 'Infrastructure security in Amazon EC2',
+    url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/infrastructure-security.html',
+  },
   ec2InstanceTypes: {
     title: 'Amazon EC2 Instance types',
     url: 'https://aws.amazon.com/ec2/instance-types/',
+  },
+  ec2OptimizeCpu: {
+    title: 'CPU options for Amazon EC2 instances',
+    url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-optimize-cpu.html',
   },
   ec2Pricing: { title: 'Amazon EC2 pricing', url: 'https://aws.amazon.com/ec2/pricing/' },
   ec2PurchaseOptions: {
     title: 'Amazon EC2 billing and purchasing options',
     url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-purchasing-options.html',
   },
+  ec2Tenancy: {
+    title: 'Amazon EC2 Dedicated Instances',
+    url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/dedicated-instance.html',
+  },
   ec2UserGuide: {
     title: 'What is Amazon EC2?',
     url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html',
   },
   ecr: { title: 'Amazon Elastic Container Registry', url: 'https://aws.amazon.com/ecr/' },
+  ecrEnhancedScanning: {
+    title: 'Scan images for OS and programming language package vulnerabilities in Amazon ECR',
+    url: 'https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning-enhanced.html',
+  },
   ecs: { title: 'Amazon Elastic Container Service', url: 'https://aws.amazon.com/ecs/' },
   edgeLocations: {
     title: 'Amazon CloudFront key features (edge locations)',
@@ -210,6 +362,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html',
   },
   eks: { title: 'Amazon Elastic Kubernetes Service', url: 'https://aws.amazon.com/eks/' },
+  eksDocs: {
+    title: 'What is Amazon EKS?',
+    url: 'https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html',
+  },
   elasticDr: {
     title: 'AWS Elastic Disaster Recovery',
     url: 'https://aws.amazon.com/disaster-recovery/',
@@ -235,9 +391,21 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html',
   },
   fargate: { title: 'AWS Fargate', url: 'https://aws.amazon.com/fargate/' },
+  faultTolerance: {
+    title: 'Fault tolerance and fault isolation',
+    url: 'https://docs.aws.amazon.com/whitepapers/latest/availability-and-beyond-improving-resilience/fault-tolerance-and-fault-isolation.html',
+  },
   firewallManager: {
     title: 'AWS Firewall Manager',
     url: 'https://aws.amazon.com/firewall-manager/',
+  },
+  fis: {
+    title: 'AWS Fault Injection Service',
+    url: 'https://aws.amazon.com/fis/',
+  },
+  flowLogs: {
+    title: 'Logging IP traffic using VPC Flow Logs',
+    url: 'https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html',
   },
   forecast: { title: 'Amazon Forecast', url: 'https://aws.amazon.com/forecast/' },
   fraudDetector: { title: 'Amazon Fraud Detector', url: 'https://aws.amazon.com/fraud-detector/' },
@@ -255,15 +423,27 @@ export const REFS = {
     title: 'AWS Global Infrastructure',
     url: 'https://aws.amazon.com/about-aws/global-infrastructure/',
   },
+  globalNetworkFaq: {
+    title: 'AWS Global Network FAQs',
+    url: 'https://aws.amazon.com/about-aws/global-infrastructure/global-network/faqs/',
+  },
   glue: { title: 'AWS Glue', url: 'https://aws.amazon.com/glue/' },
   glueDocs: {
     title: 'What is AWS Glue?',
     url: 'https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html',
   },
+  govCloud: {
+    title: 'What is AWS GovCloud (US)?',
+    url: 'https://docs.aws.amazon.com/govcloud-us/latest/UserGuide/whatis.html',
+  },
   guardDuty: { title: 'Amazon GuardDuty', url: 'https://aws.amazon.com/guardduty/' },
   guardDutyDocs: {
     title: 'What is Amazon GuardDuty?',
     url: 'https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html',
+  },
+  guardDutyMalware: {
+    title: 'GuardDuty Malware Protection for EC2',
+    url: 'https://docs.aws.amazon.com/guardduty/latest/ug/malware-protection.html',
   },
   ha: {
     title: 'Reliability pillar: Design your workload to withstand component failures',
@@ -281,21 +461,45 @@ export const REFS = {
     title: 'How AWS Pricing Works',
     url: 'https://docs.aws.amazon.com/whitepapers/latest/how-aws-pricing-works/',
   },
+  iamAbac: {
+    title: 'Define permissions based on attributes with ABAC authorization',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction_attribute-based-access-control.html',
+  },
   iamBestPractices: {
     title: 'Security best practices in IAM',
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html',
+  },
+  iamCredentialReport: {
+    title: 'Generate credential reports for your AWS account',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html',
   },
   iamGroups: {
     title: 'IAM user groups',
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups.html',
   },
+  iamLastAccessed: {
+    title: 'Refine permissions in AWS using last accessed information',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_last-accessed.html',
+  },
   iamPolicies: {
     title: 'Policies and permissions in IAM',
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html',
   },
+  iamPolicyElements: {
+    title: 'IAM JSON policy element reference',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements.html',
+  },
+  iamPolicyEval: {
+    title: 'Policy evaluation logic',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html',
+  },
   iamRoles: {
     title: 'IAM roles',
     url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html',
+  },
+  iamTempCredentials: {
+    title: 'Temporary security credentials in IAM',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html',
   },
   iamWhatIs: {
     title: 'What is IAM?',
@@ -332,6 +536,14 @@ export const REFS = {
     title: 'AWS Key Management Service concepts',
     url: 'https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html',
   },
+  kmsOverview: {
+    title: 'AWS Key Management Service overview',
+    url: 'https://docs.aws.amazon.com/kms/latest/developerguide/overview.html',
+  },
+  kmsRotation: {
+    title: 'Rotate AWS KMS keys',
+    url: 'https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html',
+  },
   knowledgeCenter: { title: 'AWS Knowledge Center', url: 'https://repost.aws/knowledge-center' },
   lakeFormation: { title: 'AWS Lake Formation', url: 'https://aws.amazon.com/lake-formation/' },
   lambda: { title: 'AWS Lambda', url: 'https://aws.amazon.com/lambda/' },
@@ -340,8 +552,24 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/lambda/latest/dg/welcome.html',
   },
   lambdaPricing: { title: 'AWS Lambda pricing', url: 'https://aws.amazon.com/lambda/pricing/' },
+  lambdaRuntimeUpdates: {
+    title: 'Understanding how Lambda manages runtime version updates',
+    url: 'https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html',
+  },
+  lambdaTimeout: {
+    title: 'Configure Lambda function timeout',
+    url: 'https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html',
+  },
+  largeMigrationPhases: {
+    title: 'Phases of a large migration',
+    url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/phases.html',
+  },
   lex: { title: 'Amazon Lex', url: 'https://aws.amazon.com/lex/' },
   licenseManager: { title: 'AWS License Manager', url: 'https://aws.amazon.com/license-manager/' },
+  licenseManagerDocs: {
+    title: 'What is AWS License Manager?',
+    url: 'https://docs.aws.amazon.com/license-manager/latest/userguide/license-manager.html',
+  },
   licensing: {
     title: 'Licensing options (BYOL) on Amazon EC2 Dedicated Hosts',
     url: 'https://aws.amazon.com/ec2/dedicated-hosts/faqs/',
@@ -396,20 +624,56 @@ export const REFS = {
     title: 'AWS Network Firewall',
     url: 'https://aws.amazon.com/network-firewall/',
   },
+  onPremComparison: {
+    title: 'Five things you should do to create an accurate on-premises vs cloud comparison model',
+    url: 'https://aws.amazon.com/blogs/aws-cloud-financial-management/five-things-you-should-do-to-create-an-accurate-on-premises-vs-cloud-comparison-model/',
+  },
   opensearch: {
     title: 'Amazon OpenSearch Service',
     url: 'https://aws.amazon.com/opensearch-service/',
+  },
+  oracleMigrationStrategies: {
+    title: 'Oracle database migration strategies',
+    url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/migration-oracle-database/strategies.html',
   },
   organizations: { title: 'AWS Organizations', url: 'https://aws.amazon.com/organizations/' },
   organizationsDocs: {
     title: 'What is AWS Organizations?',
     url: 'https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html',
   },
+  orgPolicies: {
+    title: 'Managing organization policies with AWS Organizations',
+    url: 'https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies.html',
+  },
   outposts: { title: 'AWS Outposts', url: 'https://aws.amazon.com/outposts/' },
+  outpostsDocs: {
+    title: 'What is AWS Outposts?',
+    url: 'https://docs.aws.amazon.com/outposts/latest/userguide/what-is-outposts.html',
+  },
+  outpostsRackFaq: {
+    title: 'AWS Outposts racks FAQs',
+    url: 'https://aws.amazon.com/outposts/rack/faqs/',
+  },
+  parameterStore: {
+    title: 'AWS Systems Manager Parameter Store',
+    url: 'https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html',
+  },
   partnerNetwork: { title: 'AWS Partner Network', url: 'https://aws.amazon.com/partners/' },
+  pciFaq: {
+    title: 'PCI DSS Level 1 FAQs',
+    url: 'https://aws.amazon.com/compliance/pci-dss-level-1-faqs/',
+  },
   penTesting: {
     title: 'Penetration Testing',
     url: 'https://aws.amazon.com/security/penetration-testing/',
+  },
+  permissionsBoundaries: {
+    title: 'Permissions boundaries for IAM entities',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html',
+  },
+  permissionSets: {
+    title: 'Manage AWS accounts with permission sets',
+    url: 'https://docs.aws.amazon.com/singlesignon/latest/userguide/permissionsetsconcept.html',
   },
   personalize: { title: 'Amazon Personalize', url: 'https://aws.amazon.com/personalize/' },
   pinpoint: { title: 'Amazon Pinpoint', url: 'https://aws.amazon.com/pinpoint/' },
@@ -432,7 +696,23 @@ export const REFS = {
   qDeveloper: { title: 'Amazon Q Developer', url: 'https://aws.amazon.com/q/developer/' },
   quickSight: { title: 'Amazon Quick Sight', url: 'https://aws.amazon.com/quicksight/' },
   ram: { title: 'AWS Resource Access Manager', url: 'https://aws.amazon.com/ram/' },
+  ramDocs: {
+    title: 'What is AWS Resource Access Manager?',
+    url: 'https://docs.aws.amazon.com/ram/latest/userguide/what-is.html',
+  },
   rds: { title: 'Amazon RDS', url: 'https://aws.amazon.com/rds/' },
+  rdsEncryption: {
+    title: 'Encrypting Amazon RDS resources',
+    url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html',
+  },
+  rdsOracleLicensing: {
+    title: 'RDS for Oracle licensing options',
+    url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Oracle.Concepts.Licensing.html',
+  },
+  rdsSecurity: {
+    title: 'Security in Amazon RDS',
+    url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.html',
+  },
   rdsUserGuide: {
     title: 'What is Amazon RDS?',
     url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html',
@@ -450,11 +730,23 @@ export const REFS = {
     title: 'Regions and Availability Zones',
     url: 'https://aws.amazon.com/about-aws/global-infrastructure/regions_az/',
   },
+  regionsAzsDocs: {
+    title: 'AWS Regions and Availability Zones (Global Infrastructure guide)',
+    url: 'https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-regions-availability-zones.html',
+  },
   rekognition: { title: 'Amazon Rekognition', url: 'https://aws.amazon.com/rekognition/' },
+  rekognitionAvailability: {
+    title: 'Amazon Rekognition feature availability changes',
+    url: 'https://docs.aws.amazon.com/rekognition/latest/dg/rekognition-availability-changes.html',
+  },
   repost: { title: 'AWS re:Post', url: 'https://repost.aws/' },
   reservedInstances: {
     title: 'Amazon EC2 Reserved Instances',
     url: 'https://aws.amazon.com/ec2/pricing/reserved-instances/',
+  },
+  rootMfa: {
+    title: 'Multi-factor authentication for AWS account root user',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/enable-mfa-for-root.html',
   },
   rootUser: {
     title: 'AWS account root user',
@@ -470,6 +762,14 @@ export const REFS = {
     title: 'Blocking public access to your Amazon S3 storage',
     url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html',
   },
+  s3BlockPublicDocs: {
+    title: 'Blocking public access to your Amazon S3 storage',
+    url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html',
+  },
+  s3DefaultEncryption: {
+    title: 'Amazon S3 default encryption FAQ',
+    url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-encryption-faq.html',
+  },
   s3Glacier: {
     title: 'Amazon S3 Glacier storage classes',
     url: 'https://aws.amazon.com/s3/storage-classes/glacier/',
@@ -478,10 +778,18 @@ export const REFS = {
     title: 'Managing the lifecycle of objects',
     url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html',
   },
+  s3ObjectLock: {
+    title: 'Locking objects with Object Lock',
+    url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html',
+  },
   s3Pricing: { title: 'Amazon S3 pricing', url: 'https://aws.amazon.com/s3/pricing/' },
   s3StorageClasses: {
     title: 'Amazon S3 storage classes',
     url: 'https://aws.amazon.com/s3/storage-classes/',
+  },
+  s3Upload: {
+    title: 'Uploading objects (Amazon S3)',
+    url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html',
   },
   s3UserGuide: {
     title: 'What is Amazon S3?',
@@ -511,11 +819,19 @@ export const REFS = {
     title: 'Amazon WorkSpaces Secure Browser',
     url: 'https://aws.amazon.com/workspaces/secure-browser/',
   },
+  securityBulletins: {
+    title: 'AWS Security Bulletins',
+    url: 'https://aws.amazon.com/security/security-bulletins/',
+  },
   securityGroups: {
     title: 'Control traffic to your AWS resources using security groups',
     url: 'https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html',
   },
   securityHub: { title: 'AWS Security Hub', url: 'https://aws.amazon.com/security-hub/' },
+  securityHubCentralConfig: {
+    title: 'Understanding central configuration in Security Hub CSPM',
+    url: 'https://docs.aws.amazon.com/securityhub/latest/userguide/central-configuration-intro.html',
+  },
   securityHubDocs: {
     title: 'What is AWS Security Hub?',
     url: 'https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html',
@@ -535,6 +851,18 @@ export const REFS = {
     title: 'AWS Shield',
     url: 'https://docs.aws.amazon.com/waf/latest/developerguide/shield-chapter.html',
   },
+  shieldFeatures: {
+    title: 'AWS Shield features',
+    url: 'https://aws.amazon.com/shield/features/',
+  },
+  shieldPricing: {
+    title: 'AWS Shield pricing',
+    url: 'https://aws.amazon.com/shield/pricing/',
+  },
+  shieldSrt: {
+    title: 'Shield Response Team (SRT) support',
+    url: 'https://docs.aws.amazon.com/waf/latest/developerguide/ddos-srt-support.html',
+  },
   siteToSiteVpn: {
     title: 'AWS Site-to-Site VPN',
     url: 'https://aws.amazon.com/vpn/site-to-site-vpn/',
@@ -549,6 +877,10 @@ export const REFS = {
   sns: { title: 'Amazon SNS', url: 'https://aws.amazon.com/sns/' },
   solutionsLibrary: { title: 'AWS Solutions Library', url: 'https://aws.amazon.com/solutions/' },
   spot: { title: 'Amazon EC2 Spot Instances', url: 'https://aws.amazon.com/ec2/spot/' },
+  spRecommendations: {
+    title: 'Understanding Savings Plans recommendations',
+    url: 'https://docs.aws.amazon.com/savingsplans/latest/userguide/sp-recommendations.html',
+  },
   sqs: { title: 'Amazon SQS', url: 'https://aws.amazon.com/sqs/' },
   stepFunctions: { title: 'AWS Step Functions', url: 'https://aws.amazon.com/step-functions/' },
   storageGateway: { title: 'AWS Storage Gateway', url: 'https://aws.amazon.com/storagegateway/' },
@@ -580,17 +912,29 @@ export const REFS = {
   },
   textract: { title: 'Amazon Textract', url: 'https://aws.amazon.com/textract/' },
   timestream: { title: 'Amazon Timestream', url: 'https://aws.amazon.com/timestream/' },
+  timestreamDocs: {
+    title: 'What is Amazon Timestream?',
+    url: 'https://docs.aws.amazon.com/timestream/latest/developerguide/what-is-timestream.html',
+  },
   training: { title: 'AWS Training and Certification', url: 'https://aws.amazon.com/training/' },
   transcribe: { title: 'Amazon Transcribe', url: 'https://aws.amazon.com/transcribe/' },
   transferFamily: {
     title: 'AWS Transfer Family',
     url: 'https://aws.amazon.com/aws-transfer-family/',
   },
+  transferFamilyDocs: {
+    title: 'What is AWS Transfer Family?',
+    url: 'https://docs.aws.amazon.com/transfer/latest/userguide/what-is-aws-transfer-family.html',
+  },
   transitGateway: { title: 'AWS Transit Gateway', url: 'https://aws.amazon.com/transit-gateway/' },
   translate: { title: 'Amazon Translate', url: 'https://aws.amazon.com/translate/' },
   trustedAdvisor: {
     title: 'AWS Trusted Advisor',
     url: 'https://aws.amazon.com/premiumsupport/technology/trusted-advisor/',
+  },
+  trustedAdvisorChecks: {
+    title: 'AWS Trusted Advisor check reference',
+    url: 'https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor-check-reference.html',
   },
   trustedAdvisorDocs: {
     title: 'AWS Trusted Advisor check reference',
@@ -602,37 +946,158 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html',
   },
   vpn: { title: 'AWS VPN', url: 'https://aws.amazon.com/vpn/' },
+  vulnerabilityReporting: {
+    title: 'AWS vulnerability reporting',
+    url: 'https://aws.amazon.com/security/vulnerability-reporting/',
+  },
+  waAbuse: {
+    title: 'AWS response to abuse and compromise',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/abuse-and-compromise.html',
+  },
+  waAvailability: {
+    title: 'Reliability pillar: Availability',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/availability.html',
+  },
   waCost: {
     title: 'Cost Optimization Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html',
+  },
+  waCostAware: {
+    title: 'Well-Architected Framework: Expenditure and usage awareness',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-aware.html',
+  },
+  waCostBestPractices: {
+    title: 'Well-Architected Framework: Cost optimization best practices',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-bp.html',
+  },
+  waCostDesign: {
+    title: 'Well-Architected Framework: Cost optimization design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-dp.html',
+  },
+  waCostOptimizeOverTime: {
+    title: 'Well-Architected Framework: Optimize over time',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-opti.html',
+  },
+  waDefinitions: {
+    title: 'Well-Architected Framework: Definitions',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/definitions.html',
   },
   waFramework: {
     title: 'AWS Well-Architected Framework',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html',
   },
+  wafRateBased: {
+    title: 'Using rate-based rule statements in AWS WAF',
+    url: 'https://docs.aws.amazon.com/waf/latest/developerguide/waf-rule-statement-type-rate-based.html',
+  },
+  waGameDays: {
+    title: 'REL12-BP05 Conduct game days regularly',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_testing_resiliency_game_days_resiliency.html',
+  },
+  waGeneralDesign: {
+    title: 'AWS Well-Architected Framework: General design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/general-design-principles.html',
+  },
+  waImmutable: {
+    title: 'Reliability pillar: REL08-BP04 Deploy using immutable infrastructure',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_tracking_change_management_immutable_infrastructure.html',
+  },
+  waLensCatalog: {
+    title: 'AWS Well-Architected Tool: Lens Catalog',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/userguide/lens-catalog.html',
+  },
+  waLenses: {
+    title: 'AWS Well-Architected Tool: Using lenses',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/userguide/lenses.html',
+  },
+  waLooseCoupling: {
+    title: 'Reliability pillar: REL04-BP02 Implement loosely coupled dependencies',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_prevent_interaction_failure_loosely_coupled_system.html',
+  },
   waOpex: {
     title: 'Operational Excellence Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/welcome.html',
+  },
+  waOpexDesign: {
+    title: 'Well-Architected Framework: Operational excellence design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/oe-design-principles.html',
   },
   waPerformance: {
     title: 'Performance Efficiency Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/performance-efficiency-pillar/welcome.html',
   },
+  waPerformanceDesign: {
+    title: 'Well-Architected Framework: Performance efficiency design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/perf-dp.html',
+  },
   waPillars: {
     title: 'Well-Architected Framework: The pillars of the framework',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html',
+  },
+  waPurposeBuiltDb: {
+    title: 'PERF03-BP01 Use a purpose-built data store',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/perf_data_use_purpose_built_data_store.html',
+  },
+  waRelBackupTest: {
+    title:
+      'REL09-BP04 Perform periodic recovery of the data to verify backup integrity and processes',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_backing_up_data_periodic_recovery_testing_data.html',
+  },
+  waRelChange: {
+    title: 'Well-Architected Framework: Reliability change management',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel-chg-mgmt.html',
   },
   waReliability: {
     title: 'Reliability Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html',
   },
+  waReliabilityDesign: {
+    title: 'Well-Architected Framework: Reliability design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel-dp.html',
+  },
+  waRelQuotas: {
+    title: 'REL01-BP04 Monitor and manage quotas',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_manage_service_limits_monitor_manage_limits.html',
+  },
+  waResiliency: {
+    title: 'Reliability pillar: Resiliency, and the components of reliability',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/resiliency-and-the-components-of-reliability.html',
+  },
+  waSecDataProtection: {
+    title: 'Well-Architected Framework: Security data protection',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sec-dataprot.html',
+  },
   waSecurity: {
     title: 'Security Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html',
   },
+  waSecurityDesign: {
+    title: 'Well-Architected Framework: Security design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sec-design.html',
+  },
+  waStateless: {
+    title: 'REL05-BP06 Make systems stateless where possible',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel_mitigate_interaction_failure_stateless.html',
+  },
+  waSusRegion: {
+    title: 'SUS01-BP01 Choose Region based on both business requirements and sustainability goals',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sus_sus_region_a2.html',
+  },
+  waSusScale: {
+    title: 'SUS02-BP01 Scale workload infrastructure dynamically',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sus_sus_user_a2.html',
+  },
   waSustainability: {
     title: 'Sustainability Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/sustainability-pillar/sustainability-pillar.html',
+  },
+  waSustainabilityDesign: {
+    title: 'Well-Architected Framework: Sustainability design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sus-design-principles.html',
+  },
+  waSustainabilityRevisions: {
+    title: 'Sustainability Pillar: Document revisions',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/sustainability-pillar/document-revisions.html',
   },
   waTool: {
     title: 'AWS Well-Architected Tool',
@@ -643,13 +1108,26 @@ export const REFS = {
     title: 'AWS WAF',
     url: 'https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html',
   },
+  waToolPricing: {
+    title: 'AWS Well-Architected Tool pricing',
+    url: 'https://aws.amazon.com/well-architected-tool/pricing/',
+  },
   wavelength: { title: 'AWS Wavelength', url: 'https://aws.amazon.com/wavelength/' },
   whatIsCloud: {
     title: 'What is cloud computing?',
     url: 'https://aws.amazon.com/what-is-cloud-computing/',
   },
+  whatIsIaas: {
+    title: 'What is IaaS (Infrastructure as a Service)?',
+    url: 'https://aws.amazon.com/what-is/iaas/',
+  },
+
   whitepapers: { title: 'AWS Whitepapers & Guides', url: 'https://aws.amazon.com/whitepapers/' },
   workspaces: { title: 'Amazon WorkSpaces', url: 'https://aws.amazon.com/workspaces/' },
+  workspacesFaq: {
+    title: 'Amazon WorkSpaces FAQs',
+    url: 'https://aws.amazon.com/workspaces/faqs/',
+  },
   xray: { title: 'AWS X-Ray', url: 'https://aws.amazon.com/xray/' },
   xrayDocs: {
     title: 'What is AWS X-Ray?',

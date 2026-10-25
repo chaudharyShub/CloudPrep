@@ -5,7 +5,7 @@ import { D3_QUESTIONS } from './d3-technology-services';
 import { D4_QUESTIONS } from './d4-billing-support';
 
 /** Bump when questions are added, removed, or revised. */
-export const BANK_VERSION = '2026-10-22.1';
+export const BANK_VERSION = '2026-10-25.2';
 
 /** Every file in ./batches/ exports a default array of questions (see author.ts). */
 const batchModules = import.meta.glob<readonly Question[]>('./batches/*.ts', {
