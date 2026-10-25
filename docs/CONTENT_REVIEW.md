@@ -1,6 +1,6 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-25.1` · 2,000 questions · 1,217 `checked`, 783 `unverified`, none `approved` yet.
+> Bank version `2026-10-25.1` · 2,000 questions · 1,257 `checked`, 743 `unverified`, none `approved` yet.
 >
 > Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
 
@@ -40,6 +40,7 @@ Batches in `src/content/questions/batches/` are reviewed one file (about 30 ques
 | `d3-03` (3.4 databases) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0110` notes AWS's end-of-support notice for Timestream for LiveAnalytics (AWS points to Timestream for InfluxDB); `0124` cites the RDS product page (nine engines, including Db2); `0130` cites RDS encryption. MemoryDB (Valkey- and Redis OSS-compatible), DynamoDB, Aurora, Neptune, DocumentDB, Keyspaces and Redshift facts were confirmed on their pages. |
 | `d3-04` (3.5 networking) | 2026-10-25 | All 40 checked; no changes to questions or answers. `clf-d3-0175` now cites CloudFront's caching page ("reduces the load on your origin server"); `0170` cites VPC Flow Logs. VPC, subnet, gateway, Transit Gateway, PrivateLink, Route 53 routing policy, load balancer and Global Accelerator facts were confirmed on their pages. |
 | `d3-05` (3.6 storage) | 2026-10-25 | All 40 checked; no changes to questions or answers. S3 storage classes (11 nines durability; all classes except One Zone use at least three AZs), Glacier retrieval options, EBS, EFS (Infrequent Access and Archive classes), FSx and Storage Gateway facts were confirmed. `clf-d3-0205`, `0210` and `0214` now cite the S3 Object Lock and default encryption pages. |
+| `d3-06` (3.7 AI/ML and analytics) | 2026-10-25 | All 40 checked; no answers changed. `clf-d3-0235` notes AWS will discontinue support for the Amazon Q Developer IDE plugins on 30 April 2027 (AWS points to Kiro). AI service purposes (Polly, Transcribe, Translate, Comprehend, Rekognition, Textract, Lex, Bedrock, SageMaker AI) and analytics services (Athena, Glue, EMR, Kinesis, Data Firehose, Quick Sight, OpenSearch Service, MSK, Lake Formation, Data Exchange) were confirmed on their pages. |
 
 Each question was written for CloudPrep from the AWS pages it cites, and every cited URL was confirmed to load (HTTP 200) on 2026-10-21. Key facts were checked against the live pages (six advantages, Well-Architected pillars, CAF perspectives, 7 Rs, root-user tasks, shared responsibility, AZ definition, security groups vs network ACLs, S3 storage classes and Glacier, instance store persistence, Spot, Savings Plans, consolidated billing, Budgets, Artifact, Shield Standard, Trusted Advisor, Support plans).
 
@@ -49,6 +50,7 @@ To approve a question, change its `review.status` from `'checked'` to `'approved
 
 | Question | Why |
 |---|---|
+| `clf-d3-0235` and other Amazon Q Developer questions | AWS will discontinue support for the Q Developer IDE plugins on 30 April 2027 and points to Kiro. Revisit Q Developer questions in 2027 or if the exam guide changes. |
 | `clf-d3-0110` and other Amazon Timestream questions | AWS has an end-of-support notice for Timestream for LiveAnalytics and points to Timestream for InfluxDB. The questions still name "Amazon Timestream"; revisit if the exam guide changes. |
 | `clf-d3-0077` (AWS App Runner) | Closed to new customers since 30 April 2026; the explanation says so. Consider retiring App Runner questions if it leaves the exam guide. |
 | `clf-d2-0212` (AWS CloudTrail Lake) | Closed to new customers since 31 May 2026; the explanation says so. Revisit if it leaves the exam scope. |
