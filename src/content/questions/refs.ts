@@ -888,6 +888,10 @@ export const REFS = {
   },
   textract: { title: 'Amazon Textract', url: 'https://aws.amazon.com/textract/' },
   timestream: { title: 'Amazon Timestream', url: 'https://aws.amazon.com/timestream/' },
+  timestreamDocs: {
+    title: 'What is Amazon Timestream?',
+    url: 'https://docs.aws.amazon.com/timestream/latest/developerguide/what-is-timestream.html',
+  },
   training: { title: 'AWS Training and Certification', url: 'https://aws.amazon.com/training/' },
   transcribe: { title: 'Amazon Transcribe', url: 'https://aws.amazon.com/transcribe/' },
   transferFamily: {
