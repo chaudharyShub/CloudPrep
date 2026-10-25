@@ -1,6 +1,7 @@
 import { useState, type SyntheticEvent } from 'react';
 import { Link, Navigate, useSearchParams } from 'react-router';
 import { Mail } from 'lucide-react';
+import { LogoTile } from '@/components/brand/LogoMark';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { buttonClasses } from '@/components/ui/buttonStyles';
@@ -79,6 +80,13 @@ export function SignInPage() {
         ) : (
           <Card>
             <CardBody className="flex flex-col gap-6">
+              <div className="flex items-center gap-3">
+                <LogoTile size={40} />
+                <div className="flex flex-col leading-tight">
+                  <span className="text-sm font-semibold text-fg">CloudPrep</span>
+                  <span className="text-xs text-fg-subtle">CLF-C02 practice</span>
+                </div>
+              </div>
               {!client.emailSignIn ? null : sentTo ? (
                 <div role="status" className="flex flex-col items-start gap-4">
                   <Notice tone="success" title="Check your email">

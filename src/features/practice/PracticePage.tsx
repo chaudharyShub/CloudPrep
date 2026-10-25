@@ -2,6 +2,7 @@ import { useMemo, useState, type SyntheticEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Bookmark, CircleX, History, Play } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { buttonClasses } from '@/components/ui/buttonStyles';
@@ -107,6 +108,7 @@ export function PracticePage() {
     <>
       <PageHeader
         title="Learning mode"
+        icon={PAGE_ICONS.practice}
         description="Practise by domain or topic. Check each answer as you go and read why every option is right or wrong."
       />
 

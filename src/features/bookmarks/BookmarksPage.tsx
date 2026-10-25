@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Bookmark, BookmarkX, Play } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Button } from '@/components/ui/Button';
 import { buttonClasses } from '@/components/ui/buttonStyles';
 import { Card } from '@/components/ui/Card';
@@ -34,6 +35,7 @@ export function BookmarksPage() {
     <>
       <PageHeader
         title="Bookmarks"
+        icon={PAGE_ICONS.bookmarks}
         description="Questions you saved to revisit and practise."
         actions={
           items.length > 0 && (

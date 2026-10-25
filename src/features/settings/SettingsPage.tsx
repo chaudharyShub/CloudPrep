@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
@@ -48,6 +49,7 @@ export function SettingsPage() {
     <>
       <PageHeader
         title="Settings"
+        icon={PAGE_ICONS.settings}
         description="Preferences and the data stored in this browser. Changes save automatically."
       />
 

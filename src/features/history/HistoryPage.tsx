@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { ChevronRight, History } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Badge } from '@/components/ui/Badge';
 import { buttonClasses } from '@/components/ui/buttonStyles';
 import { Card } from '@/components/ui/Card';
@@ -14,6 +15,7 @@ export function HistoryPage() {
     <>
       <PageHeader
         title="Exam history"
+        icon={PAGE_ICONS.history}
         description="Your submitted mock exams in this browser, newest first."
       />
       <Card>

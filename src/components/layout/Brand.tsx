@@ -1,12 +1,10 @@
 import { Link } from 'react-router';
-import { Cloud } from 'lucide-react';
+import { LogoTile } from '@/components/brand/LogoMark';
 
 export function Brand({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <Link to="/dashboard" onClick={onNavigate} className="flex items-center gap-2.5 rounded-md">
-      <span className="flex size-8 items-center justify-center rounded-md border border-border-strong bg-surface-2">
-        <Cloud size={18} strokeWidth={2} aria-hidden="true" className="text-accent-fg" />
-      </span>
+      <LogoTile size={32} />
       <span className="flex flex-col leading-tight">
         <span className="text-sm font-semibold text-fg">CloudPrep</span>
         <span className="text-xs text-fg-subtle">CLF-C02 practice</span>

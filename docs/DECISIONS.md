@@ -54,6 +54,7 @@
 | D-047 | Signed-in users' data syncs to Supabase from a local copy; guest data stays separate and is added only on request | Accepted |
 | D-048 | Vercel Web Analytics for page views, production builds only | Accepted |
 | D-049 | Test time limits sized for a parallel run on a 4-core machine; effect-timing races fixed | Accepted |
+| D-050 | CloudPrep logo (circuit cloud), app icons, link preview and page icons | Accepted |
 
 ---
 
@@ -305,4 +306,13 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Parallelism:** running fewer Vitest workers (2) was slower (141 s against 109–133 s) and no more stable, so the default stays.
 - **Races fixed in tests:** two tests acted right after a page appeared, before an effect had run. The proctor test (AC-7.5) now waits for `proctor-resumed` in the log, and the fullscreen-exit test waits for `monitoring-started` (logged as the listeners are attached) before simulating the event.
 - **Checked:** two full unit runs passed; two rounds of two suites run at the same time (double load) passed all 2,040 tests; then `npm run check`.
+
+### D-050 Logo, icons and link preview (2026-10-24)
+- **Logo:** after two rounds of original options (a cloud with a check; then a C monogram, badge, summit and cloud-P), the user supplied a reference image: a cloud with circuit traces, apparently a stock graphic. It wasn't used as is (stock licences rarely allow a logo use, it isn't exclusive, and a JPG with a shadow can't follow the themes); an original version was drawn instead and the user chose variation 3: a cloud outline with three circuit traces ending in solid nodes, one colour, drawn on a 48-unit grid (paths in `src/components/brand/logoPaths.ts`, drawn by `LogoMark` and `LogoTile`). At 20 px and below it simplifies to the cloud and three dots. `LogoTile` shows it in `text-on-accent` on a solid `bg-accent` tile. It borrows nothing from Amazon Web Services branding. It appears in the sidebar and mobile header (`Brand`), on the sign-in card, the error page and the loading screens.
+- **Browser and home-screen icons:** `public/favicon.svg` (the small form of the mark on the accent tile), `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` and `manifest.webmanifest` (name, colours, icons; no service worker, so it's "Add to Home Screen" only, not offline install). The PNGs and the preview image are drawn by `npm run brand:assets` (`scripts/generate-brand-assets.mjs`, Playwright's Chromium, the Inter font from `node_modules`) and committed. `brandAssets.test.ts` checks that the favicon and the script use the same paths as `LogoMark`, and that every linked file exists.
+- **Link preview:** Open Graph and Twitter tags in `index.html` with a 1200×630 `og-image.png`. Preview URLs must be absolute, so a small Vite plugin replaces `%SITE_URL%` with `https://` plus Vercel's `VERCEL_PROJECT_PRODUCTION_URL` at build time (site-relative elsewhere). Nothing to configure on Vercel while system environment variables are exposed (the default).
+- **Page icons:** one icon per main page in `src/components/layout/pageIcons.ts`, used by both the navigation and `PageHeader`'s new `icon` prop, so they always match. Privacy uses a lock.
+- **Domain icons:** tried (one icon per exam domain) and removed at the user's request; domains show their number and name only.
+- **Branded waits:** `BrandLoading` (the logo pulsing, unless the system asks for reduced motion, plus a visible status message) replaces the skeleton while questions first download and the "Signing you in…" text. The 404 page keeps its compass icon inside the app layout, which already shows the logo.
+- **Not done:** icons on every card heading (about 39), which would make pages busy.
 

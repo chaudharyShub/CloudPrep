@@ -12,6 +12,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Badge, type BadgeTone } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { buttonClasses } from '@/components/ui/buttonStyles';
@@ -58,6 +59,7 @@ export function ProgressPage() {
     <>
       <PageHeader
         title="Progress"
+        icon={PAGE_ICONS.progress}
         description="Readiness indicators calculated only from the exams and practice saved in this browser."
       />
 

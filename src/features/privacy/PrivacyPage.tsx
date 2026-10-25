@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 
 const SECTIONS: { title: string; body: React.ReactNode }[] = [
@@ -123,6 +124,7 @@ export function PrivacyPage() {
     <>
       <PageHeader
         title="Privacy"
+        icon={PAGE_ICONS.privacy}
         description="What CloudPrep stores, and what strict practice and the AI proctor monitor."
       />
       <div className="flex max-w-prose flex-col gap-6">
