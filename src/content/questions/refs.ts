@@ -289,6 +289,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/ebs/latest/userguide/block-public-access-snapshots.html',
   },
   ec2: { title: 'Amazon EC2', url: 'https://aws.amazon.com/ec2/' },
+  ec2DataProtection: {
+    title: 'Data protection in Amazon EC2',
+    url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/data-protection.html',
+  },
   ec2InfraSecurity: {
     title: 'Infrastructure security in Amazon EC2',
     url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/infrastructure-security.html',
@@ -611,6 +615,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html',
   },
   partnerNetwork: { title: 'AWS Partner Network', url: 'https://aws.amazon.com/partners/' },
+  pciFaq: {
+    title: 'PCI DSS Level 1 FAQs',
+    url: 'https://aws.amazon.com/compliance/pci-dss-level-1-faqs/',
+  },
   penTesting: {
     title: 'Penetration Testing',
     url: 'https://aws.amazon.com/security/penetration-testing/',
@@ -649,6 +657,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/ram/latest/userguide/what-is.html',
   },
   rds: { title: 'Amazon RDS', url: 'https://aws.amazon.com/rds/' },
+  rdsEncryption: {
+    title: 'Encrypting Amazon RDS resources',
+    url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Overview.Encryption.html',
+  },
   rdsOracleLicensing: {
     title: 'RDS for Oracle licensing options',
     url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Oracle.Concepts.Licensing.html',
@@ -679,6 +691,10 @@ export const REFS = {
   reservedInstances: {
     title: 'Amazon EC2 Reserved Instances',
     url: 'https://aws.amazon.com/ec2/pricing/reserved-instances/',
+  },
+  rootMfa: {
+    title: 'Multi-factor authentication for AWS account root user',
+    url: 'https://docs.aws.amazon.com/IAM/latest/UserGuide/enable-mfa-for-root.html',
   },
   rootUser: {
     title: 'AWS account root user',
@@ -756,6 +772,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html',
   },
   securityHub: { title: 'AWS Security Hub', url: 'https://aws.amazon.com/security-hub/' },
+  securityHubCentralConfig: {
+    title: 'Understanding central configuration in Security Hub CSPM',
+    url: 'https://docs.aws.amazon.com/securityhub/latest/userguide/central-configuration-intro.html',
+  },
   securityHubDocs: {
     title: 'What is AWS Security Hub?',
     url: 'https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html',
