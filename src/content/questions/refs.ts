@@ -203,6 +203,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html',
   },
   connect: { title: 'Amazon Connect', url: 'https://aws.amazon.com/connect/' },
+  connectPricing: {
+    title: 'Amazon Connect pricing',
+    url: 'https://aws.amazon.com/connect/pricing/',
+  },
   console: { title: 'AWS Management Console', url: 'https://aws.amazon.com/console/' },
   consolidatedBilling: {
     title: 'Consolidated billing for AWS Organizations',
