@@ -122,6 +122,10 @@ export const REFS = {
     title: 'Overview of AWS: Types of cloud computing',
     url: 'https://docs.aws.amazon.com/whitepapers/latest/aws-overview/types-of-cloud-computing.html',
   },
+  cloudVsOnPrem: {
+    title: 'What is the difference between cloud and on premises?',
+    url: 'https://aws.amazon.com/what-is/cloud-vs-on-premises/',
+  },
   cloudWatch: { title: 'Amazon CloudWatch', url: 'https://aws.amazon.com/cloudwatch/' },
   cloudWatchDocs: {
     title: 'What is Amazon CloudWatch?',
@@ -444,6 +448,10 @@ export const REFS = {
     title: 'AWS Network Firewall',
     url: 'https://aws.amazon.com/network-firewall/',
   },
+  onPremComparison: {
+    title: 'Five things you should do to create an accurate on-premises vs cloud comparison model',
+    url: 'https://aws.amazon.com/blogs/aws-cloud-financial-management/five-things-you-should-do-to-create-an-accurate-on-premises-vs-cloud-comparison-model/',
+  },
   opensearch: {
     title: 'Amazon OpenSearch Service',
     url: 'https://aws.amazon.com/opensearch-service/',
@@ -485,6 +493,10 @@ export const REFS = {
   quickSight: { title: 'Amazon Quick Sight', url: 'https://aws.amazon.com/quicksight/' },
   ram: { title: 'AWS Resource Access Manager', url: 'https://aws.amazon.com/ram/' },
   rds: { title: 'Amazon RDS', url: 'https://aws.amazon.com/rds/' },
+  rdsOracleLicensing: {
+    title: 'RDS for Oracle licensing options',
+    url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Oracle.Concepts.Licensing.html',
+  },
   rdsUserGuide: {
     title: 'What is Amazon RDS?',
     url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html',
@@ -601,6 +613,10 @@ export const REFS = {
   sns: { title: 'Amazon SNS', url: 'https://aws.amazon.com/sns/' },
   solutionsLibrary: { title: 'AWS Solutions Library', url: 'https://aws.amazon.com/solutions/' },
   spot: { title: 'Amazon EC2 Spot Instances', url: 'https://aws.amazon.com/ec2/spot/' },
+  spRecommendations: {
+    title: 'Understanding Savings Plans recommendations',
+    url: 'https://docs.aws.amazon.com/savingsplans/latest/userguide/sp-recommendations.html',
+  },
   sqs: { title: 'Amazon SQS', url: 'https://aws.amazon.com/sqs/' },
   stepFunctions: { title: 'AWS Step Functions', url: 'https://aws.amazon.com/step-functions/' },
   storageGateway: { title: 'AWS Storage Gateway', url: 'https://aws.amazon.com/storagegateway/' },

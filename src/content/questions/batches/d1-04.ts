@@ -418,7 +418,7 @@ export default defineQuestions(
         ],
         [
           'Both are the lowest-cost EC2 options available',
-          'Dedicated options cost more than shared tenancy.',
+          'Neither is the lowest-cost option; Spot Instances offer the largest discounts. Dedicated options are chosen for licensing or compliance needs.',
         ],
         [
           'Dedicated Hosts can be interrupted with a two-minute warning like Spot Instances',
