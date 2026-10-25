@@ -27,6 +27,8 @@ export interface QuestionSpec {
   readonly tags?: readonly string[];
   /** Overrides the batch status, e.g. a question that couldn't be confirmed during review. */
   readonly st?: ReviewStatus;
+  /** Revision, raised when the question changes in substance (default 1). */
+  readonly rev?: number;
 }
 
 export interface BatchMeta {
@@ -46,7 +48,7 @@ export function defineQuestions(meta: BatchMeta, specs: readonly QuestionSpec[])
     const correct = typeof spec.a === 'string' ? [spec.a] : [...spec.a];
     return {
       id: `clf-d${DOMAIN_NUMBER[meta.domain]}-${String(spec.n).padStart(4, '0')}`,
-      revision: 1,
+      revision: spec.rev ?? 1,
       type: correct.length > 1 ? 'multiple' : 'single',
       stem: spec.q,
       options: spec.o.map(([text, explanation], index) => ({

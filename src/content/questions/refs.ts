@@ -610,17 +610,37 @@ export const REFS = {
     title: 'Cost Optimization Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html',
   },
+  waCostDesign: {
+    title: 'Well-Architected Framework: Cost optimization design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/cost-dp.html',
+  },
+  waDefinitions: {
+    title: 'Well-Architected Framework: Definitions',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/definitions.html',
+  },
   waFramework: {
     title: 'AWS Well-Architected Framework',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html',
+  },
+  waLooseCoupling: {
+    title: 'Reliability pillar: REL04-BP02 Implement loosely coupled dependencies',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_prevent_interaction_failure_loosely_coupled_system.html',
   },
   waOpex: {
     title: 'Operational Excellence Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/welcome.html',
   },
+  waOpexDesign: {
+    title: 'Well-Architected Framework: Operational excellence design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/oe-design-principles.html',
+  },
   waPerformance: {
     title: 'Performance Efficiency Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/performance-efficiency-pillar/welcome.html',
+  },
+  waPerformanceDesign: {
+    title: 'Well-Architected Framework: Performance efficiency design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/perf-dp.html',
   },
   waPillars: {
     title: 'Well-Architected Framework: The pillars of the framework',
@@ -630,13 +650,25 @@ export const REFS = {
     title: 'Reliability Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html',
   },
+  waReliabilityDesign: {
+    title: 'Well-Architected Framework: Reliability design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/rel-dp.html',
+  },
   waSecurity: {
     title: 'Security Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html',
   },
+  waSecurityDesign: {
+    title: 'Well-Architected Framework: Security design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sec-design.html',
+  },
   waSustainability: {
     title: 'Sustainability Pillar',
     url: 'https://docs.aws.amazon.com/wellarchitected/latest/sustainability-pillar/sustainability-pillar.html',
+  },
+  waSustainabilityDesign: {
+    title: 'Well-Architected Framework: Sustainability design principles',
+    url: 'https://docs.aws.amazon.com/wellarchitected/latest/framework/sus-design-principles.html',
   },
   waTool: {
     title: 'AWS Well-Architected Tool',
@@ -646,6 +678,10 @@ export const REFS = {
   wafDocs: {
     title: 'AWS WAF',
     url: 'https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html',
+  },
+  waToolPricing: {
+    title: 'AWS Well-Architected Tool pricing',
+    url: 'https://aws.amazon.com/well-architected-tool/pricing/',
   },
   wavelength: { title: 'AWS Wavelength', url: 'https://aws.amazon.com/wavelength/' },
   whatIsCloud: {

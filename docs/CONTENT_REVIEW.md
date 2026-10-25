@@ -1,6 +1,6 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-25.1` · 2,000 questions · 73 `checked`, 1,927 `unverified`, none `approved` yet.
+> Bank version `2026-10-25.1` · 2,000 questions · 111 `checked`, 1,889 `unverified`, none `approved` yet.
 >
 > Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
 
@@ -11,6 +11,7 @@ Batches in `src/content/questions/batches/` are reviewed one file (about 30 ques
 | Batch | Checked | Result |
 |---|---|---|
 | `d1-01` (1.1 benefits of the cloud) | 2026-10-25 | 29 checked, 1 left unverified. `clf-d1-0019` (scalability vs elasticity): no AWS page defines the difference. Fixes: `clf-d1-0027` explanation misquoted the hybrid page ("most common" refers to cloud + on-premises hybrids); `clf-d1-0028`–`0030` re-sourced, because "Types of cloud computing" no longer covers IaaS/PaaS/SaaS (now "What is IaaS?" and the shared responsibility model, which states EC2 is IaaS and the customer manages the guest OS; the IaaS page's own table marks the OS as provider-managed, which contradicts it); `clf-d1-0024` now cites the Data Privacy FAQ for customer choice of Region; `clf-d1-0025` dropped an unconfirmed aside about inbound data transfer and cites Cloud Economics (the pricing whitepaper doesn't render); wording aligned with the pages in `clf-d1-0029` and `clf-d1-0038`. |
+| `d1-02` (1.2 Well-Architected design principles) | 2026-10-25 | 38 checked, 2 left unverified: `clf-d1-0067` ("disposable resources") and `clf-d1-0069` ("design for failure") come from an older AWS whitepaper and aren't principles in the current Well-Architected Framework. Fixes: renamed principles updated to the current framework: "perform operations as code" is now "safely automate where possible" (`clf-d1-0053`, revision 2; distractor in `0059`) and "learn from all operational failures" is now "learn from all operational events and metrics" (`0054`, revision 2; distractor in `0075`); `0071` merged two separate security principles (now "automate security best practices", revision 2) and said "manage change in automation" (now "through automation"); `0042` and `0045` reworded to the current pillar definitions; `0050` and `0076` explanations aligned with the pages. New sources: the framework's design-principles and definitions pages, REL04-BP02 (loose coupling) for `0065`, `0066` and `0077`, and the Well-Architected Tool pricing page for `0062` ("no additional charge"). |
 
 Each question was written for CloudPrep from the AWS pages it cites, and every cited URL was confirmed to load (HTTP 200) on 2026-10-21. Key facts were checked against the live pages (six advantages, Well-Architected pillars, CAF perspectives, 7 Rs, root-user tasks, shared responsibility, AZ definition, security groups vs network ACLs, S3 storage classes and Glacier, instance store persistence, Spot, Savings Plans, consolidated billing, Budgets, Artifact, Shield Standard, Trusted Advisor, Support plans).
 
