@@ -586,6 +586,10 @@ export const REFS = {
     title: 'Managing the lifecycle of objects',
     url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html',
   },
+  s3ObjectLock: {
+    title: 'Locking objects with Object Lock',
+    url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html',
+  },
   s3Pricing: { title: 'Amazon S3 pricing', url: 'https://aws.amazon.com/s3/pricing/' },
   s3StorageClasses: {
     title: 'Amazon S3 storage classes',
