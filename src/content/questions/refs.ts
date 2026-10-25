@@ -189,6 +189,10 @@ export const REFS = {
     title: 'AWS Cost and Usage Reports',
     url: 'https://docs.aws.amazon.com/cur/latest/userguide/what-is-cur.html',
   },
+  dataCenterControls: {
+    title: 'AWS data center controls',
+    url: 'https://aws.amazon.com/compliance/data-center/controls/',
+  },
   dataExchange: { title: 'AWS Data Exchange', url: 'https://aws.amazon.com/data-exchange/' },
   dataFirehose: { title: 'Amazon Data Firehose', url: 'https://aws.amazon.com/firehose/' },
   dataPrivacyFaq: {
@@ -237,6 +241,10 @@ export const REFS = {
     url: 'https://aws.amazon.com/ebs/pricing/',
   },
   ec2: { title: 'Amazon EC2', url: 'https://aws.amazon.com/ec2/' },
+  ec2InfraSecurity: {
+    title: 'Infrastructure security in Amazon EC2',
+    url: 'https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/infrastructure-security.html',
+  },
   ec2InstanceTypes: {
     title: 'Amazon EC2 Instance types',
     url: 'https://aws.amazon.com/ec2/instance-types/',
@@ -404,6 +412,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/lambda/latest/dg/welcome.html',
   },
   lambdaPricing: { title: 'AWS Lambda pricing', url: 'https://aws.amazon.com/lambda/pricing/' },
+  lambdaRuntimeUpdates: {
+    title: 'Understanding how Lambda manages runtime version updates',
+    url: 'https://docs.aws.amazon.com/lambda/latest/dg/runtimes-update.html',
+  },
   largeMigrationPhases: {
     title: 'Phases of a large migration',
     url: 'https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/phases.html',
@@ -521,6 +533,10 @@ export const REFS = {
     title: 'RDS for Oracle licensing options',
     url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Oracle.Concepts.Licensing.html',
   },
+  rdsSecurity: {
+    title: 'Security in Amazon RDS',
+    url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.html',
+  },
   rdsUserGuide: {
     title: 'What is Amazon RDS?',
     url: 'https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html',
@@ -557,6 +573,10 @@ export const REFS = {
   s3BlockPublic: {
     title: 'Blocking public access to your Amazon S3 storage',
     url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html',
+  },
+  s3DefaultEncryption: {
+    title: 'Amazon S3 default encryption FAQ',
+    url: 'https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-encryption-faq.html',
   },
   s3Glacier: {
     title: 'Amazon S3 Glacier storage classes',
@@ -864,6 +884,10 @@ export const REFS = {
 
   whitepapers: { title: 'AWS Whitepapers & Guides', url: 'https://aws.amazon.com/whitepapers/' },
   workspaces: { title: 'Amazon WorkSpaces', url: 'https://aws.amazon.com/workspaces/' },
+  workspacesFaq: {
+    title: 'Amazon WorkSpaces FAQs',
+    url: 'https://aws.amazon.com/workspaces/faqs/',
+  },
   xray: { title: 'AWS X-Ray', url: 'https://aws.amazon.com/xray/' },
   xrayDocs: {
     title: 'What is AWS X-Ray?',
