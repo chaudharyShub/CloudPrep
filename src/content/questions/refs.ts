@@ -126,6 +126,10 @@ export const REFS = {
     url: 'https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html',
   },
   cloudFront: { title: 'Amazon CloudFront', url: 'https://aws.amazon.com/cloudfront/' },
+  cloudFrontCaching: {
+    title: 'Caching and availability (CloudFront)',
+    url: 'https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/ConfiguringCaching.html',
+  },
   cloudFrontDocs: {
     title: 'What is Amazon CloudFront?',
     url: 'https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html',
