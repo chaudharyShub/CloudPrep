@@ -216,6 +216,10 @@ export const REFS = {
     title: 'Amazon EBS volumes',
     url: 'https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volumes.html',
   },
+  ebsPricing: {
+    title: 'Amazon EBS pricing',
+    url: 'https://aws.amazon.com/ebs/pricing/',
+  },
   ec2: { title: 'Amazon EC2', url: 'https://aws.amazon.com/ec2/' },
   ec2InstanceTypes: {
     title: 'Amazon EC2 Instance types',
@@ -374,6 +378,10 @@ export const REFS = {
   lambdaPricing: { title: 'AWS Lambda pricing', url: 'https://aws.amazon.com/lambda/pricing/' },
   lex: { title: 'Amazon Lex', url: 'https://aws.amazon.com/lex/' },
   licenseManager: { title: 'AWS License Manager', url: 'https://aws.amazon.com/license-manager/' },
+  licenseManagerDocs: {
+    title: 'What is AWS License Manager?',
+    url: 'https://docs.aws.amazon.com/license-manager/latest/userguide/license-manager.html',
+  },
   licensing: {
     title: 'Licensing options (BYOL) on Amazon EC2 Dedicated Hosts',
     url: 'https://aws.amazon.com/ec2/dedicated-hosts/faqs/',
