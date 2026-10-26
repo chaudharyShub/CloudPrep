@@ -6,7 +6,7 @@ CloudPrep is an unofficial AWS Certified Cloud Practitioner (CLF-C02) exam simul
 
 ## Current status
 
-All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring) and steps 1–4 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script; D-045: sign-in; D-046: questions from the database; D-047: progress in the database), plus analytics (D-048), the logo (D-050), the Review due schedule (D-052, spaced repetition in Learning mode) and a full review of the question bank (1,995 `checked`, 5 `unverified`; `docs/CONTENT_REVIEW.md`). The app version is in `package.json` (2.0.0 = the Supabase backend; 2.1.0 = Review due). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
+All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring) and steps 1–4 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script; D-045: sign-in; D-046: questions from the database; D-047: progress in the database), plus analytics (D-048), the logo (D-050), the Review due schedule (D-052, spaced repetition in Learning mode) and a full review of the question bank (1,995 `checked`, 5 `unverified`; `docs/CONTENT_REVIEW.md`). The app version is in `package.json` (2.0.0 = the Supabase backend; 2.1.0 = Review due; 2.1.1 = reload once after a deploy, D-053). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
 
 ## Commands
 

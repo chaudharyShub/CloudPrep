@@ -24,6 +24,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Content review | All 2,000 questions checked against their cited AWS pages: 1,995 `checked`, 5 left `unverified` (CONTENT_REVIEW.md), published as bank `2026-10-25.2` | Done; `approved` needs the user's sign-off |
 | Docs audit (D-051) | Docs brought in line with the app; version 2.0.0 | Done, merged and live |
 | Review due (D-052) | Spaced-repetition review schedule in Learning mode and on the dashboard; version 2.1.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-26) |
+| Reload after a deploy (D-053) | A tab opened before a deploy reloads once instead of showing "Something went wrong"; version 2.1.1; acceptance criteria below | Built and verified |
 | Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring, then multi-exam UI) | — |
 
 Changes from the original plan:
@@ -38,7 +39,7 @@ Changes from the original plan:
 - The bank grew from 44 questions (C1) to 2,000 (D-041) instead of the C2–C3 batches, with a new `unverified` status; the review statuses are `draft` → `unverified` → `checked` → `approved` → `retired`, not `reviewed`.
 - The full exam is available; a shorter timed exam is offered only if the bank is too small (D-025). No `beforeunload` leave-page warning: a reload restores the exam, so it isn't needed. No multi-tab read-only guard: tabs share the same exam and stay in sync.
 - Proctoring-lite (P10) became strict practice, and the webcam option became the AI proctor (Phase 7, D-043).
-- **Test tags:** only Phase 7, Phase 8 and Review due criteria are tagged in test names (`AC-7.x`, `AC-B.x`, `AC-R.x`); P0–P9 criteria were verified by the tests listed in TEST_PLAN.md, without tags (D-051).
+- **Test tags:** only Phase 7, Phase 8, Review due and reload-after-deploy criteria are tagged in test names (`AC-7.x`, `AC-B.x`, `AC-R.x`, `AC-U.x`); P0–P9 criteria were verified by the tests listed in TEST_PLAN.md, without tags (D-051).
 
 ## Principles
 
@@ -347,6 +348,17 @@ Acceptance criteria (tests are tagged `AC-R.x`):
 - AC-R.5 Learning mode has a "Review due" card: how many questions are due today, or when the next review is, or how to start the schedule. "Review due questions (n)" starts a session of the most important due questions, up to the default practice length.
 - AC-R.6 The dashboard's quick actions show how many questions are due and start the same session; with nothing due, the action opens Learning mode.
 - AC-R.7 In the browser, progress saved before the upgrade shows up as due and can be practised.
+
+## Reload after a deploy (D-053)
+
+Reported by the user on 2026-10-26: a tab opened before a deploy showed "Failed to fetch dynamically imported module" when moving to a page it hadn't loaded yet.
+
+Acceptance criteria (tests are tagged `AC-U.x`):
+- AC-U.1 A page file that failed to load is recognised from the messages of Chromium, Firefox, WebKit and Vite; other errors are not.
+- AC-U.2 The site reloads at most once per 30 seconds for this reason (guard in `sessionStorage`); without `sessionStorage` it doesn't reload by itself.
+- AC-U.3 Vite's `vite:preloadError` event starts the reload, also for files loaded outside the routes, without cancelling the error. Files cancelled because the page is navigating away (`beforeunload`, `pagehide`) never start one.
+- AC-U.4 The route error page shows "CloudPrep was updated. Loading the latest version…" while reloading. If the guard blocks a reload, it shows the error with Reload and says the user may be offline or the site may have been updated. Other errors never reload by themselves.
+- AC-U.5 In the browser, a deploy while the tab is open reloads once and opens the requested page; a file that keeps failing shows the error after one reload, with no loop.
 
 ## P10 — Optional features (v1.x, pick à la carte)
 

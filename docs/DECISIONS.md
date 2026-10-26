@@ -58,6 +58,7 @@
 | D-050 | CloudPrep logo (circuit cloud), app icons, link preview and page icons | Accepted |
 | D-051 | Docs brought in line with the app; version 2.0.0 | Accepted |
 | D-052 | Review due: spaced-repetition review schedule; version 2.1.0 | Accepted |
+| D-053 | Reload once when a page file is missing after a deploy; version 2.1.1 | Accepted |
 
 ---
 
@@ -353,3 +354,12 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Database:** migration `20261026120000_review_level.sql` adds `question_progress.review_level smallint` (0–4 or null). It's nullable, with no cross-column check, because rows saved before it, and rows written by an app version still open in a browser from before the deploy, have no level or a stale one. When reading rows, the app estimates a missing level the same way as the migration and always reads a wrong latest answer as level 0. **The migration must be applied (`npm run db:push`) before the app version that writes the column is deployed**, or saving progress to the account fails until it is. It was applied to the live database on 2026-10-26, before the merge.
 - **Test cache gotcha:** Vitest 5 caches transformed modules on disk (`fsModuleCache`, `node_modules/.vitest-cache`), including the list of files `import.meta.glob` found. After adding a migration, `schema.test.ts` kept applying only the old ones until the cache was deleted. The cache stays on (it speeds up cold starts); after adding or removing a migration, delete `node_modules/.vitest-cache` before running the tests.
 - **Version:** 2.1.0 (a new feature, backwards-compatible data).
+
+### D-053 Reload once when a page file is missing after a deploy; version 2.1.1 (2026-10-26)
+- **Problem (reported by the user):** each page is its own file with a content hash in its name, and a deploy removes the old files. A tab opened before the deploy still asks for the old names, so moving to a page it hadn't loaded yet showed "Something went wrong: Failed to fetch dynamically imported module". Reload fixed it, but users had to know that.
+- **Fix:** reload the site once when a page file fails to load (`src/lib/reloadAfterUpdate.ts`). Two triggers: Vite's `vite:preloadError` event, fired for every lazily loaded file that fails (registered in `src/main.tsx`), and the route error page, which recognises the browsers' messages for a failed module script. The error page shows "CloudPrep was updated. Loading the latest version…" while the reload runs. The event isn't cancelled: cancelling it would hand the page code an empty module and a less clear error.
+- **No loops:** a timestamp in `sessionStorage` allows one reload per 30 seconds. If the file fails again (offline, or really missing), the error page shows, now saying the user may be offline or the site may have been updated. Without `sessionStorage` it never reloads by itself, because it couldn't tell a second failure from the first.
+- **Leaving the page:** WebKit fails the files still loading when the page navigates away, with the same message. The first version reloaded then and interrupted the navigation (seven WebKit E2E tests caught it). Failures after `beforeunload` or `pagehide` are now ignored, until `pageshow` brings the page back from the back/forward cache.
+- **Rejected:** keeping old files on the host after a deploy (Vercel replaces the whole output, and it would only delay the problem); a service worker that caches every version (the PWA isn't built, PRODUCT_SPEC §4.3); checking for a new version on every navigation (an extra request for every page).
+- **Test note:** WebKit remembers a failed module address within a tab even after a reload, so the E2E test simulates a real deploy: the reloaded page links to the page file under a new name, as a real new version does.
+- **Version:** 2.1.1 (a fix).

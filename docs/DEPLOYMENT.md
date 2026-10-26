@@ -68,7 +68,7 @@ Note: free-tier projects pause after about a week without activity; resume them 
 - **Database changes:** add a new migration in `supabase/migrations/` and run `npm run db:push` before deploying app code that needs it.
 - **User data is kept:** signed-in users' data is in Supabase with a copy in the browser, and guests' data is in their browser. Every stored shape is versioned and migrated (see `src/storage/`).
 
-If someone has CloudPrep open during a deployment, opening a page that hasn't loaded yet may show "Something went wrong". **Reload** fixes it, and no data is lost.
+A deployment renames the page files and removes the old ones. If someone has CloudPrep open during it, opening a page their tab hasn't loaded yet reloads the site once, briefly showing "CloudPrep was updated. Loading the latest version…" (D-053). If the page still can't load (for example offline), "Something went wrong" appears with a **Reload** button. No data is lost either way.
 
 ## Smoke test after each deployment
 

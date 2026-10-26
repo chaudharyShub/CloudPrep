@@ -1,7 +1,7 @@
 {
   "name": "cloudprep",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Unofficial AWS Certified Cloud Practitioner (CLF-C02) practice exam simulator.",
   "type": "module",
   "engines": {
