@@ -22,8 +22,8 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Phase 8: backend (Supabase, D-044–D-047) | Step 1: schema, RLS, publish script. Step 2: sign-in. Step 3: questions from the database, cached in IndexedDB. Step 4: signed-in users' data synced to the database. Step 5 (server scoring) not started | Steps 1–4 done, merged and live |
 | Extras (2026-10-24 and 25) | Vercel Web Analytics (D-048), reliable test runs (D-049), logo, icons and link preview (D-050), sign-out confirmation (AC-B.25) | Done, merged and live |
 | Content review | All 2,000 questions checked against their cited AWS pages: 1,995 `checked`, 5 left `unverified` (CONTENT_REVIEW.md), published as bank `2026-10-25.2` | Done; `approved` needs the user's sign-off |
-| Docs audit (D-051) | Docs brought in line with the app; version 2.0.0 | Done |
-| Review due (D-052) | Spaced-repetition review schedule in Learning mode and on the dashboard; version 2.1.0; acceptance criteria below | Built and verified; needs the database migration before deploying |
+| Docs audit (D-051) | Docs brought in line with the app; version 2.0.0 | Done, merged and live |
+| Review due (D-052) | Spaced-repetition review schedule in Learning mode and on the dashboard; version 2.1.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-26) |
 | Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring, then multi-exam UI) | — |
 
 Changes from the original plan:
