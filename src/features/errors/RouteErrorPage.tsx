@@ -1,14 +1,28 @@
+import { useState } from 'react';
 import { isRouteErrorResponse, Link, useRouteError } from 'react-router';
 import { TriangleAlert } from 'lucide-react';
+import { BrandLoading } from '@/components/brand/BrandLoading';
 import { LogoTile } from '@/components/brand/LogoMark';
 import { Button } from '@/components/ui/Button';
 import { buttonClasses } from '@/components/ui/buttonStyles';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { isStaleAssetError, reloadOnce } from '@/lib/reloadAfterUpdate';
 
 /** Shown when a route throws while loading or rendering. */
 export function RouteErrorPage() {
   const error = useRouteError();
-  useDocumentTitle('Something went wrong');
+  const staleAsset = isStaleAssetError(error);
+  // A page file missing after a deploy: reload once to get the new version (D-053).
+  const [updating] = useState(() => staleAsset && reloadOnce());
+  useDocumentTitle(updating ? 'Updating CloudPrep' : 'Something went wrong');
+
+  if (updating) {
+    return (
+      <main className="flex min-h-dvh items-center justify-center p-6">
+        <BrandLoading message="CloudPrep was updated. Loading the latest version…" />
+      </main>
+    );
+  }
 
   const detail = isRouteErrorResponse(error)
     ? `${error.status} ${error.statusText}`
@@ -28,7 +42,9 @@ export function RouteErrorPage() {
         </span>
         <h1 className="text-xl font-semibold text-fg">Something went wrong</h1>
         <p className="mt-2 text-sm text-fg-muted">
-          CloudPrep hit an unexpected error. Reloading usually fixes it.
+          {staleAsset
+            ? "This page couldn't load. You may be offline, or CloudPrep may have just been updated. Reloading usually fixes it."
+            : 'CloudPrep hit an unexpected error. Reloading usually fixes it.'}
         </p>
         {detail && (
           <p className="mt-4 rounded-md border border-border bg-surface px-3 py-2 font-mono text-xs break-all text-fg-muted">

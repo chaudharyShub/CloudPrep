@@ -1,6 +1,6 @@
 # CloudPrep — Architecture
 
-> Status: **Describes the code as built** (version 2.1.0) · Last updated: 2026-10-26
+> Status: **Describes the code as built** (version 2.1.1) · Last updated: 2026-10-26
 > This replaces the first draft of 2026-10-21. Reasons for each choice are in DECISIONS.md.
 
 ## 1. Overview
@@ -268,6 +268,7 @@ Every value is `{ app: "cloudprep", schemaVersion, savedAt, data }`. `decodeArea
 ## 11. Error handling
 
 - A route `errorElement` shows a friendly page with Reload. In-progress exam data is safe because it's saved after every action.
+- **After a deploy (D-053):** a page file that fails to load (the old name is gone) reloads the site once, from Vite's `vite:preloadError` event (`src/main.tsx`) or the route error page. `src/lib/reloadAfterUpdate.ts` keeps a 30-second guard in `sessionStorage`, so a file that fails again shows the error page instead of reloading in a loop.
 - Storage problems show notices, never crashes (§8.2). Question download failures show "Try again".
 - A question missing from the bank renders a "no longer available" placeholder; an attempt is reviewed with its archived wording when available.
 

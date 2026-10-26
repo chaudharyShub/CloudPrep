@@ -1,6 +1,6 @@
 # CloudPrep — Test Plan
 
-> Status: **Describes the tests as built** (version 2.1.0) · Last updated: 2026-10-26
+> Status: **Describes the tests as built** (version 2.1.1) · Last updated: 2026-10-26
 > This replaces the first draft of 2026-10-21, which planned spec files and a fixture flag that were never created.
 
 ## 1. Strategy at a glance
@@ -40,6 +40,7 @@ Test philosophy: test behaviour, not implementation. Query by role and label. No
 | `integrity.spec.ts` | Strict practice (fullscreen, exit warning, neutral report); proctored check-in, warnings, ended by a phone; blocked copy and forced proctor restart after reload (AC-7.x); the real models load and analyse the camera (`@real-models`, its own project) |
 | `data.spec.ts` | Settings persist; export, reset everything, import; malformed file rejected |
 | `sync.spec.ts` | Progress saved to the account and shown on another device; guest data added on request; sign-out removes the copy (AC-B.18, B.20, B.21) |
+| `update.spec.ts` | A deploy while the tab is open: the missing page file reloads the site once and opens the page; a file that keeps failing shows the error after one reload (AC-U.5) |
 | `qa-journeys.spec.ts` | The QA pass journeys: first visit and empty states, Learning mode with both question types, old results after a new attempt, migrated old-format data and clearing one category, camera permission declined, strict-practice log, reduced motion, keyboard-only exam with visible focus, tablet layout with axe |
 
 Projects: `chromium`, `webkit` and `mobile` (Pixel 7) run everything except `@real-models`; `real-models` runs that test in Chromium.
@@ -61,7 +62,7 @@ Projects: `chromium`, `webkit` and `mobile` (Pixel 7) run everything except `@re
 
 ## 5. Acceptance-criteria tags
 
-Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`) and Review due (`AC-R.x`, D-052) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
+Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`), Review due (`AC-R.x`, D-052) and reloading after a deploy (`AC-U.x`, D-053) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
 
 ## 6. Manual checks (each release)
 
