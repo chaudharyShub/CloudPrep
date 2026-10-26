@@ -6,7 +6,7 @@ An unofficial practice simulator for the **AWS Certified Cloud Practitioner (CLF
 
 ## What it does
 
-- **Learning mode:** untimed practice by domain or topic, with instant feedback, an explanation for every option, and links to the AWS documentation each question is based on. You can bookmark questions.
+- **Learning mode:** untimed practice by domain or topic, with instant feedback, an explanation for every option, and links to the AWS documentation each question is based on. You can bookmark questions, and **Review due** brings questions back on a schedule (1, 3, 7, 21, then 60 days) so missed ones come up again before you forget them.
 - **Timed mock exam:** a 65-question / 90-minute exam that follows the CLF-C02 domain weightings, with flagging, a question grid, final review and automatic submission when time runs out.
 - **Results:** a practice score, per-domain breakdown, answer review with explanations, exam history, and progress guidance across attempts.
 - **Accounts and sync:** sign in with Google (email sign-in links can be switched on once custom email is set up). Signed-in users' progress, bookmarks, exam history, the exam in progress and settings are saved to their account and follow them to every device. The app keeps a copy in the browser, so it stays fast and works offline; changes are sent when you're back online. Progress made before signing in is added to the account only if you choose to.

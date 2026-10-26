@@ -72,11 +72,13 @@ describe('readArea', () => {
   });
 
   it('reads but flags data from a newer schema version', () => {
-    const driver = createMemoryDriver({ [storageKey('progress')]: envelope(validProgress, 2) });
+    const driver = createMemoryDriver({
+      [storageKey('progress')]: envelope(validProgress, PROGRESS_AREA.currentVersion + 1),
+    });
     expect(readArea(driver, PROGRESS_AREA, NOW)).toEqual({
       status: 'newer-version',
       value: validProgress,
-      schemaVersion: 2,
+      schemaVersion: PROGRESS_AREA.currentVersion + 1,
     });
   });
 
@@ -158,6 +160,63 @@ describe('area parsers', () => {
 
     const many = Array.from({ length: MAX_SESSION_SUMMARIES + 5 }, (_, i) => summary(`s${i}`));
     expect(SESSIONS_AREA.parse(many)?.value).toHaveLength(MAX_SESSION_SUMMARIES);
+  });
+
+  it('rejects progress entries with an invalid review level', () => {
+    const entry = { ...validProgress['clf-d1-0001'] }; // latest answer wrong, level 0
+    const parsed = PROGRESS_AREA.parse({
+      ok: entry,
+      missing: { ...entry, reviewLevel: undefined },
+      tooHigh: { ...entry, lastResult: 'correct', correct: 1, attempts: 2, reviewLevel: 5 },
+      fraction: { ...entry, reviewLevel: 0.5 },
+      wrongButLevelled: { ...entry, reviewLevel: 2 },
+    });
+    expect(parsed?.value).toEqual({ ok: entry });
+    expect(parsed?.dropped).toBe(4);
+  });
+});
+
+describe('progress v1 → v2 migration', () => {
+  // A v1 entry has no review level.
+  const v1 = (fields: Record<string, unknown>) => ({
+    attempts: 3,
+    correct: 2,
+    lastResult: 'correct',
+    firstAnsweredAt: 100,
+    lastAnsweredAt: 300,
+    lastIncorrectAt: 200,
+    lastSessionId: 's3',
+    ...fields,
+  });
+
+  it('AC-R.3 estimates a review level for saved progress and keeps everything else', () => {
+    const driver = createMemoryDriver({
+      [storageKey('progress')]: envelope(
+        {
+          wrong: v1({ lastResult: 'incorrect', correct: 1, lastIncorrectAt: 300 }),
+          neverWrong: v1({ correct: 3, lastIncorrectAt: null }),
+          recovered: v1({}),
+        },
+        1,
+      ),
+    });
+    const result = readArea(driver, PROGRESS_AREA, NOW);
+    expect(result.status).toBe('ok');
+    expect(result.value).toEqual({
+      wrong: v1({ lastResult: 'incorrect', correct: 1, lastIncorrectAt: 300, reviewLevel: 0 }),
+      neverWrong: v1({ correct: 3, lastIncorrectAt: null, reviewLevel: 3 }),
+      recovered: v1({ reviewLevel: 1 }),
+    });
+  });
+
+  it('AC-R.3 still drops malformed and unsafe entries', () => {
+    const data = JSON.parse(`{"__proto__": ${JSON.stringify(v1({}))}}`) as Record<string, unknown>;
+    data['broken'] = { attempts: -1 };
+    data['fine'] = v1({});
+    const driver = createMemoryDriver({ [storageKey('progress')]: envelope(data, 1) });
+    const result = readArea(driver, PROGRESS_AREA, NOW);
+    expect(result.status).toBe('recovered');
+    expect(Object.keys(result.value)).toEqual(['fine']);
   });
 });
 

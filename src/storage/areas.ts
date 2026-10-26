@@ -1,5 +1,6 @@
 import { DOMAINS, type DomainId } from '@/domain/exam-guide/clf-c02';
 import type { ProgressMap, QuestionProgress } from '@/domain/practice/progress';
+import { isReviewLevel, legacyReviewLevel } from '@/domain/practice/review';
 import type { DomainTally, PracticeSessionSummary } from '@/domain/practice/session';
 import type { AreaDefinition, Parsed } from './envelope';
 import { isCount, isNonEmptyString, isRecord, isSafeKey, isTimestamp } from './guards';
@@ -26,6 +27,7 @@ function parseQuestionProgress(value: unknown): QuestionProgress | null {
     lastAnsweredAt,
     lastIncorrectAt,
     lastSessionId,
+    reviewLevel,
   } = value;
   if (
     !isCount(attempts) ||
@@ -38,9 +40,11 @@ function parseQuestionProgress(value: unknown): QuestionProgress | null {
     firstAnsweredAt > lastAnsweredAt ||
     !(lastIncorrectAt === null || isTimestamp(lastIncorrectAt)) ||
     !isNonEmptyString(lastSessionId) ||
+    !isReviewLevel(reviewLevel) ||
     // Consistency checks that catch corrupted counters.
     (lastResult === 'correct' && correct === 0) ||
-    (lastResult === 'incorrect' && (correct === attempts || lastIncorrectAt === null))
+    (lastResult === 'incorrect' &&
+      (correct === attempts || lastIncorrectAt === null || reviewLevel !== 0))
   ) {
     return null;
   }
@@ -52,7 +56,43 @@ function parseQuestionProgress(value: unknown): QuestionProgress | null {
     lastAnsweredAt,
     lastIncorrectAt,
     lastSessionId,
+    reviewLevel,
   };
+}
+
+/**
+ * v1 → v2: adds `reviewLevel` (D-052), estimated from the stored counters. Malformed entries
+ * are left for the parser to reject.
+ */
+export function migrateProgressV1(data: unknown): unknown {
+  if (!isRecord(data)) return data;
+  const migrated: Record<string, unknown> = {};
+  for (const [questionId, entry] of Object.entries(data)) {
+    let next: unknown = entry;
+    if (
+      isRecord(entry) &&
+      (entry['lastResult'] === 'correct' || entry['lastResult'] === 'incorrect') &&
+      (entry['lastIncorrectAt'] === null || isTimestamp(entry['lastIncorrectAt'])) &&
+      isCount(entry['correct'])
+    ) {
+      next = {
+        ...entry,
+        reviewLevel: legacyReviewLevel({
+          lastResult: entry['lastResult'],
+          lastIncorrectAt: entry['lastIncorrectAt'],
+          correct: entry['correct'],
+        }),
+      };
+    }
+    // Own property even for unsafe keys, so the parser sees and counts them as dropped.
+    Object.defineProperty(migrated, questionId, {
+      value: next,
+      enumerable: true,
+      writable: true,
+      configurable: true,
+    });
+  }
+  return migrated;
 }
 
 export function parseProgress(data: unknown): Parsed<ProgressMap> | null {
@@ -146,9 +186,9 @@ export function parseSessions(data: unknown): Parsed<readonly PracticeSessionSum
 
 export const PROGRESS_AREA: AreaDefinition<ProgressMap> = {
   name: 'progress',
-  currentVersion: 1,
+  currentVersion: 2,
   fallback: () => ({}),
-  migrations: {},
+  migrations: { 1: migrateProgressV1 },
   parse: parseProgress,
 };
 

@@ -1,5 +1,6 @@
 import { DOMAINS, type DomainId } from '@/domain/exam-guide/clf-c02';
 import type { Question } from '@/domain/questions/types';
+import { nextReviewLevel } from './review';
 
 /**
  * Practice progress for one question.
@@ -20,6 +21,8 @@ export interface QuestionProgress {
   readonly lastIncorrectAt: number | null;
   /** Session that recorded the latest attempt. Makes recording idempotent per session. */
   readonly lastSessionId: string;
+  /** Review schedule level, 0 to MAX_REVIEW_LEVEL (D-052). 0 whenever the latest answer is wrong. */
+  readonly reviewLevel: number;
 }
 
 export type ProgressMap = Readonly<Record<string, QuestionProgress>>;
@@ -38,6 +41,7 @@ export interface AnswerRecord {
 export function recordAnswer(progress: ProgressMap, record: AnswerRecord): ProgressMap {
   const existing = progress[record.questionId];
   if (existing?.lastSessionId === record.sessionId) return progress;
+  const reviewLevel = nextReviewLevel(existing, record.isCorrect, record.at);
   const next: QuestionProgress = existing
     ? {
         attempts: existing.attempts + 1,
@@ -47,6 +51,7 @@ export function recordAnswer(progress: ProgressMap, record: AnswerRecord): Progr
         lastAnsweredAt: record.at,
         lastIncorrectAt: record.isCorrect ? existing.lastIncorrectAt : record.at,
         lastSessionId: record.sessionId,
+        reviewLevel,
       }
     : {
         attempts: 1,
@@ -56,6 +61,7 @@ export function recordAnswer(progress: ProgressMap, record: AnswerRecord): Progr
         lastAnsweredAt: record.at,
         lastIncorrectAt: record.isCorrect ? null : record.at,
         lastSessionId: record.sessionId,
+        reviewLevel,
       };
   return { ...progress, [record.questionId]: next };
 }

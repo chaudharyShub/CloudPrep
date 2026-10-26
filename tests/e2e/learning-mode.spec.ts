@@ -161,3 +161,43 @@ test('recovers from corrupted saved progress without crashing', async ({ page })
   );
   expect(backups).toHaveLength(1);
 });
+
+test('AC-R.7 progress saved before review levels shows up as review due and can be practised', async ({
+  page,
+}) => {
+  await page.goto('/practice');
+  await page.waitForFunction(() => window.localStorage.getItem('cloudprep-account:owner') !== null);
+  // Version 1 progress (no review levels), answered three days ago: two wrong, one right.
+  await page.evaluate(() => {
+    const at = Date.now() - 3 * 86_400_000;
+    const entry = (correct: boolean) => ({
+      attempts: 1,
+      correct: correct ? 1 : 0,
+      lastResult: correct ? 'correct' : 'incorrect',
+      firstAnsweredAt: at,
+      lastAnsweredAt: at,
+      lastIncorrectAt: correct ? null : at,
+      lastSessionId: 's1',
+    });
+    window.localStorage.setItem(
+      'cloudprep-account:cloudprep:progress',
+      JSON.stringify({
+        app: 'cloudprep',
+        schemaVersion: 1,
+        savedAt: 'x',
+        data: {
+          'clf-d1-0001': entry(false),
+          'clf-d2-0001': entry(false),
+          'clf-d3-0001': entry(true),
+        },
+      }),
+    );
+  });
+  await page.goto('/practice');
+  // Wrong answers are due after a day; the right one after three.
+  await expect(page.getByText('3 questions due today.')).toBeVisible();
+  await expectNoSeriousA11yViolations(page);
+  await page.getByRole('button', { name: 'Review due questions (3)' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Review due' })).toBeVisible();
+  await expect(page.getByText('Question 1 of 3')).toBeVisible();
+});

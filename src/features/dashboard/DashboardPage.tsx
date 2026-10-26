@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router';
 import {
   Bookmark,
+  CalendarCheck,
   ChevronRight,
   ClipboardCheck,
   GraduationCap,
@@ -25,6 +26,10 @@ import {
 import { FULL_EXAM } from '@/domain/exam/config';
 import { DOMAINS, EXAM_GUIDE_URL } from '@/domain/exam-guide/clf-c02';
 import { practiceStats } from '@/domain/practice/progress';
+import { reviewOverview } from '@/domain/practice/review';
+import { questionCount, reviewSessionSetup } from '@/features/practice/reviewSession';
+import { SESSION_PATH, sessionState } from '@/features/practice/sessionSetup';
+import { useNow } from '@/hooks/useNow';
 import { formatDateTime, formatPercent } from '@/lib/format';
 import type { ExamConfig } from '@/domain/exam/config';
 import {
@@ -39,6 +44,8 @@ interface QuickAction {
   title: string;
   description: string;
   icon: LucideIcon;
+  /** Router state, e.g. a practice session to start. */
+  state?: unknown;
 }
 
 const MINUTE = 60_000;
@@ -75,14 +82,43 @@ const OTHER_ACTIONS: readonly QuickAction[] = [
   },
 ];
 
+/** "Review due" (D-052): starts the review session, or opens Learning mode when nothing is due. */
+function reviewAction(due: number, setup: ReturnType<typeof reviewSessionSetup>): QuickAction {
+  return setup
+    ? {
+        to: SESSION_PATH,
+        title: 'Review due',
+        description: `${questionCount(due)} due for review today`,
+        icon: CalendarCheck,
+        state: sessionState(setup),
+      }
+    : {
+        to: '/practice',
+        title: 'Review due',
+        description: 'Nothing due for review today',
+        icon: CalendarCheck,
+      };
+}
+
+/** The review queue changes by the day; a minute's refresh is plenty. */
+const REVIEW_REFRESH_MS = 60_000;
+
 export function DashboardPage() {
   const { progress, preferences } = useUserData();
-  const { questions } = usePracticeQuestions();
+  const { questions, ids } = usePracticeQuestions();
   const { fullAvailable, shortConfig } = useExamQuestions();
-  const quickActions = useMemo(
-    () => [examAction(fullAvailable, shortConfig), ...OTHER_ACTIONS],
-    [fullAvailable, shortConfig],
-  );
+  const now = useNow(REVIEW_REFRESH_MS);
+  const quickActions = useMemo(() => {
+    const due = reviewOverview(progress, ids, now).due;
+    const setup = reviewSessionSetup(progress, ids, now, preferences.practiceSessionLength);
+    const [learning, ...rest] = OTHER_ACTIONS;
+    return [
+      examAction(fullAvailable, shortConfig),
+      ...(learning ? [learning] : []),
+      reviewAction(due, setup),
+      ...rest,
+    ];
+  }, [fullAvailable, shortConfig, progress, ids, now, preferences.practiceSessionLength]);
   const stats = useMemo(() => practiceStats(progress, questions), [progress, questions]);
   const attempts = useExamAttempts();
   const latest = attempts[0];
@@ -164,9 +200,10 @@ export function DashboardPage() {
               {quickActions.map((action) => {
                 const Icon = action.icon;
                 return (
-                  <li key={action.to}>
+                  <li key={action.title}>
                     <Link
                       to={action.to}
+                      state={action.state}
                       className="group flex items-center gap-3 rounded-md border border-border bg-surface-2 p-3 transition-colors hover:border-border-strong hover:bg-surface-3"
                     >
                       <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent-subtle text-accent-fg">
