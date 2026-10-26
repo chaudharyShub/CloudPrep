@@ -24,7 +24,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Content review | All 2,000 questions checked against their cited AWS pages: 1,995 `checked`, 5 left `unverified` (CONTENT_REVIEW.md), published as bank `2026-10-25.2` | Done; `approved` needs the user's sign-off |
 | Docs audit (D-051) | Docs brought in line with the app; version 2.0.0 | Done, merged and live |
 | Review due (D-052) | Spaced-repetition review schedule in Learning mode and on the dashboard; version 2.1.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-26) |
-| Reload after a deploy (D-053) | A tab opened before a deploy reloads once instead of showing "Something went wrong"; version 2.1.1; acceptance criteria below | Built and verified |
+| Reload after a deploy (D-053) | A tab opened before a deploy reloads once instead of showing "Something went wrong"; version 2.1.1; acceptance criteria below | Done, merged and live |
 | Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring, then multi-exam UI) | — |
 
 Changes from the original plan:
