@@ -53,13 +53,27 @@ Deployment: static build in `dist/`; Vercel Web Analytics is mounted in `src/mai
 - Note AWS's 2026–27 Support plan changes (Developer, Business and Enterprise On-Ramp end on 1 January 2027).
 - Never import scraped, dump or paid question sets (D-042). New questions must be original and marked `unverified` until checked.
 
-## Definition of done (per phase)
+## Definition of done (every change: feature, fix or content)
 
 1. The phase's acceptance criteria in IMPLEMENTATION_PLAN.md are met, with `AC-x.y` tagged in test names.
 2. `npm run check` passes. Report the commands you ran and their results, including any failures.
 3. Separate "implemented" from "verified" in the report. Never claim something works without running it.
 4. Never skip, delete or loosen a test to get a green build.
 5. Update `docs/DECISIONS.md` if a decision was made or changed.
+6. **Update the docs in the same branch as the change.** The user asked for this on 2026-10-26. Check each document below and update every one the change affects, then say in the report which ones you updated and which needed nothing:
+
+| Change | Update |
+|---|---|
+| Any change | `docs/IMPLEMENTATION_PLAN.md` (Progress row, and a section with acceptance criteria for a feature or fix); `docs/DECISIONS.md` (new `D-0nn` entry and index row) |
+| What users see or can do | `docs/PRODUCT_SPEC.md` (features, pages, §4.3 "Not built"); `README.md` ("What it does"); `docs/KNOWN_LIMITATIONS.md` (new limits, or ones removed); the in-app Privacy page if stored data changes |
+| Code structure, storage, routes, backend | `docs/ARCHITECTURE.md` (folder map, routes, data models, storage keys and versions, backend, error handling) |
+| Tests | `docs/TEST_PLAN.md` (spec list, `AC-` tag prefixes) |
+| Deploying, environment variables, database | `docs/DEPLOYMENT.md`; `.env.example`; README commands |
+| Questions | `docs/CONTENT_REVIEW.md`; the bank numbers in README and KNOWN_LIMITATIONS |
+| Version | `package.json` and `package-lock.json` (patch for a fix, minor for a feature); the version in the status lines of PRODUCT_SPEC, ARCHITECTURE and TEST_PLAN, and in this file |
+| Workflow, rules, commands, gotchas | this file (`CLAUDE.md`) |
+
+7. **After the user merges and it's deployed**, update the status text that changes with it: the IMPLEMENTATION_PLAN Progress row ("Done, merged and live"), and any note such as "needs the migration before deploying". Put this on a small docs branch for the user to merge.
 
 ## Exam engine
 
