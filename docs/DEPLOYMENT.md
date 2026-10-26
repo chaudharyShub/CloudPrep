@@ -75,7 +75,7 @@ If someone has CloudPrep open during a deployment, opening a page that hasn't lo
 1. Open the site signed out: you land on the sign-in page, with no errors in the browser console. "Continue as a guest" opens Learning mode.
 2. Open `<your-url>/practice` and `<your-url>/settings` directly in a new tab, then refresh. Both must load (this checks the route fallback).
 3. Open `<your-url>/does-not-exist`. You should see CloudPrep's "Page not found" page, not a Vercel 404.
-4. As a guest, start a short practice session and check an answer. Reload: progress is kept.
+4. As a guest, start a short practice session and check an answer. Reload: progress is kept, and the Review due card in Learning mode shows when the question comes back.
 5. Sign in with Google: you return to the page you came from and your account shows in the navigation. If you have guest data, you're asked once whether to add it.
 6. Start a timed exam, answer a question, reload the page: the exam resumes with the timer still running. Submit it and open the results.
 7. Open the site in another browser and sign in: the exam appears in Exam history.
