@@ -90,7 +90,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │                          # proctor/, components/), results, history, progress, bookmarks,
 │  │                          # settings, privacy, errors, dev (/__ui), shared (question rendering)
 │  ├─ hooks/                  # useNow, useTheme, useDocumentTitle
-│  ├─ lib/                    # theme, format, download, ids, cn
+│  ├─ lib/                    # theme, format, download, ids, cn, reloadAfterUpdate (D-053)
 │  ├─ state/                  # Providers and hooks (§6)
 │  ├─ storage/                # driver, envelope, areas, store, sync, account, transfer, questionCache
 │  ├─ styles/index.css        # Tailwind import, design tokens (both themes), base styles
