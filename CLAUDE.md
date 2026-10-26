@@ -62,16 +62,16 @@ Deployment: static build in `dist/`; Vercel Web Analytics is mounted in `src/mai
 5. Update `docs/DECISIONS.md` if a decision was made or changed.
 6. **Update the docs in the same branch as the change.** The user asked for this on 2026-10-26. Check each document below and update every one the change affects, then say in the report which ones you updated and which needed nothing:
 
-| Change | Update |
-|---|---|
-| Any change | `docs/IMPLEMENTATION_PLAN.md` (Progress row, and a section with acceptance criteria for a feature or fix); `docs/DECISIONS.md` (new `D-0nn` entry and index row) |
-| What users see or can do | `docs/PRODUCT_SPEC.md` (features, pages, §4.3 "Not built"); `README.md` ("What it does"); `docs/KNOWN_LIMITATIONS.md` (new limits, or ones removed); the in-app Privacy page if stored data changes |
-| Code structure, storage, routes, backend | `docs/ARCHITECTURE.md` (folder map, routes, data models, storage keys and versions, backend, error handling) |
-| Tests | `docs/TEST_PLAN.md` (spec list, `AC-` tag prefixes) |
-| Deploying, environment variables, database | `docs/DEPLOYMENT.md`; `.env.example`; README commands |
-| Questions | `docs/CONTENT_REVIEW.md`; the bank numbers in README and KNOWN_LIMITATIONS |
-| Version | `package.json` and `package-lock.json` (patch for a fix, minor for a feature); the version in the status lines of PRODUCT_SPEC, ARCHITECTURE and TEST_PLAN, and in this file |
-| Workflow, rules, commands, gotchas | this file (`CLAUDE.md`) |
+| Change                                     | Update                                                                                                                                                                                              |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Any change                                 | `docs/IMPLEMENTATION_PLAN.md` (Progress row, and a section with acceptance criteria for a feature or fix); `docs/DECISIONS.md` (new `D-0nn` entry and index row)                                    |
+| What users see or can do                   | `docs/PRODUCT_SPEC.md` (features, pages, §4.3 "Not built"); `README.md` ("What it does"); `docs/KNOWN_LIMITATIONS.md` (new limits, or ones removed); the in-app Privacy page if stored data changes |
+| Code structure, storage, routes, backend   | `docs/ARCHITECTURE.md` (folder map, routes, data models, storage keys and versions, backend, error handling)                                                                                        |
+| Tests                                      | `docs/TEST_PLAN.md` (spec list, `AC-` tag prefixes)                                                                                                                                                 |
+| Deploying, environment variables, database | `docs/DEPLOYMENT.md`; `.env.example`; README commands                                                                                                                                               |
+| Questions                                  | `docs/CONTENT_REVIEW.md`; the bank numbers in README and KNOWN_LIMITATIONS                                                                                                                          |
+| Version                                    | `package.json` and `package-lock.json` (patch for a fix, minor for a feature); the version in the status lines of PRODUCT_SPEC, ARCHITECTURE and TEST_PLAN, and in this file                        |
+| Workflow, rules, commands, gotchas         | this file (`CLAUDE.md`)                                                                                                                                                                             |
 
 7. **After the user merges and it's deployed**, update the status text that changes with it: the IMPLEMENTATION_PLAN Progress row ("Done, merged and live"), and any note such as "needs the migration before deploying". Put this on a small docs branch for the user to merge.
 
