@@ -6,7 +6,7 @@ CloudPrep is an unofficial AWS Certified Cloud Practitioner (CLF-C02) exam simul
 
 ## Current status
 
-All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring) and steps 1–4 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script; D-045: sign-in; D-046: questions from the database; D-047: progress in the database), plus analytics (D-048), the logo (D-050) and a full review of the question bank (1,995 `checked`, 5 `unverified`; `docs/CONTENT_REVIEW.md`). The app version is in `package.json` (2.0.0 = the Supabase backend). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
+All user phases are built: Phases 1–6, the QA pass, release preparation (static deployment on Vercel), Phase 7 (AI proctoring) and steps 1–4 of Phase 8 (Supabase backend, D-044: schema, RLS, publish script; D-045: sign-in; D-046: questions from the database; D-047: progress in the database), plus analytics (D-048), the logo (D-050), the Review due schedule (D-052, spaced repetition in Learning mode) and a full review of the question bank (1,995 `checked`, 5 `unverified`; `docs/CONTENT_REVIEW.md`). The app version is in `package.json` (2.0.0 = the Supabase backend; 2.1.0 = Review due). See the Progress table in IMPLEMENTATION_PLAN.md. **Don't add new features without first discussing their value with the user.** Deployment: `docs/DEPLOYMENT.md`. Limitations: `docs/KNOWN_LIMITATIONS.md`.
 
 ## Commands
 
@@ -70,7 +70,7 @@ Deployment: static build in `dist/`; Vercel Web Analytics is mounted in `src/mai
 
 ## Backend (Supabase)
 
-- `supabase/migrations/` is the schema; add a new timestamped migration for every change, never edit an applied one. Every table has RLS; user tables limit rows to `auth.uid()`; content is written only by `publish:questions`.
+- `supabase/migrations/` is the schema; add a new timestamped migration for every change, never edit an applied one. After adding one, delete `node_modules/.vitest-cache` before running tests (Vitest caches the `import.meta.glob` file list, D-052), and apply it with `npm run db:push` before deploying app code that uses it. Every table has RLS; user tables limit rows to `auth.uid()`; content is written only by `publish:questions`.
 - Questions are authored in the repo and published; never edit them in the database. **The app loads them at runtime** (D-046): use `useQuestionBank()` / `usePracticeQuestions()` / `useExamQuestions()` on pages under `RequireQuestions`; never import `@/content/*` in app code (lint enforces it). After changing questions: bump `BANK_VERSION`, `npm run publish:questions`, `npm run check:published`. Answers live in `question_keys`, apart from `questions`, so they can be locked for server scoring.
 - Every table carries `exam_id` for future exams; the app is still CLF-C02 only (`EXAM_ID`).
 - Sign-in (D-045): the app uses `AuthClient` (`src/backend/auth.ts`) through `useAuth()` from `src/state/AuthProvider.tsx`; never import `@supabase/supabase-js` in features. Signed-in-only routes sit under `RequireAuth` in `src/app/routes.tsx`; guests keep Learning mode, bookmarks, settings and privacy. Redirect targets go through `safeNextPath`. Email sign-in shows only when `VITE_EMAIL_SIGN_IN=true` (off until custom SMTP is set up); Google is always on.
@@ -96,6 +96,8 @@ Deployment: static build in `dist/`; Vercel Web Analytics is mounted in `src/mai
 ## Statistics
 
 Learning-mode stats are question-level: "answered" = unique questions; accuracy uses each question's latest answer. Attempt counts are stored but not used for accuracy. Recording is idempotent per session (D-019, D-023).
+
+Review due (D-052): the schedule is pure logic in `src/domain/practice/review.ts`; `recordAnswer` keeps each question's `reviewLevel`. Levels only move up when a question was due. Progress saved without a level (old browser data, exports, server rows) gets `legacyReviewLevel`.
 
 ## Conventions
 

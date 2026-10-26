@@ -80,7 +80,7 @@ Assumption: a current version of Chrome, Edge, Firefox or Safari on desktop, tab
 | Page | What it does |
 |---|---|
 | Dashboard (`/dashboard`) | Latest mock exam, recent attempts, practice by domain and quick actions, with empty states for new users |
-| Learning mode (`/practice`) | Practice by domain, topic (task statement) and difficulty, 5 / 10 / 20 / all questions, optionally unanswered only; "Practise mistakes" and "Practise bookmarks" |
+| Learning mode (`/practice`) | Practice by domain, topic (task statement) and difficulty, 5 / 10 / 20 / all questions, optionally unanswered only; "Review due", "Practise mistakes" and "Practise bookmarks" |
 | Mock exam (`/exam`) | Rules, scoring explanation, integrity mode, start / resume / abandon; full exam (65 questions, 90 minutes) |
 | Check-in (`/exam/check-in`) | AI-proctored exams only: rules, camera and microphone, room check, calibration (§9) |
 | Exam session and review (`/exam/session`, `/exam/review`) | The exam itself and the final review before submitting |
@@ -99,7 +99,7 @@ Assumption: a current version of Chrome, Edge, Firefox or Safari on desktop, tab
 - Comparing two attempts side by side.
 - Exam time accommodation (+30 minutes), keyboard shortcuts, custom-length quizzes.
 - Installable offline app (PWA): icons and "Add to Home Screen" exist, but there's no service worker.
-- Spaced repetition, an in-app question editor, other certifications, other languages.
+- An in-app question editor, other certifications, other languages.
 - Server-side scoring (Phase 8 step 5: answers are still downloaded with the questions).
 - Deleting your own account from inside the app ("Reset everything" deletes its data).
 
@@ -155,6 +155,7 @@ Within each domain, questions not used in earlier exams come first, spread acros
 - **Bookmark** on every question, in practice and in answer review.
 - **Session summary:** score, missed questions, "Retry incorrect". Sessions aren't restored after a reload (D-010), but every checked answer is saved.
 - **Mistakes:** questions whose latest answer, in practice or an exam, was incorrect. A correct answer clears them.
+- **Review due (D-052):** answered questions come back on a schedule. Each has a review level from 0 to 4, due again 1, 3, 7, 21 or 60 days (local calendar days) after its latest answer. A wrong answer sets level 0 (due the next day); a correct answer moves it up a level, but only when it was due, so a retry in the same sitting doesn't count. "Review due questions (n)" starts a session of the most important due questions (lowest level, then longest overdue), up to the default practice length. The dashboard's quick actions show the count and start the same session. Progress saved before this feature gets an estimated level. Random practice, Mistakes and exams are unchanged.
 - **Statistics** are question-level: "answered" counts unique questions, and accuracy uses each question's latest answer (D-019, D-023). Submitted exams add their answered questions (D-029).
 
 ## 8. Settings and data

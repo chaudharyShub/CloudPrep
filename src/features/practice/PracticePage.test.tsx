@@ -101,9 +101,53 @@ describe('PracticePage', () => {
     expect(screen.getByText('Question 1 of 1')).toBeVisible();
   });
 
+  it('AC-R.5 shows questions due for review and practises the most important ones', async () => {
+    const store = createTestStore();
+    const now = Date.now();
+    const DAY = 86_400_000;
+    // 12 due: answered wrong 2 days ago. One not due yet: answered right just now.
+    const due = QUESTION_BANK.slice(0, 12);
+    for (const question of due) {
+      store.recordAnswer({
+        questionId: question.id,
+        isCorrect: false,
+        at: now - 2 * DAY,
+        sessionId: 'old',
+      });
+    }
+    const notDue = QUESTION_BANK[12]?.id ?? '';
+    store.recordAnswer({ questionId: notDue, isCorrect: true, at: now, sessionId: 'today' });
+    const { user } = renderApp('/practice', { store });
+    await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
+
+    expect(screen.getByText('12 questions due today.')).toBeVisible();
+    // One session holds up to the default practice length (10).
+    await user.click(screen.getByRole('button', { name: 'Review due questions (12)' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Review due' })).toBeVisible();
+    expect(screen.getByText('Question 1 of 10')).toBeVisible();
+  });
+
+  it('AC-R.5 says when the next review is once nothing is due', async () => {
+    const store = createTestStore();
+    store.recordAnswer({
+      questionId: 'clf-d1-0001',
+      isCorrect: false,
+      at: Date.now(),
+      sessionId: 's1',
+    });
+    renderApp('/practice', { store });
+    await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
+    expect(screen.getByText('Nothing due today. Next review tomorrow.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Review due questions (0)' })).toBeDisabled();
+  });
+
   it('disables review actions when there is nothing to review', async () => {
     renderApp('/practice');
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
+    expect(screen.getByRole('button', { name: 'Review due questions (0)' })).toBeDisabled();
+    expect(
+      screen.getByText('Answer questions here or in a mock exam to start your review schedule.'),
+    ).toBeVisible();
     expect(screen.getByRole('button', { name: 'Practise mistakes (0)' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Practise bookmarks (0)' })).toBeDisabled();
     expect(screen.getByRole('heading', { name: 'No sessions yet' })).toBeVisible();

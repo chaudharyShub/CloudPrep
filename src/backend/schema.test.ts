@@ -6,7 +6,7 @@ import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
 import type { Question } from '@/domain/questions/types';
 import { createMemoryDriver } from '@/storage/driver';
 import { createAppStore } from '@/storage/store';
-import { createSyncEngine } from '@/storage/sync';
+import { createSyncEngine, parseRemote } from '@/storage/sync';
 import { EXAM_QUESTIONS } from '@/test/bank';
 import { examQuestion, makeAttempt, makeExam } from '@/test/exam';
 import { clfExamRows, isPublishable, questionToRows } from './contentRows';
@@ -392,6 +392,36 @@ describe('database schema', () => {
     phoneSync.dispose();
     await asAdmin();
     await db.query('delete from auth.users where id = $1', [CAROL]);
+  });
+
+  it('AC-R.4 review levels: stored, range-checked, and estimated for rows without one', async () => {
+    const DAVE = '00000000-0000-4000-8000-00000000000d';
+    await asAdmin();
+    await db.query(`insert into auth.users (id) values ($1)`, [DAVE]);
+    await asUser(DAVE);
+    const insert = (id: string, result: string, correct: number, level: string) =>
+      db.query(
+        `insert into public.question_progress (exam_id, question_id, attempts, correct,
+           last_result, first_answered_at, last_answered_at, last_incorrect_at, last_session_id,
+           review_level)
+         values ($1, $2, 3, $3, $4, now(), now(), now(), 's', ${level})`,
+        [EXAM_ID, id, correct, result],
+      );
+    await expect(insert('high', 'correct', 2, '5')).rejects.toThrow(/check constraint/);
+    await expect(insert('negative', 'correct', 2, '-1')).rejects.toThrow(/check constraint/);
+    await insert('stored', 'correct', 2, '3');
+    // Written before the column existed, or by an app version from before it.
+    await insert('noLevel', 'correct', 2, 'null');
+    await insert('staleLevel', 'incorrect', 2, '2');
+
+    const pulled = await createUserDataRemote(pgUserTables(), DAVE, EXAM_ID).pull();
+    const levels = Object.fromEntries(
+      Object.entries(parseRemote(pulled).progress ?? {}).map(([id, e]) => [id, e.reviewLevel]),
+    );
+    expect(levels).toEqual({ stored: 3, noLevel: 1, staleLevel: 0 });
+
+    await asAdmin();
+    await db.query('delete from auth.users where id = $1', [DAVE]);
   });
 
   it('AC-B.2 deleting an account removes all of its data', async () => {

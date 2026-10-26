@@ -83,7 +83,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │  ├─ questions/           # types, validate, evaluate, query, coverage
 │  │  ├─ exam/                # blueprint, select, session (reducer), timer, attempt, scoring, config,
 │  │  │                       # integrity (event types), proctor (rules and verdict)
-│  │  ├─ practice/            # session (reducer), progress
+│  │  ├─ practice/            # session (reducer), progress, review (schedule, D-052)
 │  │  ├─ analytics/           # readiness, attemptInsights
 │  │  └─ lib/random.ts        # Seeded PRNG and shuffle
 │  ├─ features/               # One folder per area: auth, dashboard, practice, exam (+ integrity/,
@@ -211,7 +211,8 @@ interface ExamAttempt {
   integrity: IntegrityLog;
 }
 
-// src/domain/practice/progress.ts — per question: attempts, correct, last result and time (D-019)
+// src/domain/practice/progress.ts — per question: attempts, correct, last result and time (D-019),
+//   and the review level (0–4) that src/domain/practice/review.ts schedules (D-052)
 // src/storage/areas.ts — Bookmarks = Record<questionId, { addedAt }>; practice session summaries
 ```
 
@@ -224,7 +225,7 @@ Guest data uses the `cloudprep:` prefix; a signed-in account's copy uses the sam
 | Area (key name) | Content | Version | Limit |
 |---|---|---|---|
 | `preferences` | Changed settings only | 2 | |
-| `progress` | Per-question practice progress | 1 | |
+| `progress` | Per-question practice progress (v2 adds the review level, D-052) | 2 | |
 | `bookmarks` | Bookmarked question ids | 1 | |
 | `practiceSessions` | Practice session summaries | 1 | 50 |
 | `examAttempts` | Submitted exams, newest first | 2 | 100 |
@@ -249,7 +250,7 @@ Every value is `{ app: "cloudprep", schemaVersion, savedAt, data }`. `decodeArea
 
 ## 9. Backend (Supabase)
 
-- **Schema:** `supabase/migrations/` (one migration so far). Content: `exams`, `exam_domains`, `exam_topics`, `questions`, `question_keys`, `question_revisions`. User data: `profiles` (created on sign-up), `user_preferences`, `question_progress`, `bookmarks`, `practice_sessions`, `exam_attempts` + `exam_attempt_questions`, `active_exams`. Every table has `exam_id`.
+- **Schema:** `supabase/migrations/` (the initial schema, plus `review_level` on `question_progress`, D-052). Content: `exams`, `exam_domains`, `exam_topics`, `questions`, `question_keys`, `question_revisions`. User data: `profiles` (created on sign-up), `user_preferences`, `question_progress`, `bookmarks`, `practice_sessions`, `exam_attempts` + `exam_attempt_questions`, `active_exams`. Every table has `exam_id`.
 - **Security:** RLS on every table. User tables are limited to `auth.uid()`; deleting an account deletes its data. Guests and users read only published content; only the service role writes it. Grants are set explicitly on top of RLS.
 - **Answers:** `question_keys` is readable for now, because scoring is in the browser. Keeping answers in their own table lets server scoring lock it later (Phase 8 step 5).
 - **Adapters:** `AuthClient` (`auth.ts`, `supabaseAuth.ts`), `QuestionSource` (`questionSource.ts`, `contentRows.ts`), `UserDataRemote` (`userDataRemote.ts`, `userRows.ts`). Each has a fake for tests.

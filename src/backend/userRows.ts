@@ -1,6 +1,7 @@
 import type { ExamAttempt } from '@/domain/exam/attempt';
 import type { ExamSession } from '@/domain/exam/session';
 import type { QuestionProgress } from '@/domain/practice/progress';
+import { legacyReviewLevel } from '@/domain/practice/review';
 import type { PracticeSessionSummary } from '@/domain/practice/session';
 import type { PreferenceOverrides } from '@/storage/preferencesArea';
 
@@ -21,6 +22,8 @@ export type ProgressRow = {
   last_answered_at: string;
   last_incorrect_at: string | null;
   last_session_id: string;
+  /** `null` in rows saved before review levels (D-052). */
+  review_level: number | null;
 };
 
 export type BookmarkRow = {
@@ -113,7 +116,24 @@ export function progressToRow(
     last_answered_at: iso(entry.lastAnsweredAt),
     last_incorrect_at: entry.lastIncorrectAt === null ? null : iso(entry.lastIncorrectAt),
     last_session_id: entry.lastSessionId,
+    review_level: entry.reviewLevel,
   };
+}
+
+/**
+ * The stored review level, or an estimate for rows without one. A wrong latest answer is
+ * always level 0, even if an older app version left a stale level behind.
+ */
+function rowReviewLevel(row: Partial<ProgressRow>): unknown {
+  if (row.last_result === 'incorrect') return 0;
+  // Any stored value is passed on as is; the parser rejects an invalid one.
+  if (row.review_level !== null && row.review_level !== undefined) return row.review_level;
+  if (row.last_result !== 'correct' || typeof row.correct !== 'number') return undefined;
+  return legacyReviewLevel({
+    lastResult: row.last_result,
+    lastIncorrectAt: row.last_incorrect_at === null ? null : 0,
+    correct: row.correct,
+  });
 }
 
 /** Progress rows → the progress map (question id → entry), unvalidated. */
@@ -129,6 +149,7 @@ export function rowsToProgress(rows: readonly Partial<ProgressRow>[]): Record<st
       lastAnsweredAt: ms(row.last_answered_at),
       lastIncorrectAt: row.last_incorrect_at === null ? null : ms(row.last_incorrect_at),
       lastSessionId: row.last_session_id,
+      reviewLevel: rowReviewLevel(row),
     };
   }
   return { ...map };

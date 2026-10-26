@@ -20,6 +20,7 @@ describe('recordAnswer', () => {
       lastAnsweredAt: 100,
       lastIncorrectAt: 100,
       lastSessionId: 's1',
+      reviewLevel: 0,
     });
   });
 

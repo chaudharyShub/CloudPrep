@@ -27,6 +27,13 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 - There's no button to delete your account itself; "Reset everything" deletes all its data. Ask the person who shared CloudPrep to remove the account.
 - Mock exams, the dashboard, exam history and progress need an account; Learning mode, bookmarks and settings don't.
 
+## Review schedule
+
+- **The schedule is simple.** Questions come back 1, 3, 7, 21 and then 60 days after their latest answer, the same for everyone. It doesn't adapt to how hard a question is for you, and a correct guess counts like a correct answer.
+- **Progress from before the schedule existed is estimated.** CloudPrep didn't record the order of earlier answers, so a question you got right after getting it wrong starts at the 3-day step, and one you never got wrong starts one step up per correct answer. Many older questions may be due at once; each review session takes the most important ones, up to your default practice length.
+- **Days follow this device's clock and time zone.** Changing either changes what's due.
+- **Exam answers count too.** Answering a question in a mock exam moves it on the schedule, like practice.
+
 ## Questions
 
 - Questions are downloaded from CloudPrep's database (about 1.6 MB) the first time you open a page that uses them, and kept in this browser afterwards. The first visit needs an internet connection; after that, practice works offline with the copy you have, and a newer set is downloaded when one is published.

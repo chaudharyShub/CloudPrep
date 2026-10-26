@@ -1,13 +1,13 @@
 # CloudPrep — Test Plan
 
-> Status: **Describes the tests as built** (version 2.0.0) · Last updated: 2026-10-26
+> Status: **Describes the tests as built** (version 2.1.0) · Last updated: 2026-10-26
 > This replaces the first draft of 2026-10-21, which planned spec files and a fixture flag that were never created.
 
 ## 1. Strategy at a glance
 
 | Layer | Tool | What it covers | Where |
 |---|---|---|---|
-| Unit | Vitest | Domain logic (blueprint, selection, session reducer, timer, scoring, attempts, practice, progress, readiness, proctor rules, validator, PRNG), storage (envelope, areas, migrations, store, sync, transfer, account copy, question cache), backend mappers and adapters | `src/**/*.test.ts` |
+| Unit | Vitest | Domain logic (blueprint, selection, session reducer, timer, scoring, attempts, practice, progress, review schedule, readiness, proctor rules, validator, PRNG), storage (envelope, areas, migrations, store, sync, transfer, account copy, question cache), backend mappers and adapters | `src/**/*.test.ts` |
 | Content | Vitest + `validate:questions` | Every question in the real bank against the validator | `src/content/questions/bank.test.ts`, `scripts/validate-questions.mjs` |
 | Database | Vitest + PGlite | Migrations, RLS, grants, constraints, publish rows and a real sync round trip | `src/backend/schema.test.ts` |
 | Component | Vitest + jsdom + Testing Library + user-event | UI primitives and whole pages rendered through `renderApp` | `src/**/*.test.tsx` |
@@ -35,7 +35,7 @@ Test philosophy: test behaviour, not implementation. Query by role and label. No
 |---|---|
 | `app-shell.spec.ts` | Every page passes axe (dark and light), not-found page, sidebar vs menu drawer, skip link, keyboard navigation, dialog focus |
 | `auth.spec.ts` | Guests are sent to sign-in and keep Learning mode; email link request; Google sign-in returns to the page; sign-out (AC-B.6–B.10) |
-| `learning-mode.spec.ts` | Domain practice, checking answers, bookmarks, progress after reload, session summary, keyboard-only answers, phone layout, recovery from corrupt saved progress |
+| `learning-mode.spec.ts` | Domain practice, checking answers, bookmarks, progress after reload, session summary, keyboard-only answers, phone layout, recovery from corrupt saved progress, old progress shown as review due (AC-R.7) |
 | `exam.spec.ts` | Full exam (answer, flag, review, confirm, results), restore after reload with absolute timing, low-time warnings and auto-submit at zero, expired while closed, mobile layout |
 | `integrity.spec.ts` | Strict practice (fullscreen, exit warning, neutral report); proctored check-in, warnings, ended by a phone; blocked copy and forced proctor restart after reload (AC-7.x); the real models load and analyse the camera (`@real-models`, its own project) |
 | `data.spec.ts` | Settings persist; export, reset everything, import; malformed file rejected |
@@ -61,7 +61,7 @@ Projects: `chromium`, `webkit` and `mobile` (Pixel 7) run everything except `@re
 
 ## 5. Acceptance-criteria tags
 
-Criteria from Phase 7 (AI proctoring, `AC-7.x`) and Phase 8 (backend, `AC-B.x`) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
+Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`) and Review due (`AC-R.x`, D-052) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
 
 ## 6. Manual checks (each release)
 

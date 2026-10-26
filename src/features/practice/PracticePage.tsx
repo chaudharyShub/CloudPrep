@@ -1,6 +1,6 @@
 import { useMemo, useState, type SyntheticEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { Bookmark, CircleX, History, Play } from 'lucide-react';
+import { Bookmark, CalendarCheck, CircleX, History, Play } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Badge } from '@/components/ui/Badge';
@@ -12,10 +12,13 @@ import { Field, SegmentedControl, Select, Switch } from '@/components/ui/FormCon
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { DOMAINS, type DomainId, type TaskStatementId } from '@/domain/exam-guide/clf-c02';
 import { mistakeIds, practiceStats } from '@/domain/practice/progress';
+import { localDay, reviewOverview } from '@/domain/practice/review';
 import { filterQuestions } from '@/domain/questions/query';
 import type { Difficulty } from '@/domain/questions/types';
+import { useNow } from '@/hooks/useNow';
 import { formatDateTime, formatPercent } from '@/lib/format';
 import { usePracticeQuestions, useUserData } from '@/state/hooks';
+import { describeDueDay, questionCount, reviewSessionSetup } from './reviewSession';
 import { SESSION_PATH, sessionState, type SessionSetup } from './sessionSetup';
 
 type DomainChoice = 'all' | DomainId;
@@ -46,6 +49,8 @@ const LENGTH_OPTIONS = [
 ] as const satisfies readonly { value: LengthChoice; label: string }[];
 
 const DOMAIN_SESSION_LENGTH = 10;
+/** The review queue changes by the day; a minute's refresh is plenty. */
+const REVIEW_REFRESH_MS = 60_000;
 
 export function PracticePage() {
   const navigate = useNavigate();
@@ -80,6 +85,15 @@ export function PracticePage() {
 
   const stats = useMemo(() => practiceStats(progress, questions), [progress, questions]);
   const mistakes = useMemo(() => mistakeIds(progress, ids), [progress, ids]);
+  const now = useNow(REVIEW_REFRESH_MS);
+  const today = localDay(now);
+  const review = useMemo(
+    () => ({
+      overview: reviewOverview(progress, ids, now),
+      setup: reviewSessionSetup(progress, ids, now, preferences.practiceSessionLength),
+    }),
+    [progress, ids, now, preferences.practiceSessionLength],
+  );
   const bookmarkedIds = useMemo(
     () => Object.keys(bookmarks).filter((id) => ids.has(id)),
     [bookmarks, ids],
@@ -270,7 +284,36 @@ export function PracticePage() {
             <h2 id="review-heading" className="mb-4 text-lg font-semibold text-fg">
               Review
             </h2>
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <Card className="flex flex-col">
+                <CardHeader
+                  as="h3"
+                  title="Review due"
+                  description="Questions come back 1, 3, 7, 21 and then 60 days after you last answered them correctly. A wrong answer brings a question back the next day."
+                />
+                <CardBody className="flex flex-1 flex-col gap-4">
+                  <p className="flex items-center gap-2 text-sm text-fg-muted">
+                    <CalendarCheck size={16} strokeWidth={1.75} aria-hidden="true" />
+                    {review.overview.due > 0
+                      ? `${questionCount(review.overview.due)} due today.`
+                      : review.overview.nextDueDay !== null
+                        ? `Nothing due today. Next review ${describeDueDay(review.overview.nextDueDay, today)}.`
+                        : 'Answer questions here or in a mock exam to start your review schedule.'}
+                  </p>
+                  <div className="mt-auto">
+                    <Button
+                      variant="secondary"
+                      icon={Play}
+                      disabled={review.setup === null}
+                      onClick={() => {
+                        if (review.setup) start(review.setup);
+                      }}
+                    >
+                      Review due questions ({review.overview.due})
+                    </Button>
+                  </div>
+                </CardBody>
+              </Card>
               <Card className="flex flex-col">
                 <CardHeader
                   as="h3"
