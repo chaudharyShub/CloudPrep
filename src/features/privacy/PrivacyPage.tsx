@@ -1,7 +1,9 @@
 import { Link } from 'react-router';
+import { DEVELOPER } from '@/app/developer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { ExternalLink } from '@/components/ui/ExternalLink';
 
 const SECTIONS: { title: string; body: React.ReactNode }[] = [
   {
@@ -117,6 +119,16 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
         . When you&apos;re signed in, these delete the data from your account on every device. To
         delete the account itself (your sign-in details and everything saved with it), ask the
         person who shared CloudPrep with you.
+      </>
+    ),
+  },
+  {
+    title: 'Who runs CloudPrep',
+    body: (
+      <>
+        CloudPrep is a personal project built and run by{' '}
+        <ExternalLink href={DEVELOPER.url}>{DEVELOPER.name}</ExternalLink>. It is not an AWS
+        product.
       </>
     ),
   },

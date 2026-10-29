@@ -61,6 +61,7 @@
 | D-053 | Reload once when a page file is missing after a deploy; version 2.1.1 | Accepted |
 | D-054 | Admin page for signed-in users, access checked in the database; version 2.2.0 | Accepted |
 | D-055 | Admin link for admins only; admin email in `.env.local` added by a script; version 2.3.0 | Accepted |
+| D-056 | Developer credit with a portfolio link; version 2.4.0 | Accepted |
 
 ---
 
@@ -382,3 +383,10 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Sign-in:** unchanged. The admin signs in with Google like everyone else; there is no separate admin login or password.
 - **No migration:** `is_admin()` is already granted to `authenticated`.
 - **Version:** 2.3.0 (a new feature).
+
+### D-056 Developer credit; version 2.4.0 (2026-10-29)
+- **Requested by the user:** show their name and portfolio link (https://shubhamworks.vercel.app/) in the app.
+- **Decision:** "Made by Shubham Chaudhary" under the unofficial note in the sidebar and mobile menu (`MadeBy` in `src/components/layout/Brand.tsx`), and a "Who runs CloudPrep" section on the Privacy page, which already said the site owner can see the account list without naming them. Both use `ExternalLink` (new tab, announced). The name and URL live in `src/app/developer.ts`.
+- **Not added:** a credit on exam or practice screens, the dashboard header or the sign-in page; it would distract there.
+- **Note:** the name is public on the live site, as the user intended.
+- **Version:** 2.4.0 (a new, small feature).

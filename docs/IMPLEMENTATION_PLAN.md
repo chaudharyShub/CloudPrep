@@ -27,6 +27,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Reload after a deploy (D-053) | A tab opened before a deploy reloads once instead of showing "Something went wrong"; version 2.1.1; acceptance criteria below | Done, merged and live |
 | Admin page (D-054) | Hidden `/admin` page listing signed-in accounts and their activity, for admins only (checked in the database); version 2.2.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-29) |
 | Admin link and `admin:add` (D-055) | Admin link in the navigation for admins only (checked with `is_admin()` in the database); `npm run admin:add` adds the accounts in `ADMIN_EMAIL` from `.env.local`; version 2.3.0; acceptance criteria below | Implemented on `feature/admin-button`; not merged yet. No migration needed |
+| Developer credit (D-056) | "Made by Shubham Chaudhary" with a portfolio link in the sidebar and mobile menu, and a "Who runs CloudPrep" section on the Privacy page; version 2.4.0; acceptance criteria below | Implemented on `feature/developer-credit` (built on `feature/admin-button`); not merged yet |
 | Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring, then multi-exam UI) | — |
 
 Changes from the original plan:
@@ -380,6 +381,14 @@ Acceptance criteria (tests are tagged `AC-A.x`):
 - AC-A.1 (changed) `/admin` is under `RequireAuth` (guests go to sign-in) and isn't in the navigation for guests or non-admins.
 - AC-A.5 Signed-in admins see an **Admin** link (sidebar and mobile menu) that opens `/admin`; non-admins and guests don't. The app asks `is_admin()`; errors count as "not an admin".
 - AC-A.6 `npm run admin:add` reads `ADMIN_EMAIL` (one or more, comma-separated), `SUPABASE_URL` and `SUPABASE_SECRET_KEY`, adds each matching account to `public.admins` (never removes any), prints the admins, and fails with a clear message if a setting is missing or an email has no account yet. Checked by hand (no automated test: it needs the live project).
+
+## Developer credit (D-056)
+
+Requested by the user on 2026-10-29: show the developer's name and portfolio link in the app.
+
+Acceptance criteria (tests are tagged `AC-D.x`):
+- AC-D.1 The sidebar and mobile menu show "Made by Shubham Chaudhary" under the unofficial note; the name links to https://shubhamworks.vercel.app/ in a new tab (`rel="noopener noreferrer"`).
+- AC-D.2 The Privacy page has a "Who runs CloudPrep" section with the same link.
 
 ## P10 — Optional features (v1.x, pick à la carte)
 
