@@ -7,10 +7,11 @@ describe('SettingsPage', () => {
     const { user } = renderApp('/settings');
     await screen.findByRole('heading', { level: 1, name: 'Settings' });
 
-    expect(document.documentElement.dataset['theme']).toBe('dark');
-    await user.click(screen.getByText('Light'));
+    // Light is the default theme (D-057, 3.0.1).
     expect(document.documentElement.dataset['theme']).toBe('light');
-    expect(screen.getByRole('radio', { name: 'Light' })).toBeChecked();
+    await user.click(screen.getByText('Dark'));
+    expect(document.documentElement.dataset['theme']).toBe('dark');
+    expect(screen.getByRole('radio', { name: 'Dark' })).toBeChecked();
   });
 
   it('saves the practice benchmark, option shuffling and session length', async () => {

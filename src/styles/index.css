@@ -17,6 +17,57 @@
  */
 
 :root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  /* Surfaces: soft lilac-grey paper */
+  --cp-bg: #f3f0f2;
+  --cp-surface: #ffffff;
+  --cp-surface-2: #f8f5f7;
+  --cp-surface-3: #e9e0e6;
+
+  --cp-border: #d9cfd5;
+  --cp-border-strong: #998d95;
+  --cp-border-control: #8e828b;
+  --cp-ink: #1f1a1e;
+
+  --cp-fg: #1f1a1e;
+  --cp-fg-muted: #4a4148;
+  --cp-fg-subtle: #5b5158;
+
+  --cp-accent: #6a2c5e;
+  --cp-accent-hover: #4a1e41;
+  --cp-accent-fg: #6a2c5e;
+  --cp-on-accent: #ffffff;
+
+  --cp-highlight: #f1e0ec;
+  --cp-highlight-hover: #e9cfe1;
+  --cp-on-highlight: #4a1e41;
+
+  --cp-primary: #6a2c5e;
+  --cp-primary-hover: #4a1e41;
+  --cp-on-primary: #ffffff;
+
+  --cp-meter: #6a2c5e;
+
+  --cp-flag: #fbe7d3;
+  --cp-flag-border: #1f1a1e;
+  --cp-on-flag: #1f1a1e;
+
+  --cp-success: #166534;
+  --cp-warning: #8a3f06;
+  --cp-danger: #b91c1c;
+  --cp-info: #1f5fd6;
+  --cp-danger-hover: #991b1b;
+  --cp-on-danger: #ffffff;
+
+  --cp-focus: #1f5fd6;
+
+  --cp-shadow-overlay: 0 16px 48px -12px rgb(31 26 30 / 0.22), 0 0 0 1px rgb(31 26 30 / 0.06);
+  --cp-shadow-lift: 0 10px 24px -14px rgb(31 26 30 / 0.35);
+  --cp-backdrop: rgb(31 26 30 / 0.45);
+}
+
 [data-theme='dark'] {
   color-scheme: dark;
 
@@ -75,57 +126,6 @@
   --cp-shadow-overlay: 0 16px 48px -12px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.05);
   --cp-shadow-lift: 0 10px 24px -12px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
   --cp-backdrop: rgb(0 0 0 / 0.75);
-}
-
-[data-theme='light'] {
-  color-scheme: light;
-
-  /* Surfaces: soft lilac-grey paper */
-  --cp-bg: #f3f0f2;
-  --cp-surface: #ffffff;
-  --cp-surface-2: #f8f5f7;
-  --cp-surface-3: #e9e0e6;
-
-  --cp-border: #d9cfd5;
-  --cp-border-strong: #998d95;
-  --cp-border-control: #8e828b;
-  --cp-ink: #1f1a1e;
-
-  --cp-fg: #1f1a1e;
-  --cp-fg-muted: #4a4148;
-  --cp-fg-subtle: #5b5158;
-
-  --cp-accent: #6a2c5e;
-  --cp-accent-hover: #4a1e41;
-  --cp-accent-fg: #6a2c5e;
-  --cp-on-accent: #ffffff;
-
-  --cp-highlight: #f1e0ec;
-  --cp-highlight-hover: #e9cfe1;
-  --cp-on-highlight: #4a1e41;
-
-  --cp-primary: #6a2c5e;
-  --cp-primary-hover: #4a1e41;
-  --cp-on-primary: #ffffff;
-
-  --cp-meter: #6a2c5e;
-
-  --cp-flag: #fbe7d3;
-  --cp-flag-border: #1f1a1e;
-  --cp-on-flag: #1f1a1e;
-
-  --cp-success: #166534;
-  --cp-warning: #8a3f06;
-  --cp-danger: #b91c1c;
-  --cp-info: #1f5fd6;
-  --cp-danger-hover: #991b1b;
-  --cp-on-danger: #ffffff;
-
-  --cp-focus: #1f5fd6;
-
-  --cp-shadow-overlay: 0 16px 48px -12px rgb(31 26 30 / 0.22), 0 0 0 1px rgb(31 26 30 / 0.06);
-  --cp-shadow-lift: 0 10px 24px -14px rgb(31 26 30 / 0.35);
-  --cp-backdrop: rgb(31 26 30 / 0.45);
 }
 
 :root {

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,7 +11,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#f3f0f2" />
     <!-- Link previews (D-050). %SITE_URL% is the production address on Vercel (vite.config.ts). -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="CloudPrep" />
@@ -31,7 +31,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <title>CloudPrep</title>
     <script>
-      // Apply the saved theme before first paint, so light-theme users don't see a dark flash.
+      // Apply the saved theme before first paint, so dark-theme users don't see a light flash.
       // The app applies the same setting again once it loads (src/lib/theme.ts).
       try {
         // A signed-in user's copy (src/storage/account.ts) wins over guest settings.
@@ -41,17 +41,14 @@
             ? 'cloudprep-account:cloudprep:preferences'
             : 'cloudprep:preferences';
         var saved = JSON.parse(localStorage.getItem(key) || 'null');
-        // No saved choice means the default, "system" (src/storage/preferencesArea.ts).
-        var theme = (saved && saved.data && saved.data.theme) || 'system';
+        // No saved choice means the default, "light" (src/storage/preferencesArea.ts).
+        var theme = (saved && saved.data && saved.data.theme) || 'light';
         if (theme === 'system') {
           theme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         }
-        if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
       } catch (e) {
-        // Storage unavailable or unreadable: follow the device, like the app does.
-        if (matchMedia('(prefers-color-scheme: light)').matches) {
-          document.documentElement.setAttribute('data-theme', 'light');
-        }
+        // Storage unavailable or unreadable: keep the default light theme.
       }
     </script>
   </head>

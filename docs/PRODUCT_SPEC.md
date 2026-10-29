@@ -1,6 +1,6 @@
 # CloudPrep — Product Specification
 
-> Status: **Describes the app as built** (version 3.0.0) · Last updated: 2026-10-29
+> Status: **Describes the app as built** (version 3.0.1) · Last updated: 2026-10-29
 > CloudPrep is an unofficial practice tool. It is not affiliated with, endorsed by, or sponsored by Amazon Web Services.
 >
 > This replaces the first draft of 2026-10-21. What changed from that plan is in IMPLEMENTATION_PLAN.md ("Changes from the original plan") and the reasons are in DECISIONS.md.
@@ -162,7 +162,7 @@ Within each domain, questions not used in earlier exams come first, spread acros
 
 ## 8. Settings and data
 
-- **Preferences:** theme (system by default, or dark or light), motion (system, reduce), practice benchmark, low-time warnings, option shuffling, default practice length. Only changed values are saved (D-034).
+- **Preferences:** theme (light by default, or dark or system), motion (system, reduce), practice benchmark, low-time warnings, option shuffling, default practice length. Only changed values are saved (D-034).
 - **Account:** who is signed in, whether changes are saved or waiting, sign out, add guest data.
 - **Export / import:** a JSON file of all data except the exam in progress. Import checks the file strictly (5 MB limit, same parsers as storage), shows a preview, and then merges or replaces. A full backup is made first (D-035).
 - **Recovery:** backups and copies of unreadable data can be downloaded, restored (full backups) or deleted.

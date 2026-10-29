@@ -10,7 +10,7 @@ test.beforeEach(async ({ page }) => {
 
 test('settings persist across reloads', async ({ page }) => {
   await page.goto('/settings');
-  // Dark, because the default (System) already shows light in the test browser.
+  // Dark, because the default theme is light.
   await page.getByRole('radio', { name: 'Dark' }).check();
   await page.getByRole('combobox', { name: 'Practice benchmark' }).selectOption('80');
   await page.reload();

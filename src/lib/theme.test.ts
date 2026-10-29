@@ -12,16 +12,16 @@ describe('theme', () => {
 
   it('applies and reads the theme from the root element', () => {
     const root = document.createElement('html');
-    expect(getAppliedTheme(root)).toBe('dark');
-    applyTheme('light', root);
-    expect(root.dataset['theme']).toBe('light');
     expect(getAppliedTheme(root)).toBe('light');
+    applyTheme('dark', root);
+    expect(root.dataset['theme']).toBe('dark');
+    expect(getAppliedTheme(root)).toBe('dark');
   });
 
-  it('falls back to dark for unknown values', () => {
+  it('falls back to light for unknown values', () => {
     const root = document.createElement('html');
     root.dataset['theme'] = 'sepia';
-    expect(getAppliedTheme(root)).toBe('dark');
+    expect(getAppliedTheme(root)).toBe('light');
   });
 });
 

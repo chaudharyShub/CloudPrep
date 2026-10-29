@@ -98,7 +98,7 @@ describe('guest data and the account copy', () => {
     const { user } = renderApp('/settings', { store: guest, accounts });
     await screen.findByRole('heading', { name: 'Account' });
     // Sign out straight after a change, before the batched send would run.
-    await user.click(screen.getByRole('radio', { name: 'Light' }));
+    await user.click(screen.getByRole('radio', { name: 'Dark' })); // Light is the default
     await user.click(screen.getAllByRole('button', { name: 'Sign out' })[0] as HTMLElement);
     await user.click(
       within(await screen.findByRole('dialog', { name: 'Sign out of CloudPrep?' })).getByRole(
@@ -108,7 +108,7 @@ describe('guest data and the account copy', () => {
     );
     expect(await screen.findByText('Signed out')).toBeVisible();
     expect(tables.rows('user_preferences').map((row) => row['preferences'])).toEqual([
-      { theme: 'light' },
+      { theme: 'dark' },
     ]);
   });
 });
@@ -195,7 +195,7 @@ describe('sync status', () => {
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
     tables.failWith = 'Failed to fetch';
-    await user.click(screen.getByRole('radio', { name: 'Light' }));
+    await user.click(screen.getByRole('radio', { name: 'Dark' })); // Light is the default
     await screen.findByText(/1 change is waiting to be saved/, {}, { timeout: 3000 });
     await user.click(screen.getAllByRole('button', { name: 'Sign out' })[0] as HTMLElement);
     expect(
@@ -215,7 +215,7 @@ describe('sync status', () => {
     ).toBeVisible();
 
     tables.failWith = 'Failed to fetch';
-    await user.click(screen.getByRole('radio', { name: 'Light' }));
+    await user.click(screen.getByRole('radio', { name: 'Dark' })); // Light is the default
     expect(
       await screen.findByText(
         /1 change is waiting to be saved to your account/,

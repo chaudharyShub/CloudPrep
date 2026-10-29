@@ -113,7 +113,9 @@ export function LandingPage() {
               <br />
               before you
               <br />
-              <em className="font-medium text-accent-fg">sit the exam.</em>
+              <em className="rounded-md bg-highlight [box-decoration-break:clone] px-2 font-medium text-on-highlight">
+                sit the exam.
+              </em>
             </h1>
             <p
               style={rise(180)}

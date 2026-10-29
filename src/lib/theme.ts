@@ -6,7 +6,7 @@ export type Theme = (typeof THEMES)[number];
 export const THEME_PREFERENCES = ['dark', 'light', 'system'] as const;
 export type ThemePreference = (typeof THEME_PREFERENCES)[number];
 
-export const DEFAULT_THEME: Theme = 'dark';
+export const DEFAULT_THEME: Theme = 'light';
 
 export function isTheme(value: unknown): value is Theme {
   return typeof value === 'string' && (THEMES as readonly string[]).includes(value);
