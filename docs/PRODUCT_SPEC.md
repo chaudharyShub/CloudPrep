@@ -97,7 +97,7 @@ Assumption: a current version of Chrome, Edge, Firefox or Safari on desktop, tab
 
 ### 4.3 Not built
 
-- A welcome or onboarding flow, and an About page. The unofficial-tool note and the developer credit ("Made by Shubham Chaudhary", linking to his portfolio, D-056) are in the sidebar and mobile menu; the scoring explanation is on the exam and results pages.
+- An onboarding flow and an About page. The landing page at `/` introduces CloudPrep to guests (D-057); signed-in users can't open it. The unofficial-tool note and the developer credit ("Made by Shubham Chaudhary", linking to his portfolio, D-056) are in the sidebar, the mobile menu and the landing page footer; the scoring explanation is on the exam and results pages.
 - Comparing two attempts side by side.
 - Exam time accommodation (+30 minutes), keyboard shortcuts, custom-length quizzes.
 - Installable offline app (PWA): icons and "Add to Home Screen" exist, but there's no service worker.
