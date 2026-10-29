@@ -143,6 +143,24 @@ test('practice pages fit a phone screen', async ({ page }) => {
   await expectNoHorizontalOverflow(page);
 });
 
+test('AC-I.5 the Review due explanation fits a phone screen and passes axe', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  for (const path of ['/practice', '/dashboard']) {
+    await page.goto(path);
+    await page.getByRole('button', { name: 'About Review due' }).click();
+    const tip = page.getByText(/after 1, 3, 7, 21 and then 60 days/);
+    await expect(tip).toBeVisible();
+    const box = await tip.boundingBox();
+    // At least 16px from both screen edges.
+    expect(box?.x ?? -1).toBeGreaterThanOrEqual(16);
+    expect((box?.x ?? 0) + (box?.width ?? 999)).toBeLessThanOrEqual(375 - 16);
+    await expectNoHorizontalOverflow(page);
+    await expectNoSeriousA11yViolations(page);
+    await page.keyboard.press('Escape');
+    await expect(tip).toBeHidden();
+  }
+});
+
 test('recovers from corrupted saved progress without crashing', async ({ page }) => {
   await page.goto('/practice');
   // Signed in, saved data is the account's copy in this browser (D-047). Wait until sign-in

@@ -63,6 +63,7 @@
 | D-055 | Admin link for admins only; admin email in `.env.local` added by a script; version 2.3.0 | Accepted |
 | D-056 | Developer credit with a portfolio link; version 2.4.0 | Accepted |
 | D-057 | UI redesign "Study notes in aubergine" (with an exam-paper answer sheet), landing page, version 3.0.0; old UI kept on `archive/ui-v2` | Accepted (live, PR #15) |
+| D-058 | An "i" explanation (toggletip) beside "Review due", version 3.1.0 | Accepted (not merged yet) |
 
 ---
 
@@ -410,4 +411,11 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Default theme: System** (user's choice; replaced by Light in 3.0.1, below): new visitors get light or dark to match their device (`DEFAULT_PREFERENCES.theme`, and `index.html`'s before-paint script treats "no saved choice" as System). Anyone who picked Dark or Light keeps it. E2E tests run on a light device, so the tests that check a saved theme now pick Dark, the migration journey emulates a dark device, and a dark-theme axe check was added.
 - **3.0.1, headline highlight (user's choice, after comparing mockups):** "sit the exam." in the landing headline sits on the theme's own selection tint (`bg-highlight` / `text-on-highlight`: light aubergine in light mode, deep plum in dark), like a marker. A yellow highlighter and A's black-and-yellow palette were considered and rejected: the user kept the aubergine theme.
 - **3.0.1, Light is the default theme (user's choice):** new visitors see the light theme; Dark and System stay one click away in Settings, and a saved choice still wins. The before-paint script, `DEFAULT_THEME`, `DEFAULT_PREFERENCES`, the stylesheet's default block (`:root` now carries the light colours) and the `theme-color` / manifest colours all say light. Tests that check a saved theme pick Dark; the old-format migration journey saves "system" on a dark device.
+
+## D-058 — An "i" explanation beside "Review due"
+
+- **Context:** "Review due" (D-052) is the least self-explanatory term in the app. The Learning mode card described the schedule in a long line of text, and the dashboard's quick action didn't explain it at all. The user asked for an "i" icon with an explanation, as the AWS console does.
+- **Decision:** a shared `InfoTip` (`src/components/ui/InfoTip.tsx`): an "i" button named "About Review due" that opens a small panel on click or tap and closes on Escape (focus returns to the button) or a click outside. It is a toggletip, not a hover tooltip, so it works on phones and with a keyboard and screen reader (`aria-expanded`, `aria-controls`). The panel is `position: fixed` and kept 16px inside the screen, so it can't widen the page on a phone. `ReviewDueInfo` holds the text and builds the day list from `REVIEW_INTERVAL_DAYS`, so it can't drift from the schedule. It sits beside the Learning mode card heading (the card's description is now one short line) and beside the dashboard's Review due row, outside the link.
+- **Scope:** Review due only, by the user's choice. Other terms (practice benchmark, readiness, weakest domain) could use the same component later, after discussing it.
+- **Version:** 3.1.0 (a feature).
 

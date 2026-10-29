@@ -18,6 +18,7 @@ import { useNow } from '@/hooks/useNow';
 import { formatDateTime, formatPercent } from '@/lib/format';
 import { usePracticeQuestions, useUserData } from '@/state/hooks';
 import { describeDueDay, questionCount, reviewSessionSetup } from './reviewSession';
+import { ReviewDueInfo } from './ReviewDueInfo';
 import { SESSION_PATH, sessionState, type SessionSetup } from './sessionSetup';
 
 type DomainChoice = 'all' | DomainId;
@@ -287,7 +288,8 @@ export function PracticePage() {
                 <CardHeader
                   as="h3"
                   title="Review due"
-                  description="Questions come back 1, 3, 7, 21 and then 60 days after you last answered them correctly. A wrong answer brings a question back the next day."
+                  info={<ReviewDueInfo />}
+                  description="Questions you’re about to forget, brought back at the right time."
                 />
                 <CardBody className="flex flex-1 flex-col gap-4">
                   <p className="flex items-center gap-2 text-sm text-fg-muted">
