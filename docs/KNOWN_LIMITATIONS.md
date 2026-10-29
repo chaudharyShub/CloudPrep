@@ -25,6 +25,7 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 - Progress from before you signed in stays in the browser as guest data. You're asked once whether to add it to your account; you can also do it later in Settings.
 - On a new device, a past exam taken with an older version of a question is reviewed with the current version (with a note), because the old wording is only kept in the browser where you took it.
 - There's no button to delete your account itself; "Reset everything" deletes all its data. Ask the person who shared CloudPrep to remove the account.
+- The landing page (`/`, D-057) is shown to guests only; signed-in users go straight to the dashboard and can't open it. Its "2,000 questions" figure is fixed text, updated by hand when the bank grows.
 - The admin page (`/admin`, D-054) lists signed-in accounts only. Guests are counted only as anonymous totals in Vercel Analytics. Admins are added with `npm run admin:add` (from `ADMIN_EMAIL` in `.env.local`) or the Supabase SQL editor; there's no page for it, and the script never removes admins. After becoming an admin, reload the site to see the Admin link. The list loads all accounts at once, which is fine for a site shared with friends.
 - Mock exams, the dashboard, exam history and progress need an account; Learning mode, bookmarks and settings don't.
 

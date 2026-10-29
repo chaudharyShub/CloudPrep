@@ -1,6 +1,6 @@
 # CloudPrep — Implementation Plan
 
-> Status: **In progress** · Last updated: 2026-10-26
+> Status: **In progress** · Last updated: 2026-10-29
 >
 > The phase sections below (P0–P10, C1–C3) are the original plan from 2026-10-21, kept for history; the Progress table and "Changes from the original plan" say what was actually built. For how the app works today, see PRODUCT_SPEC.md and ARCHITECTURE.md.
 
@@ -395,7 +395,7 @@ Acceptance criteria (tests are tagged `AC-D.x`):
 
 Requested by the user on 2026-10-29: make CloudPrep look like a product made by a person, add a landing page, keep the current UI until the new one has been tested in production. Direction chosen from mockups: "Study notes in aubergine" (B2), with the exam's question grid in the "exam paper" style (A), and a true-black dark mode.
 
-Branches: `archive/ui-v2` and tag `v2.4.0` keep the old UI (both on GitHub, never changed). All five steps were built together on `ui/redesign`, which goes into `master` as 3.0.0 through a pull request the user merges, after testing it on the branch's Vercel preview. (The `redesign` integration branch from the original plan isn't needed.)
+Branches: `archive/ui-v2` and tag `v2.4.0` keep the old UI (both on GitHub, never changed). All five steps were built together on `ui/redesign` and merged into `master` as 3.0.0 (PR #15); that branch and the planned `redesign` integration branch were then deleted.
 
 | Step | Scope | Status |
 |---|---|---|
