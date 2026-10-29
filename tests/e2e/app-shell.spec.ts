@@ -53,7 +53,7 @@ test.describe('pages', () => {
     await expectNoSeriousA11yViolations(page);
   });
 
-  // Pages follow the device by default (System, D-057); the test browser is light, so check dark too.
+  // Pages are light by default (D-057, 3.0.1), so check dark too.
   test('dark theme passes axe', async ({ page }) => {
     await page.goto('/settings');
     await page.getByRole('radio', { name: 'Dark' }).check();

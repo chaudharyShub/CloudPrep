@@ -29,8 +29,8 @@ export interface Preferences {
  * learner who never changed a setting picks up improved defaults automatically.
  */
 export const DEFAULT_PREFERENCES: Preferences = {
-  // Follow the device until the learner picks Light or Dark (D-057).
-  theme: 'system',
+  // Light until the learner picks Dark or System (D-057, 3.0.1).
+  theme: 'light',
   reducedMotion: 'system',
   benchmarkPercent: DEFAULT_BENCHMARK_PERCENT,
   examTimeWarnings: true,

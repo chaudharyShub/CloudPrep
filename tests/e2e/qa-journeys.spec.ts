@@ -76,7 +76,7 @@ test('A. first visit: dashboard empty states, navigation, settings survive a ref
   await expect(page.getByText('Not enough data yet')).toBeVisible();
 
   await page.goto('/settings');
-  // Dark, because the default (System) already shows light in the test browser.
+  // Dark, because the default theme is light.
   await page.getByRole('radio', { name: 'Dark' }).check();
   await page.getByRole('radio', { name: /Reduce/ }).check();
   await page.reload();
@@ -192,7 +192,7 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
         schemaVersion: 1,
         savedAt: 'x',
         data: {
-          theme: 'light',
+          theme: 'system',
           benchmarkPercent: 70,
           shuffleOptions: true,
           practiceSessionLength: '10',
@@ -201,7 +201,7 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
     );
   });
 
-  // A dark device, so seeing light proves the saved choice survived the migration.
+  // A dark device: the saved "system" choice must survive the migration and show dark.
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/history');
   await page
@@ -209,7 +209,7 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
     .first()
     .click();
   await expect(page.getByText(score ?? '')).toBeVisible();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.getByText(/couldn't be read/)).toHaveCount(0);
 
   // Clear exam history only: bookmarks stay.
