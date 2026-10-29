@@ -54,6 +54,17 @@ Note: free-tier projects pause after about a week without activity; resume them 
 2. **Google:** in Google Cloud Console create an OAuth client (*Web application*) with the authorised redirect URI `https://<project-ref>.supabase.co/auth/v1/callback`. Enter its client ID and secret in Supabase under *Authentication → Sign In / Providers → Google* and enable it. Publish the Google app (out of "Testing") so anyone can sign in.
 3. **Email sign-in links (off by default):** the sign-in page shows only Google unless `VITE_EMAIL_SIGN_IN=true` is set. Supabase's built-in email only reaches your project team's addresses, a few per hour, so first set up custom SMTP under *Authentication → Emails → SMTP Settings* (for example Resend or Brevo, with a sender on a domain you own), then add the variable in Vercel and redeploy.
 
+### Admin access (D-054)
+
+The `/admin` page shows signed-in accounts and their activity, only to accounts listed in `public.admins`. After `npm run db:push` has created the table, sign in to the live site once with your Google account, then run this in the Supabase *SQL Editor* (replace the email):
+
+```sql
+insert into public.admins (user_id)
+select id from auth.users where email = 'you@example.com';
+```
+
+Open `/admin` (refresh if it was already open). To remove an admin: `delete from public.admins where user_id = (select id from auth.users where email = 'you@example.com');`. The table can't be read or changed from the app, only here.
+
 ### 3. Vercel project
 
 1. Sign in at vercel.com, choose *Add New → Project*, and import the GitHub repository. Vercel reads `vercel.json`; leave the settings as detected.

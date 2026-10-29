@@ -1,6 +1,6 @@
 # CloudPrep — Architecture
 
-> Status: **Describes the code as built** (version 2.1.1) · Last updated: 2026-10-26
+> Status: **Describes the code as built** (version 2.2.0) · Last updated: 2026-10-29
 > This replaces the first draft of 2026-10-21. Reasons for each choice are in DECISIONS.md.
 
 ## 1. Overview
@@ -71,7 +71,8 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │  └─ layouts/             # RootLayout (watchers, theme), AppLayout (sidebar / drawer), ExamLayout
 │  ├─ backend/                # Supabase adapters behind interfaces, row types and mappers, fakes
 │  │                          # auth.ts, supabaseAuth.ts, questionSource.ts, contentRows.ts,
-│  │                          # userDataRemote.ts, userRows.ts, fakeAuth.ts, fakeUserTables.ts, schema.test.ts
+│  │                          # userDataRemote.ts, userRows.ts, admin.ts (D-054), fakeAuth.ts, fakeAdmin.ts,
+│  │                          # fakeUserTables.ts, schema.test.ts
 │  ├─ components/
 │  │  ├─ ui/                  # Design-system primitives: Button, Card, Badge, Dialog, ConfirmDialog,
 │  │  │                       # FormControls, Notice, ProgressBar, Skeleton, Toast, EmptyState, ExternalLink
@@ -85,10 +86,11 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │  │                       # integrity (event types), proctor (rules and verdict)
 │  │  ├─ practice/            # session (reducer), progress, review (schedule, D-052)
 │  │  ├─ analytics/           # readiness, attemptInsights
+│  │  ├─ admin/users.ts       # Admin overview: summary, last activity, sorting (D-054)
 │  │  └─ lib/random.ts        # Seeded PRNG and shuffle
 │  ├─ features/               # One folder per area: auth, dashboard, practice, exam (+ integrity/,
 │  │                          # proctor/, components/), results, history, progress, bookmarks,
-│  │                          # settings, privacy, errors, dev (/__ui), shared (question rendering)
+│  │                          # settings, privacy, admin (D-054), errors, dev (/__ui), shared (question rendering)
 │  ├─ hooks/                  # useNow, useTheme, useDocumentTitle
 │  ├─ lib/                    # theme, format, download, ids, cn, reloadAfterUpdate (D-053)
 │  ├─ state/                  # Providers and hooks (§6)
@@ -114,6 +116,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 | `/exam/session`, `/exam/review` | Exam and final review (`ExamLayout`) | Signed in + questions + active exam |
 | `/results/:attemptId`, `/results/:attemptId/review` | Results and answer review | Signed in + questions |
 | `/history`, `/progress` | Exam history, progress | Signed in + questions |
+| `/admin` | Admin overview of signed-in users (not in the navigation, D-054) | Signed in; the database returns data only to admins |
 | `/__ui` | Design-system page (development only) | — |
 | `*` | Not found | — |
 
@@ -250,10 +253,10 @@ Every value is `{ app: "cloudprep", schemaVersion, savedAt, data }`. `decodeArea
 
 ## 9. Backend (Supabase)
 
-- **Schema:** `supabase/migrations/` (the initial schema, plus `review_level` on `question_progress`, D-052). Content: `exams`, `exam_domains`, `exam_topics`, `questions`, `question_keys`, `question_revisions`. User data: `profiles` (created on sign-up), `user_preferences`, `question_progress`, `bookmarks`, `practice_sessions`, `exam_attempts` + `exam_attempt_questions`, `active_exams`. Every table has `exam_id`.
+- **Schema:** `supabase/migrations/` (the initial schema, `review_level` on `question_progress` (D-052), and the admin overview (D-054)). Content: `exams`, `exam_domains`, `exam_topics`, `questions`, `question_keys`, `question_revisions`. User data: `profiles` (created on sign-up), `user_preferences`, `question_progress`, `bookmarks`, `practice_sessions`, `exam_attempts` + `exam_attempt_questions`, `active_exams`. Every user-data table has `exam_id`. Admin: `admins` (no API access at all) and two security-definer functions, `is_admin()` and `admin_user_overview()`, which raises error `42501` unless the caller is in `admins`.
 - **Security:** RLS on every table. User tables are limited to `auth.uid()`; deleting an account deletes its data. Guests and users read only published content; only the service role writes it. Grants are set explicitly on top of RLS.
 - **Answers:** `question_keys` is readable for now, because scoring is in the browser. Keeping answers in their own table lets server scoring lock it later (Phase 8 step 5).
-- **Adapters:** `AuthClient` (`auth.ts`, `supabaseAuth.ts`), `QuestionSource` (`questionSource.ts`, `contentRows.ts`), `UserDataRemote` (`userDataRemote.ts`, `userRows.ts`). Each has a fake for tests.
+- **Adapters:** `AuthClient` (`auth.ts`, `supabaseAuth.ts`), `QuestionSource` (`questionSource.ts`, `contentRows.ts`), `UserDataRemote` (`userDataRemote.ts`, `userRows.ts`), `AdminClient` (`admin.ts`, an RPC to `admin_user_overview`, provided by `AdminProvider`). Each has a fake for tests.
 - **Tests:** `src/backend/schema.test.ts` applies the migrations to PGlite with the Supabase roles stubbed and checks RLS, grants, constraints and a sync round trip.
 
 ## 10. Design system
@@ -275,6 +278,7 @@ Every value is `{ app: "cloudprep", schemaVersion, savedAt, data }`. `decodeArea
 ## 12. Security and privacy
 
 - The browser only has the publishable key; RLS protects every row. The secret key is used only by scripts in `.env.local`.
+- Admin access (D-054) is decided in the database, not the app: the `/admin` page's code is public like the rest of the site, but `admin_user_overview()` returns other users' details only to accounts listed in `admins`, which is changed only in the Supabase SQL editor.
 - Network: the app's own files, Supabase, and Vercel Web Analytics in production (page views only, no cookies).
 - External links use `rel="noopener noreferrer"`. Imported files and server data are untrusted: parsed strictly, rendered as text, never with `dangerouslySetInnerHTML`.
 - Integrity logs store only `{type, at}`. Camera and microphone data are analysed in memory and never stored or sent.

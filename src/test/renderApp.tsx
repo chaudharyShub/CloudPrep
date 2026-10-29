@@ -3,9 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { createMemoryRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import { routes } from '@/app/routes';
+import type { AdminClient } from '@/backend/admin';
 import type { AuthClient } from '@/backend/auth';
+import { createFakeAdminClient } from '@/backend/fakeAdmin';
 import { createFakeAuthClient, FAKE_USER } from '@/backend/fakeAuth';
 import { ToastProvider } from '@/components/ui/Toast';
+import { AdminProvider } from '@/state/AdminProvider';
 import { AuthProvider } from '@/state/AuthProvider';
 import { QuestionBankProvider } from '@/state/QuestionBankProvider';
 import type { QuestionLoader } from '@/state/questionLoader';
@@ -46,6 +49,7 @@ export function renderApp(
     auth = createFakeAuthClient({ user: FAKE_USER }),
     questions,
     accounts = singleStoreAccounts(store),
+    admin = createFakeAdminClient(),
   }: {
     store?: AppStore;
     state?: unknown;
@@ -53,6 +57,8 @@ export function renderApp(
     questions?: QuestionLoader | null;
     /** Signed-in users' data; defaults to `store` too. */
     accounts?: AccountManager;
+    /** The admin overview; defaults to a non-admin. */
+    admin?: AdminClient;
   } = {},
 ) {
   const router = createMemoryRouter(routes, {
@@ -66,9 +72,11 @@ export function renderApp(
           loader={questions ?? null}
           {...(questions === undefined ? { initialBank: TEST_BANK } : {})}
         >
-          <ToastProvider>
-            <RouterProvider router={router} />
-          </ToastProvider>
+          <AdminProvider client={admin}>
+            <ToastProvider>
+              <RouterProvider router={router} />
+            </ToastProvider>
+          </AdminProvider>
         </QuestionBankProvider>
       </UserDataProvider>
     </AuthProvider>,

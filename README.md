@@ -14,11 +14,12 @@ An unofficial practice simulator for the **AWS Certified Cloud Practitioner (CLF
 - **Your data:** settings (theme, motion, benchmark, warnings), export/import to a file, automatic backups before risky changes, and separate "clear" actions. Signed in, clearing applies to the account on every device.
 - **Optional practice integrity:** a strict mode that asks for fullscreen and logs tab and focus changes, without judging them.
 - **AI-proctored exams (opt-in):** a check-in like an online proctored exam, then a strict AI proctor that runs on your device (MediaPipe face and object models plus microphone loudness). It watches your face, head, eyes and mouth, looks for phones, other people, books and screens, and blocks shortcuts. Two warnings, then the exam ends; a phone or another person ends it at once. Nothing is recorded or uploaded.
+- **Admin page:** a hidden `/admin` page lists every signed-in account with its activity (questions answered, sessions, exams, best score) and totals. Only accounts marked as admins in the database get any data; everyone else sees "No admin access". Guests aren't recorded there.
 - **Installable look:** CloudPrep has its own logo, home-screen icons ("Add to Home Screen") and a link preview with an image and description when the site is shared.
 
 The bank has **2,000 original questions** (400 / 600 / 753 / 247 across the four domains), written from public AWS documentation and the official exam guide. 1,995 are `checked` against the AWS pages they cite and 5 are still `unverified` (see [docs/CONTENT_REVIEW.md](docs/CONTENT_REVIEW.md)); none has had a second, human sign-off (`approved`) yet. Read [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) before relying on it.
 
-**Privacy in short:** accounts and synced data are stored with Supabase, and each user can read only their own data. The live site counts page views with Vercel Web Analytics (no cookies, no personal data). Details are on the in-app Privacy page.
+**Privacy in short:** accounts and synced data are stored with Supabase, and each user can read only their own data; the admin page shows the site owner a list of accounts with activity totals (never answers). The live site counts page views with Vercel Web Analytics (no cookies, no personal data). Details are on the in-app Privacy page.
 
 ## Tech stack
 

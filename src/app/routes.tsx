@@ -6,6 +6,7 @@ import { AppLayout } from './layouts/AppLayout';
 import { ExamLayout } from './layouts/ExamLayout';
 import { RootLayout } from './layouts/RootLayout';
 import {
+  AdminPage,
   AuthCallbackPage,
   BookmarksPage,
   CheckInPage,
@@ -53,6 +54,8 @@ export const routes: RouteObject[] = [
             // Signed-in only.
             element: <RequireAuth />,
             children: [
+              // Admins only (D-054): the database checks access; not in the navigation.
+              { path: 'admin', element: <AdminPage /> },
               {
                 element: <RequireQuestions />,
                 children: [
