@@ -86,4 +86,24 @@ describe('Admin page', () => {
     await screen.findByRole('heading', { level: 1 });
     expect(screen.queryByRole('link', { name: /admin/i })).not.toBeInTheDocument();
   });
+
+  it('AC-A.5 admins get an Admin link in the navigation that opens the admin page', async () => {
+    const { user, router } = renderApp('/dashboard', {
+      admin: createFakeAdminClient({ admin: true, users: USERS }),
+    });
+    const [link] = await screen.findAllByRole('link', { name: 'Admin' });
+    expect(link).toHaveAttribute('href', '/admin');
+    await user.click(link as HTMLElement);
+    expect(await screen.findByRole('heading', { level: 1, name: 'Admin' })).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/admin');
+  });
+
+  it('AC-A.5 guests never see the Admin link', async () => {
+    renderApp('/practice', {
+      auth: createFakeAuthClient(),
+      admin: createFakeAdminClient({ admin: true }),
+    });
+    await screen.findByRole('heading', { level: 1 });
+    expect(screen.queryByRole('link', { name: 'Admin' })).not.toBeInTheDocument();
+  });
 });

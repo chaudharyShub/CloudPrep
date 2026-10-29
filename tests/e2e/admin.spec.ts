@@ -34,6 +34,21 @@ test.describe('Admin page', () => {
     await expect(row).toContainText('friend@example.com');
     await expect(row).toContainText('76%');
   });
+
+  test('AC-A.5 only admins get the Admin link in the navigation', async ({ page, isMobile }) => {
+    await page.goto('/dashboard');
+    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Admin' })).toHaveCount(0);
+
+    await page.addInitScript((rows) => {
+      (window as unknown as { __cloudprepE2EAdmin: unknown[] }).__cloudprepE2EAdmin = rows;
+    }, ROWS);
+    await page.reload();
+    if (isMobile) await page.getByRole('button', { name: 'Open navigation' }).click();
+    await page.getByRole('link', { name: 'Admin' }).filter({ visible: true }).click();
+    await expect(page).toHaveURL(/\/admin$/);
+    await expect(page.getByRole('row', { name: /A Friend/ })).toBeVisible();
+  });
 });
 
 test.describe('Admin page as a guest', () => {

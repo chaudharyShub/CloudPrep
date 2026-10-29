@@ -82,4 +82,25 @@ describe('admin overview client', () => {
       'alice@example.com',
     ]);
   });
+
+  it('AC-A.5 isAdmin is true only when the database says so', async () => {
+    const client = (result: { data: unknown; error: unknown }) =>
+      supabaseAdminClient(() =>
+        Promise.resolve({
+          rpc: (name: string) => {
+            expect(name).toBe('is_admin');
+            return Promise.resolve(result);
+          },
+        } as unknown as SupabaseClient),
+      );
+    expect(await client({ data: true, error: null }).isAdmin()).toBe(true);
+    expect(await client({ data: false, error: null }).isAdmin()).toBe(false);
+    expect(await client({ data: 'true', error: null }).isAdmin()).toBe(false);
+    expect(await client({ data: true, error: { code: '500', message: 'Down' } }).isAdmin()).toBe(
+      false,
+    );
+    expect(await supabaseAdminClient(() => Promise.reject(new Error('Offline'))).isAdmin()).toBe(
+      false,
+    );
+  });
 });

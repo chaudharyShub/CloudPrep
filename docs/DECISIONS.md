@@ -60,6 +60,7 @@
 | D-052 | Review due: spaced-repetition review schedule; version 2.1.0 | Accepted |
 | D-053 | Reload once when a page file is missing after a deploy; version 2.1.1 | Accepted |
 | D-054 | Admin page for signed-in users, access checked in the database; version 2.2.0 | Accepted |
+| D-055 | Admin link for admins only; admin email in `.env.local` added by a script; version 2.3.0 | Accepted |
 
 ---
 
@@ -373,3 +374,11 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Privacy page:** now says the site owner can see the account list and totals, never answers.
 - **Migration:** `20261029120000_admin_overview.sql`. The app code works before it is applied (the page just shows an error), but apply it with `npm run db:push` before deploying, then add the admin row. It was applied to the live database on 2026-10-29, just after the merge; until then the live `/admin` page showed its load error.
 - **Version:** 2.2.0 (a new feature).
+
+### D-055 Admin link and `admin:add` script; version 2.3.0 (2026-10-29)
+- **Requested by the user:** a button for the admin, and a check of whether the email is the admin's, with the admin email in an env file.
+- **Rejected:** `VITE_ADMIN_EMAIL` checked in the app. Vite puts `VITE_` values in the public bundle, so the email would be readable by anyone, and a check in app code can be bypassed; D-054 already rejected deciding admin access in the app.
+- **Decision (user's choice):** the email goes in `.env.local` as `ADMIN_EMAIL` (no `VITE_` prefix, never in Vercel). `npm run admin:add` (`scripts/add-admin.mjs`) uses the secret key to find each listed account and add it to `public.admins`; it never removes admins. The app shows an **Admin** link in the navigation (sidebar and mobile menu, after Settings) only when `is_admin()`, which D-054 already created, returns true for the signed-in user (`useIsAdmin()` in `AdminProvider.tsx`). Errors count as "not an admin". The link is only a convenience: `/admin` data is still protected by `admin_user_overview()`.
+- **Sign-in:** unchanged. The admin signs in with Google like everyone else; there is no separate admin login or password.
+- **No migration:** `is_admin()` is already granted to `authenticated`.
+- **Version:** 2.3.0 (a new feature).
