@@ -24,7 +24,7 @@ export function CardHeader({
   return (
     <div className="flex items-start justify-between gap-4 px-5 pt-5">
       <div className="min-w-0">
-        <Heading id={id} className="text-base font-semibold text-fg">
+        <Heading id={id} className="font-serif text-xl font-medium text-fg">
           {title}
         </Heading>
         {description && <p className="mt-1 text-sm text-fg-muted">{description}</p>}

@@ -114,7 +114,10 @@ export function Dialog({
             className={cn('flex items-start justify-between gap-4 px-5 pt-5', hideTitle && 'pt-3')}
           >
             <div className="min-w-0">
-              <h2 id={titleId} className={cn('text-lg font-semibold', hideTitle && 'sr-only')}>
+              <h2
+                id={titleId}
+                className={cn('font-serif text-xl font-medium', hideTitle && 'sr-only')}
+              >
                 {title}
               </h2>
               {description && (

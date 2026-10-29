@@ -4,8 +4,10 @@ import { questionStatusLabel } from '../examView';
 import { cn } from '@/lib/cn';
 
 /**
- * Grid of question buttons. Each state has its own icon and text label (not colour alone):
- * answered = check, partly answered = dashed circle, flagged = flag, current = outline ring.
+ * The answer sheet: a grid of question buttons in the exam-paper style (square cells, mono
+ * numbers, D-057). Each state has its own icon and text label (not colour alone):
+ * answered = filled with a check, partly answered = dashed, flagged = flag on orange,
+ * current = outline ring.
  */
 export function QuestionNavigator({
   exam,
@@ -16,7 +18,7 @@ export function QuestionNavigator({
 }) {
   return (
     <div>
-      <ol className="grid grid-cols-6 gap-1.5 sm:grid-cols-8 lg:grid-cols-5">
+      <ol className="grid grid-cols-6 gap-1 sm:grid-cols-8">
         {exam.questionIds.map((id, index) => {
           const state = answerState(exam, id);
           const flagged = exam.flagged.includes(id);
@@ -31,12 +33,18 @@ export function QuestionNavigator({
                   onSelect(index);
                 }}
                 className={cn(
-                  'relative flex h-10 w-full items-center justify-center rounded-sm border text-sm tabular-nums transition-colors',
-                  state === 'answered' && 'border-accent/50 bg-accent-subtle font-semibold text-fg',
-                  state === 'incomplete' && 'border-dashed border-accent/70 bg-surface text-fg',
+                  'relative flex h-9 w-full items-center justify-center rounded-none border font-mono text-xs transition-colors',
+                  state === 'answered' &&
+                    !flagged &&
+                    'border-accent bg-accent font-semibold text-on-accent',
+                  state === 'incomplete' &&
+                    !flagged &&
+                    'border-dashed border-accent bg-surface text-fg',
                   state === 'unanswered' &&
-                    'border-border-control bg-surface text-fg-muted hover:bg-surface-2',
-                  current && 'ring-2 ring-fg ring-offset-2 ring-offset-bg',
+                    !flagged &&
+                    'border-border bg-surface text-fg-subtle hover:bg-surface-2',
+                  flagged && 'border-dashed border-flag-border bg-flag text-on-flag',
+                  current && 'ring-2 ring-accent ring-offset-2 ring-offset-surface',
                 )}
               >
                 {index + 1}
@@ -45,7 +53,10 @@ export function QuestionNavigator({
                     size={11}
                     strokeWidth={3}
                     aria-hidden="true"
-                    className="absolute bottom-0.5 left-0.5 text-accent-fg"
+                    className={cn(
+                      'absolute bottom-0.5 left-0.5',
+                      flagged ? 'text-on-flag' : 'text-on-accent',
+                    )}
                   />
                 )}
                 {state === 'incomplete' && (
@@ -61,7 +72,7 @@ export function QuestionNavigator({
                     size={11}
                     strokeWidth={2.5}
                     aria-hidden="true"
-                    className="absolute top-0.5 right-0.5 fill-warning text-warning"
+                    className="absolute top-0.5 right-0.5 fill-current text-on-flag"
                   />
                 )}
               </button>
@@ -81,7 +92,9 @@ function NavigatorLegend() {
       aria-label="Legend"
     >
       <li className="flex items-center gap-1.5">
-        <Check size={13} strokeWidth={3} aria-hidden="true" className="text-accent-fg" />
+        <span aria-hidden="true" className="flex size-3.5 items-center justify-center bg-accent">
+          <Check size={10} strokeWidth={3.5} className="text-on-accent" />
+        </span>
         Answered
       </li>
       <li className="flex items-center gap-1.5">
@@ -89,16 +102,16 @@ function NavigatorLegend() {
         Partly answered
       </li>
       <li className="flex items-center gap-1.5">
-        <Flag
-          size={13}
-          strokeWidth={2.5}
+        <span
           aria-hidden="true"
-          className="fill-warning text-warning"
-        />
+          className="flex size-3.5 items-center justify-center border border-dashed border-flag-border bg-flag"
+        >
+          <Flag size={9} strokeWidth={2.5} className="fill-current text-on-flag" />
+        </span>
         Flagged
       </li>
       <li className="flex items-center gap-1.5">
-        <span aria-hidden="true" className="size-3 rounded-[3px] ring-2 ring-fg" />
+        <span aria-hidden="true" className="size-3 ring-2 ring-accent" />
         Current
       </li>
     </ul>

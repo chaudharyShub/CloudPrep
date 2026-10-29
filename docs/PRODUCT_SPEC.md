@@ -1,13 +1,13 @@
 # CloudPrep — Product Specification
 
-> Status: **Describes the app as built** (version 2.4.0) · Last updated: 2026-10-29
+> Status: **Describes the app as built** (version 3.0.0) · Last updated: 2026-10-29
 > CloudPrep is an unofficial practice tool. It is not affiliated with, endorsed by, or sponsored by Amazon Web Services.
 >
 > This replaces the first draft of 2026-10-21. What changed from that plan is in IMPLEMENTATION_PLAN.md ("Changes from the original plan") and the reasons are in DECISIONS.md.
 
 ## 1. Purpose
 
-CloudPrep is a browser-based practice simulator for the **AWS Certified Cloud Practitioner (CLF-C02)** exam. It was built for one person's preparation and is shared with a small group of friends as a website.
+CloudPrep is a browser-based practice simulator for the **AWS Certified Cloud Practitioner (CLF-C02)** exam. It started as one person's preparation tool and is now a free, public product with its own landing page (non-commercial).
 
 ### 1.1 Goals
 
@@ -58,7 +58,7 @@ Source: the official CLF-C02 exam guide, <https://docs.aws.amazon.com/aws-certif
 | User | Needs |
 |---|---|
 | **Primary: the owner** | Realistic mocks, focused weak-area practice, progress over weeks, on more than one device |
-| **Friends** | Open a link and practise immediately as a guest; sign in with Google for mock exams and synced progress; their data stays private |
+| **Learners** | Arrive on the landing page, practise immediately as a guest; sign in with Google for mock exams and synced progress; their data stays private |
 
 Assumption: a current version of Chrome, Edge, Firefox or Safari on desktop, tablet or phone (KNOWN_LIMITATIONS.md lists what is tested).
 
@@ -73,12 +73,13 @@ Assumption: a current version of Chrome, Edge, Firefox or Safari on desktop, tab
 | Dashboard, mock exams, results, exam history, progress | Sign-in required | Yes |
 | Where data lives | `localStorage` in this browser | Supabase, with a copy in this browser that works offline (D-047) |
 
-`/` opens the dashboard, so guests land on the sign-in page, which offers "Continue as a guest". After signing in on a browser with guest data, the user is asked once whether to add it to the account; Settings offers it again later. Guest data is never changed by this. Signing out asks for confirmation and says whether everything is saved yet.
+`/` is the landing page for guests ("Sit the exam before you sit the exam.", an example question with explained answers, the two ways to study, what's covered, "Start practising" into Learning mode, and "Sign in"); signed-in users go straight to the dashboard (D-057). Pages that need an account send guests to the sign-in page, which offers "Continue as a guest". After signing in on a browser with guest data, the user is asked once whether to add it to the account; Settings offers it again later. Guest data is never changed by this. Signing out asks for confirmation and says whether everything is saved yet.
 
 ### 4.2 Pages
 
 | Page | What it does |
 |---|---|
+| Landing (`/`, guests only) | "Sit the exam before you sit the exam.", an example question with explained answers, the two ways to study (Learning mode and mock exam), what's covered (domain weights), links into Learning mode and sign-in; signed-in users are sent to the dashboard (D-057) |
 | Dashboard (`/dashboard`) | Latest mock exam, recent attempts, practice by domain and quick actions, with empty states for new users |
 | Learning mode (`/practice`) | Practice by domain, topic (task statement) and difficulty, 5 / 10 / 20 / all questions, optionally unanswered only; "Review due", "Practise mistakes" and "Practise bookmarks" |
 | Mock exam (`/exam`) | Rules, scoring explanation, integrity mode, start / resume / abandon; full exam (65 questions, 90 minutes) |
@@ -161,7 +162,7 @@ Within each domain, questions not used in earlier exams come first, spread acros
 
 ## 8. Settings and data
 
-- **Preferences:** theme (dark, light, system), motion (system, reduce), practice benchmark, low-time warnings, option shuffling, default practice length. Only changed values are saved (D-034).
+- **Preferences:** theme (system by default, or dark or light), motion (system, reduce), practice benchmark, low-time warnings, option shuffling, default practice length. Only changed values are saved (D-034).
 - **Account:** who is signed in, whether changes are saved or waiting, sign out, add guest data.
 - **Export / import:** a JSON file of all data except the exam in progress. Import checks the file strictly (5 MB limit, same parsers as storage), shows a preview, and then merges or replaces. A full backup is made first (D-035).
 - **Recovery:** backups and copies of unreadable data can be downloaded, restored (full backups) or deleted.
@@ -216,3 +217,7 @@ TEST_PLAN.md says which tests cover these.
 - Single answer = exactly 4 options; multiple response = 5 or more options with 2 or more correct. No "all of the above" or "none of the above".
 - Statuses: `draft` (never shown) → `unverified` (written from the cited pages, not yet re-checked) → `checked` (verified against the cited pages) → `approved` (human sign-off; only the owner sets it) → `retired` (ID never reused). Learning and Exam modes show `unverified`, `checked` and `approved`, and Learning mode notes with the feedback when a question is `unverified` or only `checked`.
 - Questions live in the repo and are published to Supabase; the live app only sees published questions.
+
+## Look and feel (D-057)
+
+"Study notes in aubergine": soft lilac-grey paper with white rounded cards in light mode, true black with grey cards in dark mode, aubergine for actions and selection, a Newsreader serif for titles and Source Sans 3 for text. The answer sheet in mock exams and Learning mode keeps an exam-paper look (square cells, monospace numbers, an ink border); in Learning mode its cells also show which answers were right or wrong. The dashboard marks the weakest practice domain once two domains have 20 or more answers, and Recent attempts show the time used. The old interface is kept on the `archive/ui-v2` branch and tag `v2.4.0`.

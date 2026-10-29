@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import { ArrowLeft, ArrowRight, Flag, LayoutGrid, ListChecks } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { buttonClasses } from '@/components/ui/buttonStyles';
-import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { Card, CardBody } from '@/components/ui/Card';
 import { Dialog } from '@/components/ui/Dialog';
 import { Notice } from '@/components/ui/Notice';
 import { examCounts } from '@/domain/exam/session';
@@ -52,7 +52,7 @@ export function ExamSessionPage() {
   const instructionsId = `${baseId}-instructions`;
 
   return (
-    <div className="mx-auto grid w-full max-w-6xl gap-6 px-4 pt-4 pb-28 sm:px-6 lg:grid-cols-[minmax(0,1fr)_17rem] lg:pb-10">
+    <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 pt-6 pb-28 sm:px-6 lg:grid-cols-[minmax(0,1fr)_18.5rem] lg:pb-10">
       <div className="min-w-0">
         <Card>
           <CardBody className="flex flex-col gap-5">
@@ -80,7 +80,10 @@ export function ExamSessionPage() {
 
             {view ? (
               <>
-                <p id={legendId} className="text-base leading-relaxed text-fg sm:text-lg">
+                <p
+                  id={legendId}
+                  className="font-serif text-xl leading-snug font-medium text-fg sm:text-[1.625rem]"
+                >
                   {view.stem}
                 </p>
                 <p id={instructionsId} className="-mt-2 text-sm text-fg-muted">
@@ -145,16 +148,21 @@ export function ExamSessionPage() {
 
       {/* Desktop question panel */}
       <aside className="hidden lg:block" aria-label="Question navigation">
-        <Card className="sticky top-20">
-          <CardHeader
-            as="h2"
-            title="Questions"
-            description={`${counts.answered} answered · ${counts.flagged} flagged`}
-          />
-          <CardBody>
-            <QuestionNavigator exam={exam} onSelect={goTo} />
-          </CardBody>
-        </Card>
+        <div className="sticky top-24 border border-ink bg-surface p-4">
+          <h2 className="font-mono text-[0.8125rem] font-semibold tracking-wide text-fg uppercase">
+            Answer sheet
+          </h2>
+          <p className="mt-1 mb-3.5 text-sm text-fg-muted tabular-nums">
+            {counts.answered} answered · {counts.flagged} flagged
+          </p>
+          <QuestionNavigator exam={exam} onSelect={goTo} />
+          <Link
+            to="/exam/review"
+            className="mt-4 flex min-h-11 items-center justify-center border border-ink font-semibold text-fg transition-colors hover:bg-surface-2"
+          >
+            Review all answers
+          </Link>
+        </div>
       </aside>
 
       {/* Mobile bottom bar: fixed, with page padding so it never covers answers. */}

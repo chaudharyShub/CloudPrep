@@ -1,88 +1,131 @@
 @import 'tailwindcss';
 
 /*
- * CloudPrep design tokens.
+ * CloudPrep design tokens: "Study notes in aubergine" (D-057).
  *
  * Raw values live in --cp-* custom properties, one set per theme. Tailwind utilities
  * (bg-surface, text-fg-muted, border-border, rounded-lg, …) reference them through
  * `@theme inline`, so switching `data-theme` on <html> restyles everything with
  * no per-component theme code.
+ *
+ * Colour roles:
+ * - accent: aubergine, readable on surfaces (text, links, borders, fills under on-accent).
+ * - highlight: the soft tint for selected/active backgrounds; text on it is on-highlight.
+ * - primary: main buttons. meter: progress fills. ink: the answer sheet's hairlines.
+ * - flag: flagged questions (orange, so it never looks like "selected").
+ * src/styles/tokens.test.ts checks the contrast of every pair below.
  */
 
 :root,
 [data-theme='dark'] {
   color-scheme: dark;
 
-  /* Surfaces, from page background up to raised layers */
-  --cp-bg: #0b0d10;
-  --cp-surface: #12151a;
-  --cp-surface-2: #181c22;
-  --cp-surface-3: #20252d;
+  /* Surfaces: true black with neutral grey layers (no tint, so the aubergine stays clean) */
+  --cp-bg: #000000;
+  --cp-surface: #121214;
+  --cp-surface-2: #1a1a1d;
+  --cp-surface-3: #2e2e33;
 
   /* Borders and separators */
-  --cp-border: #262c35;
-  --cp-border-strong: #343b46;
-  --cp-border-control: #6b7482; /* form control outlines: ≥3:1 vs surfaces */
+  --cp-border: #2a2a2e;
+  --cp-border-strong: #5e5e64;
+  --cp-border-control: #7a7a80; /* form control outlines: ≥3:1 vs surfaces */
+  --cp-ink: #ededed;
 
   /* Text */
-  --cp-fg: #e6e9ee;
-  --cp-fg-muted: #a3abb8;
-  --cp-fg-subtle: #8a93a1;
+  --cp-fg: #ededed;
+  --cp-fg-muted: #c8c8cc;
+  --cp-fg-subtle: #a6a6ab;
 
-  /* Accent (restrained blue) */
-  --cp-accent: #4c8dff;
-  --cp-accent-hover: #6ba1ff;
-  --cp-accent-fg: #7fadff; /* accent used as text on dark surfaces */
-  --cp-on-accent: #0b0d10;
+  /* Accent: a lighter aubergine for dark surfaces */
+  --cp-accent: #d9a0cb;
+  --cp-accent-hover: #e8bfdd;
+  --cp-accent-fg: #dda6cf;
+  --cp-on-accent: #000000;
+
+  /* Selected/active tint */
+  --cp-highlight: #3d2338;
+  --cp-highlight-hover: #4a2b44;
+  --cp-on-highlight: #f6d2ec;
+
+  /* Primary buttons */
+  --cp-primary: #d9a0cb;
+  --cp-primary-hover: #e8bfdd;
+  --cp-on-primary: #000000;
+
+  --cp-meter: #d9a0cb;
+
+  /* Flagged questions */
+  --cp-flag: #3a2a1e;
+  --cp-flag-border: #f0a060;
+  --cp-on-flag: #ffd9b8;
 
   /* Status */
-  --cp-success: #3fb27f;
-  --cp-warning: #e0a43a;
-  --cp-danger: #e5604d;
-  --cp-info: #4c8dff;
-  --cp-danger-hover: #ec7a69;
-  --cp-on-danger: #0b0d10;
+  --cp-success: #5cc48e;
+  --cp-warning: #f0a060;
+  --cp-danger: #f07a68;
+  --cp-info: #8db6f0;
+  --cp-danger-hover: #f49585;
+  --cp-on-danger: #000000;
 
-  /* Focus */
-  --cp-focus: #7fadff;
+  /* Focus: blue, so it never blends with the aubergine selection */
+  --cp-focus: #8db6f0;
 
   /* Elevation (overlays only — cards use borders) */
-  --cp-shadow-overlay: 0 16px 48px -12px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.04);
-  --cp-backdrop: rgb(5 6 8 / 0.7);
+  --cp-shadow-overlay: 0 16px 48px -12px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.05);
+  --cp-shadow-lift: 0 10px 24px -12px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
+  --cp-backdrop: rgb(0 0 0 / 0.75);
 }
 
 [data-theme='light'] {
   color-scheme: light;
 
-  --cp-bg: #f5f6f8;
+  /* Surfaces: soft lilac-grey paper */
+  --cp-bg: #f3f0f2;
   --cp-surface: #ffffff;
-  --cp-surface-2: #f0f2f5;
-  --cp-surface-3: #e6e9ee;
+  --cp-surface-2: #f8f5f7;
+  --cp-surface-3: #e9e0e6;
 
-  --cp-border: #dde1e7;
-  --cp-border-strong: #c5cbd4;
-  --cp-border-control: #7a8391;
+  --cp-border: #d9cfd5;
+  --cp-border-strong: #998d95;
+  --cp-border-control: #8e828b;
+  --cp-ink: #1f1a1e;
 
-  --cp-fg: #14171c;
-  --cp-fg-muted: #4a5260;
-  --cp-fg-subtle: #5b6370;
+  --cp-fg: #1f1a1e;
+  --cp-fg-muted: #4a4148;
+  --cp-fg-subtle: #5b5158;
 
-  --cp-accent: #2563eb;
-  --cp-accent-hover: #1d4ed8;
-  --cp-accent-fg: #1d4ed8;
+  --cp-accent: #6a2c5e;
+  --cp-accent-hover: #4a1e41;
+  --cp-accent-fg: #6a2c5e;
   --cp-on-accent: #ffffff;
 
+  --cp-highlight: #f1e0ec;
+  --cp-highlight-hover: #e9cfe1;
+  --cp-on-highlight: #4a1e41;
+
+  --cp-primary: #6a2c5e;
+  --cp-primary-hover: #4a1e41;
+  --cp-on-primary: #ffffff;
+
+  --cp-meter: #6a2c5e;
+
+  --cp-flag: #fbe7d3;
+  --cp-flag-border: #1f1a1e;
+  --cp-on-flag: #1f1a1e;
+
   --cp-success: #166534;
-  --cp-warning: #8a4b08;
-  --cp-danger: #c02626;
-  --cp-info: #2563eb;
-  --cp-danger-hover: #a51f1f;
+  --cp-warning: #8a3f06;
+  --cp-danger: #b91c1c;
+  --cp-info: #1f5fd6;
+  --cp-danger-hover: #991b1b;
   --cp-on-danger: #ffffff;
 
-  --cp-focus: #2563eb;
+  --cp-focus: #1f5fd6;
 
-  --cp-shadow-overlay: 0 16px 48px -12px rgb(15 23 42 / 0.25), 0 0 0 1px rgb(15 23 42 / 0.06);
-  --cp-backdrop: rgb(15 23 42 / 0.45);
+  --cp-shadow-overlay: 0 16px 48px -12px rgb(31 26 30 / 0.22), 0 0 0 1px rgb(31 26 30 / 0.06);
+  --cp-shadow-lift: 0 10px 24px -14px rgb(31 26 30 / 0.35);
+  --cp-backdrop: rgb(31 26 30 / 0.45);
 }
 
 :root {
@@ -124,6 +167,18 @@
   --color-accent-fg: var(--cp-accent-fg);
   --color-accent-subtle: color-mix(in oklab, var(--cp-accent) 14%, transparent);
   --color-on-accent: var(--cp-on-accent);
+  --color-highlight: var(--cp-highlight);
+  --color-highlight-hover: var(--cp-highlight-hover);
+  --color-highlight-subtle: color-mix(in oklab, var(--cp-highlight) 22%, transparent);
+  --color-on-highlight: var(--cp-on-highlight);
+  --color-primary: var(--cp-primary);
+  --color-primary-hover: var(--cp-primary-hover);
+  --color-on-primary: var(--cp-on-primary);
+  --color-meter: var(--cp-meter);
+  --color-flag: var(--cp-flag);
+  --color-flag-border: var(--cp-flag-border);
+  --color-on-flag: var(--cp-on-flag);
+  --color-ink: var(--cp-ink);
   --color-success: var(--cp-success);
   --color-success-subtle: color-mix(in oklab, var(--cp-success) 14%, transparent);
   --color-warning: var(--cp-warning);
@@ -137,15 +192,20 @@
   --color-focus: var(--cp-focus);
   --color-backdrop: var(--cp-backdrop);
 
-  /* Typography — Tailwind's default type scale (12/14/16/18/20/24/30px) is kept. */
+  /* Typography — Tailwind's default type scale (12/14/16/18/20/24/30px) is kept.
+     Sans for text, serif for page and section headings, mono for the answer sheet and numbers. */
   --font-sans:
-    'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
+    'Source Sans 3 Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    sans-serif;
+  --font-serif: 'Newsreader Variable', Georgia, 'Times New Roman', serif;
+  --font-mono:
+    'IBM Plex Mono', ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Radii: sm = inputs/badges, md = buttons, lg = cards/dialogs */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  /* Radii: sm = inputs/badges/small tiles, md = list items and option rows, lg = cards/dialogs.
+     Buttons, nav items and badges are pills (rounded-full). */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
 
   /* Shadows */
   --shadow-overlay: var(--cp-shadow-overlay);
@@ -159,6 +219,30 @@
   /* Motion */
   --default-transition-duration: var(--cp-duration-fast);
   --default-transition-timing-function: var(--cp-ease);
+}
+
+/* Landing page motion (D-057). Every rule here is switched off by the reduce-motion rules below. */
+@keyframes cp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* Fades and rises into place once; stagger with an inline animation-delay. */
+@utility animate-rise {
+  animation: cp-rise 560ms var(--cp-ease) both;
+}
+
+/* A slight lift on hover for cards and buttons. */
+@utility hover-lift {
+  transition-property: color, background-color, border-color, transform, box-shadow !important;
+  transition-duration: var(--cp-duration-base);
+  transition-timing-function: var(--cp-ease);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--cp-shadow-lift);
+  }
 }
 
 @utility duration-fast {
@@ -186,11 +270,16 @@
   body {
     @apply bg-bg font-sans text-fg antialiased;
     min-height: 100dvh;
-    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* Numbers line up in tables, timers and scores. */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
   }
 
   ::selection {
-    background-color: color-mix(in oklab, var(--cp-accent) 35%, transparent);
+    background-color: var(--cp-highlight);
+    color: var(--cp-on-highlight);
   }
 
   /* One focus style everywhere. Components must not remove it. */
@@ -214,6 +303,16 @@
     overflow: hidden;
   }
 
+  [data-motion='reduce'] .hover-lift:hover {
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hover-lift:hover {
+      transform: none;
+    }
+  }
+
   dialog::backdrop {
     background-color: var(--cp-backdrop);
   }
@@ -221,6 +320,7 @@
   [data-motion='reduce'] *,
   [data-motion='reduce'] *::before,
   [data-motion='reduce'] *::after {
+    animation-delay: 0s !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -231,6 +331,7 @@
     *,
     *::before,
     *::after {
+      animation-delay: 0s !important;
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;

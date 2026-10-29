@@ -10,7 +10,6 @@ function NavItemLink({
   item: NavItem;
   onNavigate?: (() => void) | undefined;
 }) {
-  const Icon = item.icon;
   return (
     <li>
       <NavLink
@@ -18,25 +17,14 @@ function NavItemLink({
         onClick={onNavigate}
         className={({ isActive }) =>
           cn(
-            'group flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors',
-            isActive ? 'bg-surface-3 text-fg' : 'text-fg-muted hover:bg-surface-2 hover:text-fg',
+            'flex min-h-10 items-center rounded-full px-4 text-[0.9375rem] transition-colors',
+            isActive
+              ? 'bg-highlight font-semibold text-on-highlight'
+              : 'text-fg-muted hover:bg-surface-2 hover:text-fg',
           )
         }
       >
-        {({ isActive }) => (
-          <>
-            <Icon
-              size={20}
-              strokeWidth={1.75}
-              aria-hidden="true"
-              className={cn(
-                'shrink-0',
-                isActive ? 'text-accent-fg' : 'text-fg-subtle group-hover:text-fg-muted',
-              )}
-            />
-            {item.label}
-          </>
-        )}
+        {item.label}
       </NavLink>
     </li>
   );
@@ -46,13 +34,13 @@ function NavItemLink({
 export function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const isAdmin = useIsAdmin();
   return (
-    <nav aria-label="Main" className="flex flex-1 flex-col gap-6">
-      <ul className="flex flex-col gap-1">
+    <nav aria-label="Main" className="flex flex-col gap-3">
+      <ul className="flex flex-col gap-0.5">
         {PRIMARY_NAV.map((item) => (
           <NavItemLink key={item.to} item={item} onNavigate={onNavigate} />
         ))}
       </ul>
-      <ul className="mt-auto flex flex-col gap-1 border-t border-border pt-4">
+      <ul className="flex flex-col gap-0.5 border-t border-border pt-3">
         {SECONDARY_NAV.map((item) => (
           <NavItemLink key={item.to} item={item} onNavigate={onNavigate} />
         ))}

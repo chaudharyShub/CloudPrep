@@ -141,3 +141,28 @@ export function practiceStats(
     ) as Record<DomainId, PracticeStats>,
   };
 }
+
+/** Answers a domain needs before it can be called the weakest (D-057). */
+export const WEAKEST_MIN_ANSWERED = 20;
+
+/**
+ * The practice domain with the lowest accuracy, or `null` until at least two domains have
+ * WEAKEST_MIN_ANSWERED answers each, so a few early answers never label a domain. Ties go
+ * to the domain listed first.
+ */
+export function weakestDomain(byDomain: Record<DomainId, PracticeStats>): DomainId | null {
+  const eligible = DOMAINS.filter(
+    (domain) => byDomain[domain.id].answeredQuestions >= WEAKEST_MIN_ANSWERED,
+  );
+  if (eligible.length < 2) return null;
+  let weakest: DomainId | null = null;
+  let lowest = Infinity;
+  for (const domain of eligible) {
+    const accuracy = byDomain[domain.id].accuracy ?? 0;
+    if (accuracy < lowest) {
+      lowest = accuracy;
+      weakest = domain.id;
+    }
+  }
+  return weakest;
+}

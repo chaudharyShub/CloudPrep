@@ -1,6 +1,9 @@
 import { lazy } from 'react';
 
 // Pages load on demand, so the shell renders quickly and each page is its own chunk.
+export const HomeRoute = lazy(() =>
+  import('@/features/landing/HomeRoute').then((m) => ({ default: m.HomeRoute })),
+);
 export const DashboardPage = lazy(() =>
   import('@/features/dashboard/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 );

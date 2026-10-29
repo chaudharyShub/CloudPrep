@@ -10,10 +10,11 @@ test.beforeEach(async ({ page }) => {
 
 test('settings persist across reloads', async ({ page }) => {
   await page.goto('/settings');
-  await page.getByRole('radio', { name: 'Light' }).check();
+  // Dark, because the default (System) already shows light in the test browser.
+  await page.getByRole('radio', { name: 'Dark' }).check();
   await page.getByRole('combobox', { name: 'Practice benchmark' }).selectOption('80');
   await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.getByRole('combobox', { name: 'Practice benchmark' })).toHaveValue('80');
 });
 

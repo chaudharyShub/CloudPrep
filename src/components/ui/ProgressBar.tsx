@@ -13,7 +13,7 @@ export interface ProgressBarProps {
 }
 
 const tones = {
-  accent: 'bg-accent',
+  accent: 'bg-meter',
   success: 'bg-success',
   warning: 'bg-warning',
   danger: 'bg-danger',

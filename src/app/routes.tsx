@@ -1,4 +1,6 @@
-import { Navigate, type RouteObject } from 'react-router';
+import { Suspense } from 'react';
+import type { RouteObject } from 'react-router';
+import { BrandLoading } from '@/components/brand/BrandLoading';
 import { RequireAuth } from '@/features/auth/RequireAuth';
 import { RouteErrorPage } from '@/features/errors/RouteErrorPage';
 import { RequireQuestions } from '@/features/shared/RequireQuestions';
@@ -16,6 +18,7 @@ import {
   ExamReviewPage,
   ExamSessionPage,
   HistoryPage,
+  HomeRoute,
   NotFoundPage,
   PracticePage,
   PracticeSessionPage,
@@ -33,9 +36,17 @@ export const routes: RouteObject[] = [
     errorElement: <RouteErrorPage />,
     children: [
       {
+        // Landing page for guests, dashboard for signed-in users (D-057). No app chrome.
+        index: true,
+        element: (
+          <Suspense fallback={<BrandLoading message="Opening CloudPrep…" />}>
+            <HomeRoute />
+          </Suspense>
+        ),
+      },
+      {
         element: <AppLayout />,
         children: [
-          { index: true, element: <Navigate to="/dashboard" replace /> },
           // Open to guests (D-045): Learning mode, bookmarks, settings and sign-in.
           {
             // Pages that use questions wait for the bank (D-046).

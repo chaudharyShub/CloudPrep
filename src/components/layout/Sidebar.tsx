@@ -8,7 +8,8 @@ export function Sidebar({ className, account }: { className?: string; account?: 
   return (
     <div
       className={cn(
-        'fixed inset-y-0 left-0 z-30 w-sidebar flex-col gap-8 border-r border-border bg-surface px-4 py-5',
+        // Fits a laptop-height window; on very short windows it still scrolls, without a visible bar.
+        'fixed inset-y-0 left-0 z-30 w-sidebar [scrollbar-width:none] flex-col gap-6 overflow-y-auto border-r border-border bg-surface px-4 py-5 [&::-webkit-scrollbar]:hidden',
         className,
       )}
     >
@@ -16,10 +17,12 @@ export function Sidebar({ className, account }: { className?: string; account?: 
         <Brand />
       </div>
       <NavList />
-      {account}
-      <div className="flex flex-col gap-2 px-2">
-        <UnofficialNote />
-        <MadeBy />
+      <div className="mt-auto flex flex-col gap-3">
+        {account}
+        <div className="flex flex-col gap-2 px-2">
+          <UnofficialNote />
+          <MadeBy />
+        </div>
       </div>
     </div>
   );

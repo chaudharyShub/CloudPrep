@@ -5,11 +5,27 @@ import { expect, test } from './support/fixtures';
 test.describe('as a guest', () => {
   test.use({ signedIn: false });
 
-  test('AC-B.6 signed-in-only pages lead to sign-in; Learning mode stays open', async ({
+  test('AC-B.6 AC-V.7 guests get the landing page; signed-in-only pages lead to sign-in; Learning mode stays open', async ({
     page,
   }) => {
+    // The front page is the landing page for guests (D-057); it passes axe too.
     await page.goto('/');
-    await expect(page).toHaveURL(/\/sign-in$/);
+    await expect(page.getByRole('heading', { level: 1, name: /Sit the exam/ })).toBeVisible();
+    // Let the entrance animation finish so the scan sees the page as people read it.
+    await page.waitForFunction(() =>
+      document.getAnimations().every((animation) => animation.playState !== 'running'),
+    );
+    const landing = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+      .analyze();
+    expect(
+      landing.violations
+        .filter((v) => v.impact === 'serious' || v.impact === 'critical')
+        .map((v) => v.id),
+    ).toEqual([]);
+
+    await page.goto('/dashboard');
+    await expect(page).toHaveURL(/\/sign-in/);
     await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
 
     const results = await new AxeBuilder({ page })

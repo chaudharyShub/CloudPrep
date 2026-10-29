@@ -66,7 +66,7 @@ export function SessionSummaryView({ session, questionsById, onRetry }: SessionS
             </p>
           ) : (
             <>
-              <p className="text-4xl font-semibold text-fg tabular-nums">
+              <p className="font-serif text-6xl leading-none font-medium text-accent-fg tabular-nums">
                 {summary.correct}
                 <span className="text-2xl text-fg-muted">/{summary.answered}</span>
               </p>

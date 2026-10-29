@@ -83,7 +83,7 @@ export function SignInPage() {
               <div className="flex items-center gap-3">
                 <LogoTile size={40} />
                 <div className="flex flex-col leading-tight">
-                  <span className="text-sm font-semibold text-fg">CloudPrep</span>
+                  <span className="font-serif text-xl font-semibold text-fg">CloudPrep</span>
                   <span className="text-xs text-fg-subtle">CLF-C02 practice</span>
                 </div>
               </div>

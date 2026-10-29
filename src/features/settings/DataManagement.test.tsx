@@ -42,11 +42,13 @@ describe('settings', () => {
   it('offers dark, light and system themes and reduced motion, saved immediately', async () => {
     const store = createTestStore();
     const { user } = await openSettings(store);
-    await user.click(screen.getByRole('radio', { name: 'System' }));
+    // System is the default theme (D-057); choosing another one is saved as a change.
+    expect(screen.getByRole('radio', { name: 'System' })).toBeChecked();
+    await user.click(screen.getByRole('radio', { name: 'Dark' }));
     await user.click(screen.getByRole('radio', { name: 'Reduce' }));
     await user.click(screen.getByRole('switch', { name: 'Low-time warnings' }));
     expect(store.getSnapshot().data.preferenceOverrides).toEqual({
-      theme: 'system',
+      theme: 'dark',
       reducedMotion: 'reduce',
       examTimeWarnings: false,
     });

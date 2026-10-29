@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { RefreshCw, ShieldOff, Users } from 'lucide-react';
 import type { AdminUsersResult } from '@/backend/admin';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
@@ -39,7 +38,6 @@ export function AdminPage() {
     <>
       <PageHeader
         title="Admin"
-        icon={PAGE_ICONS.admin}
         description="Everyone who has signed in, with their activity. Guests aren't recorded; Vercel Analytics shows visit totals."
         actions={
           state.status === 'ok' && (

@@ -14,3 +14,8 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 export function formatDateTime(timestamp: number): string {
   return dateFormatter.format(new Date(timestamp));
 }
+
+/** A duration in whole minutes, rounded up so a started minute counts: "71 min". */
+export function formatMinutes(ms: number): string {
+  return `${Math.max(0, Math.ceil(ms / 60_000))} min`;
+}

@@ -182,4 +182,39 @@ describe('PracticeSessionPage', () => {
     startSession({ questionIds: ['clf-d9-9999'] });
     expect(await screen.findByRole('heading', { name: 'No questions to practise' })).toBeVisible();
   });
+
+  it('AC-V.8 the answer sheet marks checked answers and jumps between questions', async () => {
+    const { user } = startSession({ questionIds: [SINGLE_ID] });
+    await screen.findByRole('heading', { level: 1, name: 'Test session' });
+    const sheet = screen.getByRole('region', { name: 'Answer sheet' });
+    expect(within(sheet).getByText('0 correct · 0 incorrect')).toBeVisible();
+    expect(within(sheet).getByRole('button', { name: 'Question 1, not answered' })).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+
+    await user.click(screen.getByRole('radio', { name: /Trade fixed expense/ }));
+    expect(
+      within(sheet).getByRole('button', { name: 'Question 1, answer chosen, not checked' }),
+    ).toBeVisible();
+
+    await user.click(screen.getByRole('button', { name: 'Check answer' }));
+    expect(within(sheet).getByRole('button', { name: 'Question 1, incorrect' })).toBeVisible();
+    expect(within(sheet).getByText('0 correct · 1 incorrect')).toBeVisible();
+    expect(within(sheet).getByRole('list', { name: 'Legend' })).toHaveTextContent(
+      /Correct.*Incorrect.*Not checked yet.*Current/,
+    );
+  });
+
+  it('AC-V.8 selecting a cell on the answer sheet opens that question', async () => {
+    const { user } = startSession({ questionIds: [SINGLE_ID, MULTI_ID] });
+    await screen.findByRole('heading', { level: 1, name: 'Test session' });
+    const nav = screen.getByRole('navigation', { name: 'Questions in this session' });
+    await user.click(within(nav).getByRole('button', { name: /^Question 2,/ }));
+    expect(screen.getByText('Question 2 of 2')).toBeVisible();
+    expect(within(nav).getByRole('button', { name: /^Question 2,/ })).toHaveAttribute(
+      'aria-current',
+      'step',
+    );
+  });
 });

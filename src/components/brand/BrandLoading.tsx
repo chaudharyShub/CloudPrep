@@ -7,7 +7,7 @@ import { LogoMark } from './LogoMark';
 export function BrandLoading({ message }: { message: string }) {
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
-      <span className="flex size-16 items-center justify-center rounded-xl bg-accent text-on-accent motion-safe:animate-pulse">
+      <span className="flex size-16 items-center justify-center rounded-lg bg-accent text-on-accent motion-safe:animate-pulse">
         <LogoMark size={54} />
       </span>
       <p role="status" className="text-sm text-fg-muted">

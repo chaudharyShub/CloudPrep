@@ -15,24 +15,25 @@ const NODES = [
   [31.5, 24.9],
   [24, 29.9],
 ];
-// Dark theme tokens (src/styles/index.css). Icons are the mark in dark on the accent tile.
-const BG = '#0b0d10';
-const ACCENT = '#4c8dff';
-const MARK = '#0b0d10';
-const FG = '#e6e9ee';
-const MUTED = '#a3abb8';
+// Light theme tokens (src/styles/index.css, D-057). Icons are the white mark on the aubergine tile.
+const BG = '#f3f0f2';
+const ACCENT = '#6a2c5e';
+const MARK = '#ffffff';
+const FG = '#1f1a1e';
+const MUTED = '#5b5158';
 
 const mark = (size) =>
   `<svg width="${size}" height="${size}" viewBox="0 0 48 48" fill="none" stroke="${MARK}" stroke-linecap="round" stroke-linejoin="round"><path d="${CLOUD}" stroke-width="3.4"/><path d="${TRACES}" stroke-width="2.4"/>${NODES.map(([x, y]) => `<circle cx="${x}" cy="${y}" r="3" fill="${MARK}" stroke="none"/>`).join('')}</svg>`;
 
-const inter = readFileSync(
-  `${root}node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2`,
-).toString('base64');
+const font = (path) => readFileSync(`${root}node_modules/${path}`).toString('base64');
+const sans = font('@fontsource-variable/source-sans-3/files/source-sans-3-latin-wght-normal.woff2');
+const serif = font('@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2');
 const page = (body, width, height, background = 'transparent') => `<!doctype html>
 <html><head><style>
-@font-face { font-family: Inter; src: url(data:font/woff2;base64,${inter}) format('woff2'); font-weight: 100 900; }
+@font-face { font-family: SourceSans; src: url(data:font/woff2;base64,${sans}) format('woff2'); font-weight: 200 900; }
+@font-face { font-family: Newsreader; src: url(data:font/woff2;base64,${serif}) format('woff2'); font-weight: 200 800; }
 html, body { margin: 0; width: ${width}px; height: ${height}px; background: ${background}; overflow: hidden; }
-body { font-family: Inter, system-ui, sans-serif; }
+body { font-family: SourceSans, system-ui, sans-serif; }
 </style></head><body>${body}</body></html>`;
 
 /** A square icon: the mark on a tile; `fullBleed` fills the square (iOS and maskable icons). */
@@ -50,9 +51,9 @@ const og = page(
   `<div style="width:1200px;height:630px;box-sizing:border-box;padding:96px;display:flex;flex-direction:column;justify-content:center;gap:40px;background:${BG};color:${FG}">
     <div style="display:flex;align-items:center;gap:28px">
       <div style="width:128px;height:128px;display:flex;align-items:center;justify-content:center;background:${ACCENT};border-radius:30px">${mark(116)}</div>
-      <div style="font-size:84px;font-weight:700;letter-spacing:-0.03em">CloudPrep</div>
+      <div style="font-family:Newsreader,Georgia,serif;font-size:88px;font-weight:600;letter-spacing:-0.01em">CloudPrep</div>
     </div>
-    <div style="font-size:40px;line-height:1.3;font-weight:500;max-width:960px">Practice for the AWS Certified Cloud Practitioner (CLF-C02) exam</div>
+    <div style="font-family:Newsreader,Georgia,serif;font-size:44px;line-height:1.25;font-weight:500;max-width:960px">Practice for the AWS Certified Cloud Practitioner (CLF-C02) exam</div>
     <div style="font-size:26px;color:${MUTED}">Learning mode · timed mock exams · progress tracking · Unofficial practice tool</div>
   </div>`,
   1200,

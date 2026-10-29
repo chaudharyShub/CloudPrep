@@ -87,6 +87,14 @@ Reload the site: admins get an **Admin** link in the navigation, which opens `/a
 
 A deployment renames the page files and removes the old ones. If someone has CloudPrep open during it, opening a page their tab hasn't loaded yet reloads the site once, briefly showing "CloudPrep was updated. Loading the latest version…" (D-053). If the page still can't load (for example offline), "Something went wrong" appears with a **Reload** button. No data is lost either way.
 
+### Testing a branch on a preview link
+
+Every pushed branch and pull request gets its own Vercel **preview deployment** (a separate URL shown on the pull request and in the Vercel dashboard). The live site keeps running `master` until the pull request is merged. Use previews to try a change, or to share it for feedback, before it goes live (for example the 3.0.0 redesign, D-057).
+
+- Previews use the same Supabase project and the same `VITE_` variables as production (set them for the *Preview* environment in Vercel if you scoped them to *Production* only). Data written on a preview is real account data.
+- **Google sign-in on previews:** in Supabase, *Authentication → URL Configuration → Redirect URLs*, add `https://*-<your-vercel-team>.vercel.app/**` (the wildcard that matches your preview URLs; copy the pattern from a preview link). Without it, signing in on a preview returns to the live site instead. Guests can use a preview without this.
+- To go back to the previous interface after a merge, redeploy the `archive/ui-v2` branch or tag `v2.4.0` (Vercel: *Deployments → Promote*, or *Instant Rollback* to the last 2.4.0 deployment). Both are kept on GitHub.
+
 ## Smoke test after each deployment
 
 1. Open the site signed out: you land on the sign-in page, with no errors in the browser console. "Continue as a guest" opens Learning mode.

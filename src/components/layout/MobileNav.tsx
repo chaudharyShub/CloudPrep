@@ -44,10 +44,12 @@ export function MobileNav({
             <Brand onNavigate={close} />
           </div>
           <NavList onNavigate={close} />
-          {renderAccount?.(close)}
-          <div className="flex flex-col gap-2 px-2">
-            <UnofficialNote />
-            <MadeBy />
+          <div className="mt-auto flex flex-col gap-4">
+            {renderAccount?.(close)}
+            <div className="flex flex-col gap-2 px-2">
+              <UnofficialNote />
+              <MadeBy />
+            </div>
           </div>
         </div>
       </Dialog>

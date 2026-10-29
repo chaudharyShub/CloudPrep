@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { makeMultiQuestion, makeQuestion } from '@/test/fixtures/questions';
-import { mistakeIds, practiceStats, recordAnswer, type ProgressMap } from './progress';
+import {
+  mistakeIds,
+  practiceStats,
+  recordAnswer,
+  weakestDomain,
+  WEAKEST_MIN_ANSWERED,
+  type PracticeStats,
+  type ProgressMap,
+} from './progress';
 
 const answer = (questionId: string, isCorrect: boolean, at: number, sessionId: string) => ({
   questionId,
@@ -111,5 +119,50 @@ describe('practiceStats', () => {
   it('ignores progress for questions not in the given list', () => {
     const progress = recordAnswer({}, answer('clf-d4-0001', true, 1, 's1'));
     expect(practiceStats(progress, questions).overall.answeredQuestions).toBe(0);
+  });
+});
+
+describe('weakestDomain', () => {
+  const stats = (answeredQuestions: number, accuracy: number | null): PracticeStats => ({
+    answeredQuestions,
+    correctQuestions: Math.round(answeredQuestions * (accuracy ?? 0)),
+    attempts: answeredQuestions,
+    correctAttempts: 0,
+    accuracy,
+    availableQuestions: 500,
+  });
+  const enough = WEAKEST_MIN_ANSWERED;
+
+  it('AC-V.5 picks the lowest accuracy among domains with enough answers', () => {
+    expect(
+      weakestDomain({
+        D1: stats(enough, 0.84),
+        D2: stats(enough, 0.79),
+        D3: stats(enough + 5, 0.58),
+        D4: stats(enough - 1, 0.1), // too few answers to count
+      }),
+    ).toBe('D3');
+  });
+
+  it('AC-V.5 says nothing until two domains have enough answers', () => {
+    expect(
+      weakestDomain({
+        D1: stats(enough, 0.5),
+        D2: stats(5, 0.1),
+        D3: stats(0, null),
+        D4: stats(0, null),
+      }),
+    ).toBeNull();
+  });
+
+  it('AC-V.5 breaks ties by domain order', () => {
+    expect(
+      weakestDomain({
+        D1: stats(enough, 0.6),
+        D2: stats(enough, 0.6),
+        D3: stats(0, null),
+        D4: stats(0, null),
+      }),
+    ).toBe('D1');
   });
 });
