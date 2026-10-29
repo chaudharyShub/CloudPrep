@@ -12,9 +12,12 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
         only in this browser on this device, and clearing your browsing data removes them. If you
         sign in, they&apos;re saved to your account with Supabase, the service that runs
         CloudPrep&apos;s accounts and database, along with your email address (and your name, with
-        Google). Only you can read your account&apos;s data. This browser also keeps a copy while
-        you&apos;re signed in, which is removed when you sign out. Data from before you signed in is
-        added to your account only if you choose to.
+        Google). Only you can read your answers and results. The person who runs CloudPrep can see a
+        list of accounts with each one&apos;s name, email, sign-in method, sign-up and last activity
+        dates, and how many questions, practice sessions and exams it has done, with the best exam
+        score; never the answers themselves. Guests aren&apos;t listed. This browser also keeps a
+        copy while you&apos;re signed in, which is removed when you sign out. Data from before you
+        signed in is added to your account only if you choose to.
       </>
     ),
   },

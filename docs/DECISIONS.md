@@ -59,6 +59,7 @@
 | D-051 | Docs brought in line with the app; version 2.0.0 | Accepted |
 | D-052 | Review due: spaced-repetition review schedule; version 2.1.0 | Accepted |
 | D-053 | Reload once when a page file is missing after a deploy; version 2.1.1 | Accepted |
+| D-054 | Admin page for signed-in users, access checked in the database; version 2.2.0 | Accepted |
 
 ---
 
@@ -363,3 +364,12 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Rejected:** keeping old files on the host after a deploy (Vercel replaces the whole output, and it would only delay the problem); a service worker that caches every version (the PWA isn't built, PRODUCT_SPEC §4.3); checking for a new version on every navigation (an extra request for every page).
 - **Test note:** WebKit remembers a failed module address within a tab even after a reload, so the E2E test simulates a real deploy: the reloaded page links to the page file under a new name, as a real new version does.
 - **Version:** 2.1.1 (a fix).
+
+### D-054 Admin page for signed-in users; version 2.2.0 (2026-10-29)
+- **Requested by the user:** a dashboard in the same app, on its own route, showing who uses CloudPrep, reachable only by an admin with private credentials.
+- **Scope (user's choice):** signed-in accounts with activity totals: name, email, sign-in method, sign-up date, last sign-in, questions answered and when, practice sessions, exams and best score (proctor-ended attempts are void, D-043, so they don't count). Guests aren't recorded per person; Vercel Analytics (D-048) already gives anonymous visit totals. Logging guests in the database was rejected: new data collection for little gain.
+- **Access (user's choice):** the admin is a normal Google account listed in `public.admins`, checked by the database. A password or secret in the app was rejected: the site is static, so anything in its code is public. The `/admin` page's code is public too, but it holds no data; the data comes only from `admin_user_overview()`, a `security definer` function that raises `42501` unless `auth.uid()` is in `admins`. `admins` has RLS on, no policies and no grants for `anon` or `authenticated`, so nobody can read or change it from the app, admins included; it's edited in the Supabase SQL editor (DEPLOYMENT.md). Execute on the functions is revoked from `public` and `anon`.
+- **App:** `AdminClient` (`src/backend/admin.ts`, an RPC plus a hand-written parser), created in `App.tsx` and provided by `AdminProvider`, like the auth client. `/admin` sits under `RequireAuth`, not under `RequireQuestions`, and isn't in the navigation. A non-admin sees "No admin access". Summary and sorting are pure (`src/domain/admin/users.ts`); "last activity" is the newest of sign-up, sign-in, latest answer and latest exam.
+- **Privacy page:** now says the site owner can see the account list and totals, never answers.
+- **Migration:** `20261029120000_admin_overview.sql`. The app code works before it is applied (the page just shows an error), but apply it with `npm run db:push` before deploying, then add the admin row.
+- **Version:** 2.2.0 (a new feature).

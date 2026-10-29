@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Lock,
   Settings,
+  ShieldCheck,
   TrendingUp,
   type LucideIcon,
 } from 'lucide-react';
@@ -20,4 +21,5 @@ export const PAGE_ICONS = {
   bookmarks: Bookmark,
   settings: Settings,
   privacy: Lock,
+  admin: ShieldCheck,
 } as const satisfies Record<string, LucideIcon>;

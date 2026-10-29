@@ -34,7 +34,11 @@ const SUPABASE_STUB = `
   grant usage on schema auth to anon, authenticated, service_role;
   create table auth.users (
     id uuid primary key,
-    raw_user_meta_data jsonb not null default '{}'
+    email varchar(255),
+    raw_user_meta_data jsonb not null default '{}',
+    raw_app_meta_data jsonb not null default '{}',
+    created_at timestamptz not null default now(),
+    last_sign_in_at timestamptz
   );
   create function auth.uid() returns uuid language sql stable as $$
     select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
@@ -422,6 +426,102 @@ describe('database schema', () => {
 
     await asAdmin();
     await db.query('delete from auth.users where id = $1', [DAVE]);
+  });
+
+  it('AC-A.2 only admins can list users, and nobody can read or change the admin list', async () => {
+    const ERIN = '00000000-0000-4000-8000-0000000000e1';
+    const FRANK = '00000000-0000-4000-8000-0000000000f1';
+    await asAdmin();
+    await db.query(
+      `insert into auth.users (id, email, raw_user_meta_data, raw_app_meta_data, last_sign_in_at)
+       values ($1, 'erin@example.com', '{"full_name": "Erin"}', '{"provider": "google"}', now()),
+              ($2, 'frank@example.com', '{}', '{"provider": "email"}', null)`,
+      [ERIN, FRANK],
+    );
+    await db.query('insert into public.admins (user_id) values ($1)', [ERIN]);
+
+    // Frank's activity: two answers, one practice session, a normal and a proctor-ended exam.
+    await asUser(FRANK);
+    for (const id of ['clf-d1-0001', 'clf-d1-0002']) {
+      await db.query(
+        `insert into public.question_progress (exam_id, question_id, attempts, correct,
+           last_result, first_answered_at, last_answered_at, last_session_id)
+         values ($1, $2, 1, 1, 'correct', now(), now(), 's1')`,
+        [EXAM_ID, id],
+      );
+    }
+    await db.query(
+      `insert into public.practice_sessions (id, exam_id, label, started_at, finished_at, total,
+         answered, correct) values ('p1', $1, 'Mixed', now(), now(), 2, 2, 2)`,
+      [EXAM_ID],
+    );
+    for (const [id, reason, percent] of [
+      ['x1', 'manual', 72.5],
+      ['x2', 'proctor_ended', 95],
+    ] as const) {
+      await db.query(
+        `insert into public.exam_attempts (id, exam_id, kind, bank_version, started_at, ends_at,
+           duration_ms, submitted_at, submit_reason, time_used_ms, benchmark_percent,
+           benchmark_met, summary)
+         values ($1, $2, 'short', 'v1', now() - interval '10 min', now(), 600000, now(), $3,
+           600000, 70, true, $4)`,
+        [id, EXAM_ID, reason, JSON.stringify({ percent })],
+      );
+    }
+
+    // Not an admin: refused, and the admin list is out of reach.
+    await expect(db.query('select * from public.admin_user_overview()')).rejects.toThrow(
+      /Admins only/,
+    );
+    expect((await db.query<{ ok: boolean }>('select public.is_admin() as ok')).rows[0]?.ok).toBe(
+      false,
+    );
+    await expect(count('public.admins')).rejects.toThrow(/permission denied/);
+    await expect(
+      db.query('insert into public.admins (user_id) values ($1)', [FRANK]),
+    ).rejects.toThrow(/permission denied/);
+
+    await asAnon();
+    await expect(db.query('select * from public.admin_user_overview()')).rejects.toThrow(
+      /permission denied/,
+    );
+
+    // An admin sees every account with its totals.
+    await asUser(ERIN);
+    expect((await db.query<{ ok: boolean }>('select public.is_admin() as ok')).rows[0]?.ok).toBe(
+      true,
+    );
+    const { rows } = await db.query<Record<string, unknown>>(
+      'select * from public.admin_user_overview() where user_id = any($1)',
+      [[ERIN, FRANK]],
+    );
+    const byId: Record<string, Record<string, unknown>> = Object.fromEntries(
+      rows.map((row) => [String(row['user_id']), row]),
+    );
+    expect(byId[ERIN]).toMatchObject({
+      email: 'erin@example.com',
+      display_name: 'Erin',
+      provider: 'google',
+      questions_answered: 0,
+      exam_attempts: 0,
+      best_exam_percent: null,
+    });
+    expect(byId[FRANK]).toMatchObject({
+      email: 'frank@example.com',
+      display_name: null,
+      provider: 'email',
+      questions_answered: 2,
+      practice_sessions: 1,
+      exam_attempts: 2,
+    });
+    // The proctor-ended 95% is void, so the best score is 72.5.
+    expect(Number(byId[FRANK]?.['best_exam_percent'])).toBe(72.5);
+    // Admins still can't read or change the admin list through the API.
+    await expect(count('public.admins')).rejects.toThrow(/permission denied/);
+
+    await asAdmin();
+    await db.query('delete from auth.users where id = any($1)', [[ERIN, FRANK]]);
+    expect(await count('public.admins')).toBe(0);
   });
 
   it('AC-B.2 deleting an account removes all of its data', async () => {

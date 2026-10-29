@@ -25,6 +25,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Docs audit (D-051) | Docs brought in line with the app; version 2.0.0 | Done, merged and live |
 | Review due (D-052) | Spaced-repetition review schedule in Learning mode and on the dashboard; version 2.1.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-26) |
 | Reload after a deploy (D-053) | A tab opened before a deploy reloads once instead of showing "Something went wrong"; version 2.1.1; acceptance criteria below | Done, merged and live |
+| Admin page (D-054) | Hidden `/admin` page listing signed-in accounts and their activity, for admins only (checked in the database); version 2.2.0; acceptance criteria below | Done on branch `feature/admin-overview`; needs `npm run db:push` and an admin row before it shows data |
 | Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring, then multi-exam UI) | — |
 
 Changes from the original plan:
@@ -359,6 +360,16 @@ Acceptance criteria (tests are tagged `AC-U.x`):
 - AC-U.3 Vite's `vite:preloadError` event starts the reload, also for files loaded outside the routes, without cancelling the error. Files cancelled because the page is navigating away (`beforeunload`, `pagehide`) never start one.
 - AC-U.4 The route error page shows "CloudPrep was updated. Loading the latest version…" while reloading. If the guard blocks a reload, it shows the error with Reload and says the user may be offline or the site may have been updated. Other errors never reload by themselves.
 - AC-U.5 In the browser, a deploy while the tab is open reloads once and opens the requested page; a file that keeps failing shows the error after one reload, with no loop.
+
+## Admin page (D-054)
+
+Requested by the user on 2026-10-29: a page, in the same app on its own route, to see who uses CloudPrep, only for an admin. Agreed scope: signed-in users with their activity; guests stay anonymous (Vercel Analytics); access by marking the user's Google account as admin in the database, not a password in the app.
+
+Acceptance criteria (tests are tagged `AC-A.x`):
+- AC-A.1 `/admin` is under `RequireAuth` (guests go to sign-in) and isn't in the navigation.
+- AC-A.2 Only accounts in `public.admins` get data: `admin_user_overview()` raises `42501` for everyone else and can't be called by guests; `admins` can't be read or written through the API, even by admins. A signed-in non-admin sees "No admin access" and no user data.
+- AC-A.3 An admin sees totals (users, active in the last 7 days, questions answered, exams taken) and one row per account (name, email, sign-in method, sign-up date, last activity, questions answered, practice sessions, exams, best score without proctor-ended attempts), most recently active first. Load errors show a message with "Try again".
+- AC-A.4 Rows from the server go through a hand-written parser; malformed rows are skipped and bad numbers fall back safely.
 
 ## P10 — Optional features (v1.x, pick à la carte)
 

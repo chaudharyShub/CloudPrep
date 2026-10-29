@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { createBrowserRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
+import { createAdminClient } from '@/backend/createAdminClient';
 import { createAuthClient } from '@/backend/createAuthClient';
 import { createQuestionSource } from '@/backend/createQuestionSource';
 import { createAccountRemote } from '@/backend/createUserDataRemote';
 import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
 import { ToastProvider } from '@/components/ui/Toast';
+import { AdminProvider } from '@/state/AdminProvider';
 import { AuthProvider } from '@/state/AuthProvider';
 import { QuestionBankProvider } from '@/state/QuestionBankProvider';
 import { createQuestionLoader, type QuestionLoader } from '@/state/questionLoader';
@@ -27,6 +29,7 @@ import { routes } from './routes';
 export function App() {
   const [router] = useState(() => createBrowserRouter(routes));
   const [auth] = useState(createAuthClient);
+  const [admin] = useState(createAdminClient);
   const [questions] = useState<QuestionLoader | null>(() => {
     const source = createQuestionSource();
     const cache = createIndexedDbQuestionCache() ?? createMemoryQuestionCache();
@@ -51,9 +54,11 @@ export function App() {
     <AuthProvider client={auth}>
       <UserDataProvider guestStore={guestStore} accounts={accounts}>
         <QuestionBankProvider loader={questions}>
-          <ToastProvider>
-            <RouterProvider router={router} />
-          </ToastProvider>
+          <AdminProvider client={admin}>
+            <ToastProvider>
+              <RouterProvider router={router} />
+            </ToastProvider>
+          </AdminProvider>
         </QuestionBankProvider>
       </UserDataProvider>
     </AuthProvider>

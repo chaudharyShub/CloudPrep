@@ -1,6 +1,6 @@
 # CloudPrep — Test Plan
 
-> Status: **Describes the tests as built** (version 2.1.1) · Last updated: 2026-10-26
+> Status: **Describes the tests as built** (version 2.2.0) · Last updated: 2026-10-29
 > This replaces the first draft of 2026-10-21, which planned spec files and a fixture flag that were never created.
 
 ## 1. Strategy at a glance
@@ -22,7 +22,7 @@ Test philosophy: test behaviour, not implementation. Query by role and label. No
 ## 2. Test data and helpers
 
 - **Test bank** (`src/test/bank.ts`, `src/test/fixtures/`): a small fixture bank for most unit and component tests. `FullExam.test.tsx` and `ExamUnavailable.test.tsx` swap in a generated or tiny bank with `vi.mock` (D-040).
-- **`renderApp(path, options)`** (`src/test/renderApp.tsx`): renders the real routes with an in-memory store, a ready question bank, and a fake sign-in that is signed in by default. Pass `createFakeAuthClient()` for a guest, a loader to test question loading, or `accounts` (`createAccountManager` with `createFakeUserTables`) to test sync and guest data.
+- **`renderApp(path, options)`** (`src/test/renderApp.tsx`): renders the real routes with an in-memory store, a ready question bank, and a fake sign-in that is signed in by default. Pass `createFakeAuthClient()` for a guest, `admin` (`createFakeAdminClient({ admin: true, users })`) for the Admin page, a loader to test question loading, or `accounts` (`createAccountManager` with `createFakeUserTables`) to test sync and guest data.
 - **E2E build:** `npm run test:e2e` builds `dist-e2e/` with `vite build --mode e2e`. That build uses the bundled questions and a fake sign-in that reads `cloudprep-e2e-auth` from `localStorage`; production builds contain neither (D-045, D-046).
 - **E2E fixtures** (`tests/e2e/support/fixtures.ts`): import `test` / `expect` from here. Signed in by default; `test.use({ signedIn: false })` for guests; `test.use({ sync: true })` adds a fake server. Specs that seed storage while signed in use the `cloudprep-account:` keys.
 - **AI proctor:** unit tests use fake readings and devices; E2E tests script the models through `window.__cloudprepProctorAnalyzer`, with Chromium's fake camera and a silent fake microphone (`tests/e2e/fixtures/silence.wav`).
@@ -34,6 +34,7 @@ Test philosophy: test behaviour, not implementation. Query by role and label. No
 | Spec | Covers |
 |---|---|
 | `app-shell.spec.ts` | Every page passes axe (dark and light), not-found page, sidebar vs menu drawer, skip link, keyboard navigation, dialog focus |
+| `admin.spec.ts` | Admin page: guests go to sign-in, non-admins see no data, admins see the user list (AC-A.1–A.3) |
 | `auth.spec.ts` | Guests are sent to sign-in and keep Learning mode; email link request; Google sign-in returns to the page; sign-out (AC-B.6–B.10) |
 | `learning-mode.spec.ts` | Domain practice, checking answers, bookmarks, progress after reload, session summary, keyboard-only answers, phone layout, recovery from corrupt saved progress, old progress shown as review due (AC-R.7) |
 | `exam.spec.ts` | Full exam (answer, flag, review, confirm, results), restore after reload with absolute timing, low-time warnings and auto-submit at zero, expired while closed, mobile layout |
@@ -57,12 +58,12 @@ Projects: `chromium`, `webkit` and `mobile` (Pixel 7) run everything except `@re
 | R-6 Keyboard and axe | `app-shell.spec.ts`, keyboard tests in `learning-mode.spec.ts` and `qa-journeys.spec.ts`, jsx-a11y lint |
 | R-7 Export / import round trip | `transfer.test.ts`, `DataManagement.test.tsx`, `data.spec.ts` |
 | R-8 Corrupt or unavailable storage | `storage.test.ts`, `driver.test.ts`, `examStorage.test.ts`, `historyStorage.test.ts`, `learning-mode.spec.ts` (corrupt progress) |
-| R-9 Users see only their own data | `schema.test.ts` (RLS and grants, AC-B.2, B.3) |
+| R-9 Users see only their own data | `schema.test.ts` (RLS and grants, AC-B.2, B.3; only admins list users, AC-A.2) |
 | R-10 Disclaimer and scoring note | No automated test; checked by hand (§6) |
 
 ## 5. Acceptance-criteria tags
 
-Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`), Review due (`AC-R.x`, D-052) and reloading after a deploy (`AC-U.x`, D-053) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
+Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`), Review due (`AC-R.x`, D-052) reloading after a deploy (`AC-U.x`, D-053) and the admin page (`AC-A.x`, D-054) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
 
 ## 6. Manual checks (each release)
 

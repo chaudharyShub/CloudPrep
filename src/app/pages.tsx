@@ -51,6 +51,9 @@ export const SignInPage = lazy(() =>
 export const AuthCallbackPage = lazy(() =>
   import('@/features/auth/AuthCallbackPage').then((m) => ({ default: m.AuthCallbackPage })),
 );
+export const AdminPage = lazy(() =>
+  import('@/features/admin/AdminPage').then((m) => ({ default: m.AdminPage })),
+);
 export const NotFoundPage = lazy(() =>
   import('@/features/errors/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 );
