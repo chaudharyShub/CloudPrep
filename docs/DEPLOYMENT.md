@@ -56,14 +56,20 @@ Note: free-tier projects pause after about a week without activity; resume them 
 
 ### Admin access (D-054)
 
-The `/admin` page shows signed-in accounts and their activity, only to accounts listed in `public.admins`. After `npm run db:push` has created the table, sign in to the live site once with your Google account, then run this in the Supabase *SQL Editor* (replace the email):
+The `/admin` page shows signed-in accounts and their activity, only to accounts listed in `public.admins`. After `npm run db:push` has created the table, sign in to the live site once with your Google account. Then put your email in `.env.local` (next to `SUPABASE_URL` and `SUPABASE_SECRET_KEY`; several emails can be comma-separated) and run `npm run admin:add` (D-055):
+
+```
+ADMIN_EMAIL=you@example.com
+```
+
+Don't add `ADMIN_EMAIL` to Vercel, and never as `VITE_ADMIN_EMAIL`: the app doesn't use it, and `VITE_` values end up in the public site. Or, without the script, run this in the Supabase *SQL Editor* (replace the email):
 
 ```sql
 insert into public.admins (user_id)
 select id from auth.users where email = 'you@example.com';
 ```
 
-Open `/admin` (refresh if it was already open). To remove an admin: `delete from public.admins where user_id = (select id from auth.users where email = 'you@example.com');`. The table can't be read or changed from the app, only here.
+Reload the site: admins get an **Admin** link in the navigation, which opens `/admin`. To remove an admin: `delete from public.admins where user_id = (select id from auth.users where email = 'you@example.com');`. The table can't be read or changed from the app, only here.
 
 ### 3. Vercel project
 

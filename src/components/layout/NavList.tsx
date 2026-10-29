@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router';
-import { PRIMARY_NAV, SECONDARY_NAV, type NavItem } from '@/app/navigation';
+import { ADMIN_NAV, PRIMARY_NAV, SECONDARY_NAV, type NavItem } from '@/app/navigation';
 import { cn } from '@/lib/cn';
+import { useIsAdmin } from '@/state/AdminProvider';
 
 function NavItemLink({
   item,
@@ -43,6 +44,7 @@ function NavItemLink({
 
 /** Main navigation links. NavLink sets aria-current="page" on the active item. */
 export function NavList({ onNavigate }: { onNavigate?: () => void }) {
+  const isAdmin = useIsAdmin();
   return (
     <nav aria-label="Main" className="flex flex-1 flex-col gap-6">
       <ul className="flex flex-col gap-1">
@@ -54,6 +56,7 @@ export function NavList({ onNavigate }: { onNavigate?: () => void }) {
         {SECONDARY_NAV.map((item) => (
           <NavItemLink key={item.to} item={item} onNavigate={onNavigate} />
         ))}
+        {isAdmin && <NavItemLink item={ADMIN_NAV} onNavigate={onNavigate} />}
       </ul>
     </nav>
   );

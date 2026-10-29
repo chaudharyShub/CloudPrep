@@ -26,6 +26,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Review due (D-052) | Spaced-repetition review schedule in Learning mode and on the dashboard; version 2.1.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-26) |
 | Reload after a deploy (D-053) | A tab opened before a deploy reloads once instead of showing "Something went wrong"; version 2.1.1; acceptance criteria below | Done, merged and live |
 | Admin page (D-054) | Hidden `/admin` page listing signed-in accounts and their activity, for admins only (checked in the database); version 2.2.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-29) |
+| Admin link and `admin:add` (D-055) | Admin link in the navigation for admins only (checked with `is_admin()` in the database); `npm run admin:add` adds the accounts in `ADMIN_EMAIL` from `.env.local`; version 2.3.0; acceptance criteria below | Implemented on `feature/admin-button`; not merged yet. No migration needed |
 | Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring, then multi-exam UI) | — |
 
 Changes from the original plan:
@@ -370,6 +371,15 @@ Acceptance criteria (tests are tagged `AC-A.x`):
 - AC-A.2 Only accounts in `public.admins` get data: `admin_user_overview()` raises `42501` for everyone else and can't be called by guests; `admins` can't be read or written through the API, even by admins. A signed-in non-admin sees "No admin access" and no user data.
 - AC-A.3 An admin sees totals (users, active in the last 7 days, questions answered, exams taken) and one row per account (name, email, sign-in method, sign-up date, last activity, questions answered, practice sessions, exams, best score without proctor-ended attempts), most recently active first. Load errors show a message with "Try again".
 - AC-A.4 Rows from the server go through a hand-written parser; malformed rows are skipped and bad numbers fall back safely.
+
+## Admin link and admin script (D-055)
+
+Requested by the user on 2026-10-29: a button to reach the admin page, and the admin email kept in an env file. Agreed design: the email lives in `.env.local` (never `VITE_`, so never in the public site) and a script adds that account to `public.admins`; the database still decides who is an admin.
+
+Acceptance criteria (tests are tagged `AC-A.x`):
+- AC-A.1 (changed) `/admin` is under `RequireAuth` (guests go to sign-in) and isn't in the navigation for guests or non-admins.
+- AC-A.5 Signed-in admins see an **Admin** link (sidebar and mobile menu) that opens `/admin`; non-admins and guests don't. The app asks `is_admin()`; errors count as "not an admin".
+- AC-A.6 `npm run admin:add` reads `ADMIN_EMAIL` (one or more, comma-separated), `SUPABASE_URL` and `SUPABASE_SECRET_KEY`, adds each matching account to `public.admins` (never removes any), prints the admins, and fails with a clear message if a setting is missing or an email has no account yet. Checked by hand (no automated test: it needs the live project).
 
 ## P10 — Optional features (v1.x, pick à la carte)
 

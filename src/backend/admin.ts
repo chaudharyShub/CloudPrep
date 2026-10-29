@@ -14,10 +14,13 @@ export type AdminUsersResult =
 
 export interface AdminClient {
   fetchUsers(): Promise<AdminUsersResult>;
+  /** Whether the signed-in user is an admin; only decides if the Admin link shows. False on errors. */
+  isAdmin(): Promise<boolean>;
 }
 
 export const unavailableAdminClient: AdminClient = {
   fetchUsers: () => Promise.resolve({ status: 'unavailable' }),
+  isAdmin: () => Promise.resolve(false),
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -91,6 +94,15 @@ export function supabaseAdminClient(getClient: () => Promise<SupabaseClient>): A
           status: 'error',
           message: error instanceof Error ? error.message : 'Something went wrong.',
         };
+      }
+    },
+    async isAdmin() {
+      try {
+        const supabase = await getClient();
+        const response: { data: unknown; error: unknown } = await supabase.rpc('is_admin');
+        return response.error === null && response.data === true;
+      } catch {
+        return false;
       }
     },
   };

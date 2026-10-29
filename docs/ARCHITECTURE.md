@@ -1,6 +1,6 @@
 # CloudPrep — Architecture
 
-> Status: **Describes the code as built** (version 2.2.0) · Last updated: 2026-10-29
+> Status: **Describes the code as built** (version 2.3.0) · Last updated: 2026-10-29
 > This replaces the first draft of 2026-10-21. Reasons for each choice are in DECISIONS.md.
 
 ## 1. Overview
@@ -116,7 +116,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 | `/exam/session`, `/exam/review` | Exam and final review (`ExamLayout`) | Signed in + questions + active exam |
 | `/results/:attemptId`, `/results/:attemptId/review` | Results and answer review | Signed in + questions |
 | `/history`, `/progress` | Exam history, progress | Signed in + questions |
-| `/admin` | Admin overview of signed-in users (not in the navigation, D-054) | Signed in; the database returns data only to admins |
+| `/admin` | Admin overview of signed-in users (D-054; linked in the navigation only for admins, D-055) | Signed in; the database returns data only to admins |
 | `/__ui` | Design-system page (development only) | — |
 | `*` | Not found | — |
 
@@ -256,7 +256,7 @@ Every value is `{ app: "cloudprep", schemaVersion, savedAt, data }`. `decodeArea
 - **Schema:** `supabase/migrations/` (the initial schema, `review_level` on `question_progress` (D-052), and the admin overview (D-054)). Content: `exams`, `exam_domains`, `exam_topics`, `questions`, `question_keys`, `question_revisions`. User data: `profiles` (created on sign-up), `user_preferences`, `question_progress`, `bookmarks`, `practice_sessions`, `exam_attempts` + `exam_attempt_questions`, `active_exams`. Every user-data table has `exam_id`. Admin: `admins` (no API access at all) and two security-definer functions, `is_admin()` and `admin_user_overview()`, which raises error `42501` unless the caller is in `admins`.
 - **Security:** RLS on every table. User tables are limited to `auth.uid()`; deleting an account deletes its data. Guests and users read only published content; only the service role writes it. Grants are set explicitly on top of RLS.
 - **Answers:** `question_keys` is readable for now, because scoring is in the browser. Keeping answers in their own table lets server scoring lock it later (Phase 8 step 5).
-- **Adapters:** `AuthClient` (`auth.ts`, `supabaseAuth.ts`), `QuestionSource` (`questionSource.ts`, `contentRows.ts`), `UserDataRemote` (`userDataRemote.ts`, `userRows.ts`), `AdminClient` (`admin.ts`, an RPC to `admin_user_overview`, provided by `AdminProvider`). Each has a fake for tests.
+- **Adapters:** `AuthClient` (`auth.ts`, `supabaseAuth.ts`), `QuestionSource` (`questionSource.ts`, `contentRows.ts`), `UserDataRemote` (`userDataRemote.ts`, `userRows.ts`), `AdminClient` (`admin.ts`, RPCs to `admin_user_overview` and `is_admin`, provided by `AdminProvider`; `useIsAdmin()` shows the Admin link, D-055). Each has a fake for tests.
 - **Tests:** `src/backend/schema.test.ts` applies the migrations to PGlite with the Supabase roles stubbed and checks RLS, grants, constraints and a sync round trip.
 
 ## 10. Design system
@@ -278,7 +278,7 @@ Every value is `{ app: "cloudprep", schemaVersion, savedAt, data }`. `decodeArea
 ## 12. Security and privacy
 
 - The browser only has the publishable key; RLS protects every row. The secret key is used only by scripts in `.env.local`.
-- Admin access (D-054) is decided in the database, not the app: the `/admin` page's code is public like the rest of the site, but `admin_user_overview()` returns other users' details only to accounts listed in `admins`, which is changed only in the Supabase SQL editor.
+- Admin access (D-054) is decided in the database, not the app: the `/admin` page's code is public like the rest of the site, but `admin_user_overview()` returns other users' details only to accounts listed in `admins`, which is changed only with the secret key: `npm run admin:add` (adds the accounts in `ADMIN_EMAIL` from `.env.local`, D-055) or the Supabase SQL editor. `is_admin()` only decides whether the navigation shows the Admin link; hiding it protects nothing, and the page shows no data to a non-admin anyway. The admin email is never in the app or its env (`VITE_` values are public).
 - Network: the app's own files, Supabase, and Vercel Web Analytics in production (page views only, no cookies).
 - External links use `rel="noopener noreferrer"`. Imported files and server data are untrusted: parsed strictly, rendered as text, never with `dangerouslySetInnerHTML`.
 - Integrity logs store only `{type, at}`. Camera and microphone data are analysed in memory and never stored or sent.

@@ -15,7 +15,7 @@ import { useAdminClient } from '@/state/AdminProvider';
 
 type LoadState = { readonly status: 'loading' } | AdminUsersResult;
 
-/** Signed-in accounts and their activity, for admins only (D-054). Not in the navigation. */
+/** Signed-in accounts and their activity, for admins only (D-054). Linked in the navigation only for admins (D-055). */
 export function AdminPage() {
   const client = useAdminClient();
   const [state, setState] = useState<LoadState>({ status: 'loading' });

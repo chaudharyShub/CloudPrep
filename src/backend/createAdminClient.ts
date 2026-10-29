@@ -28,6 +28,7 @@ export function createAdminClient(): AdminClient {
           users: parseAdminUsers(rows),
         }).fetchUsers();
       },
+      isAdmin: () => Promise.resolve(window.__cloudprepE2EAdmin !== undefined),
     };
   }
   const config = readSupabaseConfig(import.meta.env);

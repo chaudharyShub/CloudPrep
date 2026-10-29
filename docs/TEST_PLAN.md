@@ -1,6 +1,6 @@
 # CloudPrep — Test Plan
 
-> Status: **Describes the tests as built** (version 2.2.0) · Last updated: 2026-10-29
+> Status: **Describes the tests as built** (version 2.3.0) · Last updated: 2026-10-29
 > This replaces the first draft of 2026-10-21, which planned spec files and a fixture flag that were never created.
 
 ## 1. Strategy at a glance
@@ -34,7 +34,7 @@ Test philosophy: test behaviour, not implementation. Query by role and label. No
 | Spec | Covers |
 |---|---|
 | `app-shell.spec.ts` | Every page passes axe (dark and light), not-found page, sidebar vs menu drawer, skip link, keyboard navigation, dialog focus |
-| `admin.spec.ts` | Admin page: guests go to sign-in, non-admins see no data, admins see the user list (AC-A.1–A.3) |
+| `admin.spec.ts` | Admin page: guests go to sign-in, non-admins see no data, admins see the user list (AC-A.1–A.3); only admins get the Admin link (AC-A.5) |
 | `auth.spec.ts` | Guests are sent to sign-in and keep Learning mode; email link request; Google sign-in returns to the page; sign-out (AC-B.6–B.10) |
 | `learning-mode.spec.ts` | Domain practice, checking answers, bookmarks, progress after reload, session summary, keyboard-only answers, phone layout, recovery from corrupt saved progress, old progress shown as review due (AC-R.7) |
 | `exam.spec.ts` | Full exam (answer, flag, review, confirm, results), restore after reload with absolute timing, low-time warnings and auto-submit at zero, expired while closed, mobile layout |
@@ -63,7 +63,7 @@ Projects: `chromium`, `webkit` and `mobile` (Pixel 7) run everything except `@re
 
 ## 5. Acceptance-criteria tags
 
-Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`), Review due (`AC-R.x`, D-052) reloading after a deploy (`AC-U.x`, D-053) and the admin page (`AC-A.x`, D-054) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
+Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`), Review due (`AC-R.x`, D-052) reloading after a deploy (`AC-U.x`, D-053) and the admin page and its link (`AC-A.x`, D-054, D-055) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
 
 ## 6. Manual checks (each release)
 

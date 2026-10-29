@@ -1,7 +1,7 @@
 {
   "name": "cloudprep",
   "private": true,
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Unofficial AWS Certified Cloud Practitioner (CLF-C02) practice exam simulator.",
   "type": "module",
   "engines": {
@@ -30,6 +30,7 @@
     "publish:questions": "node --env-file-if-exists=.env.local scripts/publish-questions.mjs",
     "brand:assets": "node scripts/generate-brand-assets.mjs",
     "check:published": "node --env-file-if-exists=.env.local scripts/check-published.mjs",
+    "admin:add": "node --env-file-if-exists=.env.local scripts/add-admin.mjs",
     "db:push": "supabase db push"
   },
   "dependencies": {

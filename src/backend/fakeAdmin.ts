@@ -8,6 +8,7 @@ export function createFakeAdminClient(
   const calls = { count: 0 };
   return {
     calls,
+    isAdmin: () => Promise.resolve(options.admin === true),
     fetchUsers() {
       calls.count += 1;
       if (options.failWith !== undefined) {
