@@ -2,7 +2,6 @@ import { useMemo, useState, type SyntheticEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Bookmark, CalendarCheck, CircleX, History, Play } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { buttonClasses } from '@/components/ui/buttonStyles';
@@ -122,7 +121,6 @@ export function PracticePage() {
     <>
       <PageHeader
         title="Learning mode"
-        icon={PAGE_ICONS.practice}
         description="Practise by domain or topic. Check each answer as you go and read why every option is right or wrong."
       />
 
@@ -212,7 +210,7 @@ export function PracticePage() {
           </Card>
 
           <section aria-labelledby="by-domain-heading">
-            <h2 id="by-domain-heading" className="text-lg font-semibold text-fg">
+            <h2 id="by-domain-heading" className="font-serif text-2xl font-medium text-fg">
               Practise by domain
             </h2>
             <p className="mt-1 mb-4 text-sm text-fg-muted">
@@ -281,7 +279,7 @@ export function PracticePage() {
           </section>
 
           <section aria-labelledby="review-heading">
-            <h2 id="review-heading" className="mb-4 text-lg font-semibold text-fg">
+            <h2 id="review-heading" className="mb-4 font-serif text-2xl font-medium text-fg">
               Review
             </h2>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -389,7 +387,7 @@ export function PracticePage() {
           </section>
 
           <section aria-labelledby="recent-heading">
-            <h2 id="recent-heading" className="mb-4 text-lg font-semibold text-fg">
+            <h2 id="recent-heading" className="mb-4 font-serif text-2xl font-medium text-fg">
               Recent sessions
             </h2>
             <Card>

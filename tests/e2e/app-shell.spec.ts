@@ -53,6 +53,17 @@ test.describe('pages', () => {
     await expectNoSeriousA11yViolations(page);
   });
 
+  // Pages follow the device by default (System, D-057); the test browser is light, so check dark too.
+  test('dark theme passes axe', async ({ page }) => {
+    await page.goto('/settings');
+    await page.getByRole('radio', { name: 'Dark' }).check();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expectNoSeriousA11yViolations(page);
+    await page.goto('/dashboard');
+    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
+    await expectNoSeriousA11yViolations(page);
+  });
+
   test('unknown routes show the not-found page', async ({ page }) => {
     await page.goto('/nope');
     await expect(page.getByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();

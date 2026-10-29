@@ -1,17 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router';
-import {
-  Bookmark,
-  CalendarCheck,
-  ChevronRight,
-  ClipboardCheck,
-  GraduationCap,
-  History,
-  Target,
-  type LucideIcon,
-} from 'lucide-react';
+import { History, Target } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { PAGE_ICONS } from '@/components/layout/pageIcons';
 import { Badge } from '@/components/ui/Badge';
 import { buttonClasses } from '@/components/ui/buttonStyles';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
@@ -25,12 +15,13 @@ import {
 } from '@/domain/analytics/readiness';
 import { FULL_EXAM } from '@/domain/exam/config';
 import { DOMAINS, EXAM_GUIDE_URL } from '@/domain/exam-guide/clf-c02';
-import { practiceStats } from '@/domain/practice/progress';
+import { practiceStats, weakestDomain } from '@/domain/practice/progress';
 import { reviewOverview } from '@/domain/practice/review';
 import { questionCount, reviewSessionSetup } from '@/features/practice/reviewSession';
 import { SESSION_PATH, sessionState } from '@/features/practice/sessionSetup';
 import { useNow } from '@/hooks/useNow';
-import { formatDateTime, formatPercent } from '@/lib/format';
+import { cn } from '@/lib/cn';
+import { formatDateTime, formatMinutes, formatPercent } from '@/lib/format';
 import type { ExamConfig } from '@/domain/exam/config';
 import {
   useExamAttempts,
@@ -43,7 +34,10 @@ interface QuickAction {
   to: string;
   title: string;
   description: string;
-  icon: LucideIcon;
+  /** Drawn as the page's main suggestion (Review due when something is due). */
+  emphasis?: boolean;
+  /** A count shown as a pill, e.g. questions due. */
+  count?: number;
   /** Router state, e.g. a practice session to start. */
   state?: unknown;
 }
@@ -57,13 +51,11 @@ function examAction(fullAvailable: boolean, shortConfig: ExamConfig | null): Qui
         to: '/exam',
         title: 'Timed mock exam',
         description: `${FULL_EXAM.questionCount} questions · ${FULL_EXAM.durationMs / MINUTE} minutes`,
-        icon: ClipboardCheck,
       }
     : {
         to: '/exam',
         title: 'Timed mock exam (shorter)',
         description: `${shortConfig.questionCount} questions · ${shortConfig.durationMs / MINUTE} minutes`,
-        icon: ClipboardCheck,
       };
 }
 
@@ -72,13 +64,11 @@ const OTHER_ACTIONS: readonly QuickAction[] = [
     to: '/practice',
     title: 'Learning mode',
     description: 'Untimed, with instant feedback and explanations',
-    icon: GraduationCap,
   },
   {
     to: '/bookmarks',
     title: 'Bookmarked questions',
     description: 'Questions you saved for later',
-    icon: Bookmark,
   },
 ];
 
@@ -89,14 +79,14 @@ function reviewAction(due: number, setup: ReturnType<typeof reviewSessionSetup>)
         to: SESSION_PATH,
         title: 'Review due',
         description: `${questionCount(due)} due for review today`,
-        icon: CalendarCheck,
+        emphasis: true,
+        count: due,
         state: sessionState(setup),
       }
     : {
         to: '/practice',
         title: 'Review due',
         description: 'Nothing due for review today',
-        icon: CalendarCheck,
       };
 }
 
@@ -128,32 +118,37 @@ export function DashboardPage() {
     [attempts, preferences.benchmarkPercent],
   );
 
+  const weakest = useMemo(() => weakestDomain(stats.byDomain), [stats]);
+
   return (
     <>
       <PageHeader
         title="Dashboard"
-        icon={PAGE_ICONS.dashboard}
         description="Your AWS Certified Cloud Practitioner (CLF-C02) preparation at a glance."
       />
 
-      <div className="grid gap-6 lg:grid-cols-5">
+      <div className="grid gap-5 lg:grid-cols-5">
         <Card className="lg:col-span-3">
           <CardHeader title="Latest mock exam" description="Your most recent timed exam." />
           {latest && latestScore ? (
             <CardBody>
-              <p className="text-5xl font-semibold text-fg tabular-nums">{latestScore.percent}%</p>
-              <p className="mt-1 text-sm text-fg-muted tabular-nums">
-                {latestScore.correct} of {latestScore.total} correct ·{' '}
-                {latest.kind === 'short' ? 'shorter exam' : 'full exam'} ·{' '}
-                {formatDateTime(latest.submittedAt)}
-              </p>
-              <div className="mt-4">
+              <div className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
+                <p className="font-serif text-7xl leading-none font-medium text-accent-fg tabular-nums">
+                  {latestScore.percent}%
+                </p>
+                <p className="text-fg-muted tabular-nums">
+                  {latestScore.correct} of {latestScore.total} correct
+                </p>
                 <Badge tone={latest.benchmarkMet ? 'success' : 'danger'}>
                   Practice benchmark {latest.benchmarkMet ? 'met' : 'not met'} (
                   {latest.benchmarkPercent}%)
                 </Badge>
               </div>
-              <p className="mt-4 text-sm text-fg-muted">
+              <p className="mt-2 text-sm text-fg-subtle">
+                {latest.kind === 'short' ? 'Shorter exam' : 'Full exam'} ·{' '}
+                {formatDateTime(latest.submittedAt)}
+              </p>
+              <p className="mt-4 text-fg-muted">
                 {readiness.level === 'insufficient-data'
                   ? `Readiness guidance starts after ${MIN_ATTEMPTS_FOR_GUIDANCE} exams (${countedAttempts(attempts).length} so far).`
                   : readiness.level === 'consistent'
@@ -165,18 +160,20 @@ export function DashboardPage() {
               <p className="mt-2 text-xs text-fg-subtle">
                 Unofficial practice score. Official AWS result not predicted or guaranteed.
               </p>
-              <Link
-                to={`/results/${latest.id}`}
-                className={buttonClasses({ variant: 'secondary', className: 'mt-5' })}
-              >
-                View results
-              </Link>
-              <Link
-                to="/progress"
-                className={buttonClasses({ variant: 'ghost', className: 'mt-5 ml-2' })}
-              >
-                See progress
-              </Link>
+              <div className="mt-5 flex flex-wrap gap-2">
+                <Link to="/exam" className={buttonClasses()}>
+                  Start a new mock exam
+                </Link>
+                <Link
+                  to={`/results/${latest.id}`}
+                  className={buttonClasses({ variant: 'secondary' })}
+                >
+                  View results
+                </Link>
+                <Link to="/progress" className={buttonClasses({ variant: 'ghost' })}>
+                  See progress
+                </Link>
+              </div>
             </CardBody>
           ) : (
             <EmptyState
@@ -185,7 +182,7 @@ export function DashboardPage() {
               title="No mock exams yet"
               description="Take a timed mock exam to see your practice score and how each domain is going."
               action={
-                <Link to="/exam" className={buttonClasses({ variant: 'secondary' })}>
+                <Link to="/exam" className={buttonClasses()}>
                   Go to mock exam
                 </Link>
               }
@@ -196,92 +193,115 @@ export function DashboardPage() {
         <Card className="lg:col-span-2">
           <CardHeader title="Quick actions" />
           <CardBody>
-            <ul className="flex flex-col gap-2">
-              {quickActions.map((action) => {
-                const Icon = action.icon;
-                return (
-                  <li key={action.title}>
-                    <Link
-                      to={action.to}
-                      state={action.state}
-                      className="group flex items-center gap-3 rounded-md border border-border bg-surface-2 p-3 transition-colors hover:border-border-strong hover:bg-surface-3"
-                    >
-                      <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-accent-subtle text-accent-fg">
-                        <Icon size={18} strokeWidth={1.75} aria-hidden="true" />
+            <ul className="flex flex-col gap-2.5">
+              {quickActions.map((action) => (
+                <li key={action.title}>
+                  <Link
+                    to={action.to}
+                    state={action.state}
+                    className={cn(
+                      'flex min-h-14 items-center gap-3 rounded-md border px-4 py-2.5 transition-colors',
+                      action.emphasis
+                        ? 'border-accent bg-highlight text-on-highlight hover:bg-highlight-hover'
+                        : 'border-border text-fg hover:bg-surface-2',
+                    )}
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-semibold">{action.title}</span>
+                      <span
+                        className={cn(
+                          'block text-sm',
+                          action.emphasis ? 'text-on-highlight' : 'text-fg-muted',
+                        )}
+                      >
+                        {action.description}
                       </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium text-fg">{action.title}</span>
-                        <span className="block text-sm text-fg-muted">{action.description}</span>
-                      </span>
-                      <ChevronRight
-                        size={18}
-                        strokeWidth={1.75}
+                    </span>
+                    {action.count !== undefined ? (
+                      <span
                         aria-hidden="true"
-                        className="shrink-0 text-fg-subtle group-hover:text-fg-muted"
-                      />
-                    </Link>
-                  </li>
-                );
-              })}
+                        className="shrink-0 rounded-full bg-accent px-2.5 py-0.5 text-sm font-bold text-on-accent tabular-nums"
+                      >
+                        {action.count}
+                      </span>
+                    ) : (
+                      <span aria-hidden="true" className="shrink-0 text-fg-subtle">
+                        →
+                      </span>
+                    )}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </CardBody>
         </Card>
 
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-5">
           <CardHeader
             title="Practice by domain"
             description="Correct uses your most recent answer to each question. Weightings are from the official exam guide."
           />
           <CardBody>
-            <ul className="divide-y divide-border">
+            <ul className="grid gap-3.5 md:grid-cols-2">
               {DOMAINS.map((domain) => {
                 const domainStats = stats.byDomain[domain.id];
+                const isWeakest = weakest === domain.id;
                 return (
-                  <li key={domain.id} className="py-3 first:pt-0 last:pb-0">
-                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-                      <div className="flex min-w-0 items-center gap-2">
-                        <Badge>Domain {domain.number}</Badge>
-                        <span className="text-sm font-medium text-fg">{domain.name}</span>
-                      </div>
-                      <span className="text-sm text-fg-muted tabular-nums">
-                        {domain.weightPercent}% of exam
-                      </span>
+                  <li
+                    key={domain.id}
+                    className={cn(
+                      'rounded-md bg-surface-2 px-4 py-4',
+                      isWeakest && 'shadow-[inset_0_0_0_1.5px_var(--cp-warning)]',
+                    )}
+                  >
+                    <div className="flex items-baseline justify-between gap-3">
+                      <span className="font-semibold text-fg">{domain.name}</span>
+                      {domainStats.answeredQuestions > 0 && (
+                        <span className="font-semibold text-accent-fg tabular-nums">
+                          {formatPercent(domainStats.accuracy)}
+                        </span>
+                      )}
                     </div>
                     {domainStats.answeredQuestions === 0 ? (
-                      <p className="mt-1.5 text-sm text-fg-subtle">No practice answers yet</p>
+                      <p className="mt-2 text-sm text-fg-subtle">No practice answers yet</p>
                     ) : (
-                      <div className="mt-2 flex items-center gap-3">
-                        <ProgressBar
-                          className="flex-1"
-                          tone="success"
-                          label={`${domain.name}: correct`}
-                          value={domainStats.correctQuestions}
-                          max={domainStats.answeredQuestions}
-                          valueText={`${formatPercent(domainStats.accuracy)} correct`}
-                        />
-                        <span className="w-44 shrink-0 text-right text-sm text-fg-muted tabular-nums">
-                          {formatPercent(domainStats.accuracy)} correct ·{' '}
-                          {domainStats.answeredQuestions}/{domainStats.availableQuestions} answered
-                        </span>
-                      </div>
+                      <ProgressBar
+                        className="mt-2.5"
+                        size="md"
+                        label={`${domain.name}: correct`}
+                        value={domainStats.correctQuestions}
+                        max={domainStats.answeredQuestions}
+                        valueText={`${formatPercent(domainStats.accuracy)} correct`}
+                      />
                     )}
+                    <p className="mt-2 text-sm text-fg-muted tabular-nums">
+                      Domain {domain.number} · {domain.weightPercent}% of exam
+                      {domainStats.answeredQuestions > 0 &&
+                        ` · ${String(domainStats.answeredQuestions)}/${String(domainStats.availableQuestions)} answered`}
+                      {isWeakest && (
+                        <>
+                          {' · '}
+                          <strong className="font-semibold text-warning">weakest</strong>
+                        </>
+                      )}
+                    </p>
                   </li>
                 );
               })}
             </ul>
-            <p className="mt-6 text-sm text-fg-muted">
+            <p className="mt-5 text-sm text-fg-muted">
               Source: <ExternalLink href={EXAM_GUIDE_URL}>CLF-C02 exam guide</ExternalLink>
             </p>
           </CardBody>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-5">
           <CardHeader
             title="Recent attempts"
             action={
               attempts.length > 0 && (
                 <Link to="/history" className={buttonClasses({ variant: 'ghost', size: 'sm' })}>
-                  View all
+                  All exam history
                 </Link>
               )
             }
@@ -294,21 +314,23 @@ export function DashboardPage() {
               description="Completed mock exams will be listed here."
             />
           ) : (
-            <ul className="divide-y divide-border px-5 pt-3 pb-2">
-              {attempts.slice(0, 4).map((attempt) => {
-                const score = attempt.summary;
-                return (
-                  <li key={attempt.id} className="py-2.5">
-                    <Link
-                      to={`/results/${attempt.id}`}
-                      className="flex items-center justify-between gap-3 rounded-sm text-sm hover:text-fg"
-                    >
-                      <span className="text-fg-muted">{formatDateTime(attempt.submittedAt)}</span>
-                      <span className="font-medium text-fg tabular-nums">{score.percent}%</span>
-                    </Link>
-                  </li>
-                );
-              })}
+            <ul className="px-5 pt-2 pb-3">
+              {attempts.slice(0, 4).map((attempt) => (
+                <li key={attempt.id} className="border-t border-border first:border-t-0">
+                  <Link
+                    to={`/results/${attempt.id}`}
+                    className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-sm py-3"
+                  >
+                    <span className="font-semibold text-accent-fg">
+                      {formatDateTime(attempt.submittedAt)}
+                    </span>
+                    <span className="text-fg-muted tabular-nums">
+                      {attempt.summary.percent}% · {formatMinutes(attempt.timeUsedMs)} used ·
+                      benchmark {attempt.benchmarkMet ? 'met' : 'not met'}
+                    </span>
+                  </Link>
+                </li>
+              ))}
             </ul>
           )}
         </Card>

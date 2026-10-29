@@ -76,12 +76,13 @@ test('A. first visit: dashboard empty states, navigation, settings survive a ref
   await expect(page.getByText('Not enough data yet')).toBeVisible();
 
   await page.goto('/settings');
-  await page.getByRole('radio', { name: 'Light' }).check();
+  // Dark, because the default (System) already shows light in the test browser.
+  await page.getByRole('radio', { name: 'Dark' }).check();
   await page.getByRole('radio', { name: /Reduce/ }).check();
   await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduce');
-  await expect(page.getByRole('radio', { name: 'Light' })).toBeChecked();
+  await expect(page.getByRole('radio', { name: 'Dark' })).toBeChecked();
 });
 
 test('B. learning mode: single and multiple-response questions, explanations, bookmark, persistence', async ({
@@ -200,6 +201,8 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
     );
   });
 
+  // A dark device, so seeing light proves the saved choice survived the migration.
+  await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/history');
   await page
     .getByRole('link', { name: /Full exam · 65 questions/ })

@@ -186,7 +186,7 @@ export function SegmentedControl<T extends string>({
           {description}
         </p>
       )}
-      <div className="inline-flex max-w-full flex-wrap gap-1 rounded-md border border-border-control bg-surface-2 p-1">
+      <div className="inline-flex max-w-full flex-wrap gap-1 rounded-[1.25rem] border border-border-control bg-surface-2 p-1">
         {options.map((option) => {
           const id = `${name}-${option.value}`;
           return (
@@ -205,9 +205,10 @@ export function SegmentedControl<T extends string>({
               <label
                 htmlFor={id}
                 className={cn(
-                  'pointer-events-none flex h-8 items-center rounded-sm px-3 text-sm font-medium whitespace-nowrap transition-colors',
-                  'text-fg-muted peer-hover:text-fg',
-                  'peer-checked:bg-surface-3 peer-checked:text-fg peer-checked:shadow-[inset_0_0_0_1px_var(--cp-border-strong)]',
+                  'pointer-events-none flex h-8 items-center rounded-full px-3 text-sm font-medium whitespace-nowrap transition-colors',
+                  // Hover only lightens unselected options: selected text must stay on-highlight.
+                  'text-fg-muted peer-[:not(:checked):hover]:text-fg',
+                  'peer-checked:bg-highlight peer-checked:text-on-highlight peer-checked:shadow-[inset_0_0_0_1.5px_var(--cp-accent)]',
                   'peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus',
                 )}
               >

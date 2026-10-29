@@ -27,15 +27,15 @@ export function ExamTimer({ endsAt }: { endsAt: number }) {
   return (
     <div
       className={cn(
-        'flex items-center gap-2 rounded-md border px-3 py-1.5',
-        level === 'none' && 'border-border-strong bg-surface-2 text-fg',
+        'flex items-center gap-2 rounded-full border px-3 py-1.5',
+        level === 'none' && 'border-border bg-surface text-fg [&>svg]:text-accent-fg',
         level === 'low' && 'border-warning/50 bg-warning-subtle text-warning',
         level === 'critical' && 'border-danger/60 bg-danger-subtle text-danger',
       )}
     >
       <Icon size={18} strokeWidth={1.75} aria-hidden="true" className="shrink-0" />
       <span className="sr-only">Time remaining:</span>
-      <span role="timer" className="text-lg font-semibold tabular-nums sm:text-xl">
+      <span role="timer" className="font-mono text-lg font-semibold sm:text-xl">
         {formatClock(remaining)}
       </span>
       {level !== 'none' && <span className="hidden text-xs font-medium md:inline">Low time</span>}

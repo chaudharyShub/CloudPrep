@@ -27,11 +27,11 @@ export function LogoMark({ size = 24, className }: { size?: number; className?: 
   );
 }
 
-/** The mark on its solid accent tile, as in the sidebar and the app icon. */
+/** The mark on its aubergine tile, as in the sidebar and the app icon. */
 export function LogoTile({ size = 32 }: { size?: number }) {
   return (
     <span
-      className="flex shrink-0 items-center justify-center rounded-md bg-accent text-on-accent"
+      className="flex shrink-0 items-center justify-center rounded-sm bg-accent text-on-accent"
       style={{ width: size, height: size }}
     >
       <LogoMark size={Math.round(size * 0.86)} />

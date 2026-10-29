@@ -1,6 +1,6 @@
 # CloudPrep — Architecture
 
-> Status: **Describes the code as built** (version 2.4.0) · Last updated: 2026-10-29
+> Status: **Describes the code as built** (version 3.0.0) · Last updated: 2026-10-29
 > This replaces the first draft of 2026-10-21. Reasons for each choice are in DECISIONS.md.
 
 ## 1. Overview
@@ -43,7 +43,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 | Language | TypeScript 6 (`strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`); `any` is banned by lint |
 | Styling | Tailwind CSS 4 (`@tailwindcss/vite`, CSS-first tokens in `src/styles/index.css`) |
 | Routing | React Router 8, data router (`createBrowserRouter`, `RouterProvider` from `react-router/dom`) |
-| Icons, font | `lucide-react`; Inter Variable via `@fontsource-variable/inter` (self-hosted) |
+| Icons, font | `lucide-react`; Source Sans 3 (text) and Newsreader (headings), both variable, and IBM Plex Mono (answer sheet, numbers) via `@fontsource` (self-hosted, D-057) |
 | Validation | Hand-written parsers (D-005); no schema library |
 | Backend | `@supabase/supabase-js` (loaded in its own chunk), Supabase CLI for migrations |
 | AI proctor | `@mediapipe/tasks-vision` with self-hosted models (D-043) |
@@ -91,7 +91,8 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │  └─ lib/random.ts        # Seeded PRNG and shuffle
 │  ├─ features/               # One folder per area: auth, dashboard, practice, exam (+ integrity/,
 │  │                          # proctor/, components/), results, history, progress, bookmarks,
-│  │                          # settings, privacy, admin (D-054), errors, dev (/__ui), shared (question rendering)
+│  │                          # settings, privacy, admin (D-054), landing (D-057), errors, dev (/__ui),
+│  │                          # shared (question rendering)
 │  ├─ hooks/                  # useNow, useTheme, useDocumentTitle
 │  ├─ lib/                    # theme, format, download, ids, cn, reloadAfterUpdate (D-053)
 │  ├─ state/                  # Providers and hooks (§6)
@@ -107,7 +108,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 
 | Path | Page | Guard |
 |---|---|---|
-| `/` | Redirect to `/dashboard` | — |
+| `/` | Landing page for guests; signed-in users are redirected to `/dashboard` (`HomeRoute`, D-057). Outside `AppLayout`: own header and footer | — |
 | `/practice`, `/practice/session` | Learning mode setup and session | Questions loaded |
 | `/bookmarks` | Bookmarks | Questions loaded |
 | `/settings`, `/privacy` | Settings, privacy | — |
@@ -262,12 +263,13 @@ Every value is `{ app: "cloudprep", schemaVersion, savedAt, data }`. `decodeArea
 
 ## 10. Design system
 
-- **Tokens:** colours, radii and shadows are CSS variables in `src/styles/index.css`, defined for the dark and light themes and exposed to Tailwind with `@theme`. Feature code uses only these tokens and the primitives in `src/components/ui/`. Contrast is checked against WCAG 2.2 AA in both themes (D-024).
-- **Theme:** dark, light or system, applied before first paint by an inline script in `index.html` (D-039) and then by `src/lib/theme.ts`; keep the two in sync.
-- **Brand:** `LogoMark` / `LogoTile` (`src/components/brand/`), page icons from `PAGE_ICONS` (D-050).
+- **Tokens:** colours, radii and shadows are CSS variables in `src/styles/index.css`, defined for the dark and light themes and exposed to Tailwind with `@theme`. Feature code uses only these tokens and the primitives in `src/components/ui/`. Contrast is checked against WCAG 2.2 AA in both themes (D-024): `src/styles/tokens.test.ts` checks every token pair, and axe runs in the E2E tests.
+- **Look (D-057, "study notes in aubergine"):** rounded cards (`rounded-lg`, 18px), pill buttons, badges and nav items (`rounded-full`), Source Sans 3 for text, Newsreader (`font-serif`) for page, card and dialog titles, IBM Plex Mono (`font-mono`, tabular numbers) for numbers and the exam's answer sheet, which keeps the exam-paper look (square cells, `ink` hairline). Colour roles: `accent` (aubergine: text, links, borders, fills under `on-accent`), `highlight` / `on-highlight` (soft tint for selected and active states), `primary` / `on-primary` (main buttons), `meter` (progress fills), `flag` / `flag-border` / `on-flag` (flagged questions, orange), `ink` (answer-sheet hairlines), blue `focus`. Dark mode is true black (`#000000`) with neutral grey layers and a lighter aubergine.
+- **Theme:** system (the default, D-057), dark or light, applied before first paint by an inline script in `index.html` (D-039) and then by `src/lib/theme.ts`; keep the two in sync.
+- **Brand:** `LogoMark` / `LogoTile` (`src/components/brand/`), an aubergine tile (D-050, D-057). Navigation and page titles have no icons since D-057.
 - **Layout:** sidebar from 1024 px, otherwise a top bar and drawer; content up to the `max-w-content` width. The exam layout has no sidebar: a header with the timer, then the exam page with "Question n of 65", the question grid and a link to the final review.
 - **Controls:** native radio and checkbox inputs in a `<fieldset>`, native `<dialog>` with `showModal()`, native buttons and links (D-014). Every interactive element has a visible focus style and an accessible name.
-- **Motion:** short colour and opacity transitions, off under `prefers-reduced-motion` or the setting.
+- **Motion:** short colour and opacity transitions, off under `prefers-reduced-motion` or the setting. The landing page alone adds `animate-rise`, `hover-lift` (utilities in `index.css`) and `useReveal` / `useExamDemo` (`src/features/landing/motion.ts`); the reduce-motion rules also remove animation delays and the hover lift.
 
 ## 11. Error handling
 

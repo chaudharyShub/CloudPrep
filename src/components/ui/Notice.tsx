@@ -5,7 +5,7 @@ import { cn } from '@/lib/cn';
 export type NoticeTone = 'info' | 'success' | 'warning' | 'danger';
 
 const tones: Record<NoticeTone, { icon: LucideIcon; box: string; iconClass: string }> = {
-  info: { icon: Info, box: 'border-accent/30 bg-accent-subtle', iconClass: 'text-accent-fg' },
+  info: { icon: Info, box: 'border-info/40 bg-info-subtle', iconClass: 'text-info' },
   success: {
     icon: CircleCheck,
     box: 'border-success/30 bg-success-subtle',

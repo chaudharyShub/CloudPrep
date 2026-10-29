@@ -31,6 +31,8 @@ export default defineConfig({
     // 5 s limit made random tests time out (D-049). Assertions are unchanged.
     testTimeout: 15_000,
     include: ['src/**/*.test.{ts,tsx}'],
+    // Let the token contrast test read the real stylesheet (Vitest blanks other CSS).
+    css: { include: [/src\/styles\/index\.css/] },
     restoreMocks: true,
     coverage: {
       provider: 'v8',

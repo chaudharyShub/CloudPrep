@@ -11,7 +11,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <meta name="theme-color" content="#0b0d10" />
+    <meta name="theme-color" content="#000000" />
     <!-- Link previews (D-050). %SITE_URL% is the production address on Vercel (vite.config.ts). -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="CloudPrep" />
@@ -41,13 +41,17 @@
             ? 'cloudprep-account:cloudprep:preferences'
             : 'cloudprep:preferences';
         var saved = JSON.parse(localStorage.getItem(key) || 'null');
-        var theme = saved && saved.data && saved.data.theme;
+        // No saved choice means the default, "system" (src/storage/preferencesArea.ts).
+        var theme = (saved && saved.data && saved.data.theme) || 'system';
         if (theme === 'system') {
           theme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
         }
         if (theme === 'light') document.documentElement.setAttribute('data-theme', 'light');
       } catch (e) {
-        // Storage unavailable or unreadable: keep the default dark theme.
+        // Storage unavailable or unreadable: follow the device, like the app does.
+        if (matchMedia('(prefers-color-scheme: light)').matches) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
       }
     </script>
   </head>

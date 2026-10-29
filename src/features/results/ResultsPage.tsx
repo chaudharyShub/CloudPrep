@@ -100,7 +100,9 @@ function Results({ attempt }: { attempt: ExamAttempt }) {
         <Card className="lg:col-span-2">
           <CardHeader title="Practice score" />
           <CardBody>
-            <p className="text-5xl font-semibold text-fg tabular-nums">{summary.percent}%</p>
+            <p className="font-serif text-7xl leading-none font-medium text-accent-fg tabular-nums">
+              {summary.percent}%
+            </p>
             <p className="mt-1 text-sm text-fg-muted tabular-nums">
               {summary.correct} of {summary.total} questions correct
             </p>

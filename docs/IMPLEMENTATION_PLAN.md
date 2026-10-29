@@ -26,8 +26,9 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Review due (D-052) | Spaced-repetition review schedule in Learning mode and on the dashboard; version 2.1.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-26) |
 | Reload after a deploy (D-053) | A tab opened before a deploy reloads once instead of showing "Something went wrong"; version 2.1.1; acceptance criteria below | Done, merged and live |
 | Admin page (D-054) | Hidden `/admin` page listing signed-in accounts and their activity, for admins only (checked in the database); version 2.2.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-29) |
-| Admin link and `admin:add` (D-055) | Admin link in the navigation for admins only (checked with `is_admin()` in the database); `npm run admin:add` adds the accounts in `ADMIN_EMAIL` from `.env.local`; version 2.3.0; acceptance criteria below | Implemented on `feature/admin-button`; not merged yet. No migration needed |
-| Developer credit (D-056) | "Made by Shubham Chaudhary" with a portfolio link in the sidebar and mobile menu, and a "Who runs CloudPrep" section on the Privacy page; version 2.4.0; acceptance criteria below | Implemented on `feature/developer-credit` (built on `feature/admin-button`); not merged yet |
+| Admin link and `admin:add` (D-055) | Admin link in the navigation for admins only (checked with `is_admin()` in the database); `npm run admin:add` adds the accounts in `ADMIN_EMAIL` from `.env.local`; version 2.3.0; acceptance criteria below | Done and merged (PR #13) |
+| UI redesign (D-057) | "Study notes in aubergine" with an exam-paper answer sheet and a true-black dark mode; landing page at `/`; old UI kept on `archive/ui-v2` (tag `v2.4.0`); version 3.0.0 | Implemented on branch `ui/redesign`; to be merged into `master` by pull request after the user approves (old UI stays on `archive/ui-v2` / `v2.4.0`) |
+| Developer credit (D-056) | "Made by Shubham Chaudhary" with a portfolio link in the sidebar and mobile menu, and a "Who runs CloudPrep" section on the Privacy page; version 2.4.0; acceptance criteria below | Done and merged (PR #14) |
 | Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring, then multi-exam UI) | — |
 
 Changes from the original plan:
@@ -389,6 +390,32 @@ Requested by the user on 2026-10-29: show the developer's name and portfolio lin
 Acceptance criteria (tests are tagged `AC-D.x`):
 - AC-D.1 The sidebar and mobile menu show "Made by Shubham Chaudhary" under the unofficial note; the name links to https://shubhamworks.vercel.app/ in a new tab (`rel="noopener noreferrer"`).
 - AC-D.2 The Privacy page has a "Who runs CloudPrep" section with the same link.
+
+## UI redesign (D-057)
+
+Requested by the user on 2026-10-29: make CloudPrep look like a product made by a person, add a landing page, keep the current UI until the new one has been tested in production. Direction chosen from mockups: "Study notes in aubergine" (B2), with the exam's question grid in the "exam paper" style (A), and a true-black dark mode.
+
+Branches: `archive/ui-v2` and tag `v2.4.0` keep the old UI (both on GitHub, never changed). All five steps were built together on `ui/redesign`, which goes into `master` as 3.0.0 through a pull request the user merges, after testing it on the branch's Vercel preview. (The `redesign` integration branch from the original plan isn't needed.)
+
+| Step | Scope | Status |
+|---|---|---|
+| 1 | Tokens (both palettes, colour roles, radii), fonts (Source Sans 3, Newsreader, IBM Plex Mono), shared components (`Button` pills, `Card`, serif `CardHeader` and `Dialog` titles, `Badge`, `Notice`, `ProgressBar`, `Switch`, `SegmentedControl`, logo tile), brand icons and link preview | Implemented |
+| 2 | Sidebar (pill navigation, no icons), mobile menu, account block, serif page headers, exam header (logo, pill timer, progress line) | Implemented |
+| 3 | Pages: dashboard (with a "weakest" domain tag and the time used in Recent attempts), Learning mode, exam (answer sheet in the exam-paper style) and results, then the rest | Implemented |
+| 4 | Landing page at `/` for guests; signed-in users go to the dashboard | Implemented |
+| 5 | Product wording in CLAUDE.md, PRODUCT_SPEC and README; version 3.0.0 | Implemented |
+
+Acceptance criteria (tests are tagged `AC-V.x`):
+- AC-V.1 Every text colour token is at least 4.5:1 on `bg`, `surface` and `surface-2`, every on-fill pair (on-accent, on-highlight, on-primary, on-danger, on-flag) is at least 4.5:1, and control borders, meters, focus, ink and the flag border are at least 3:1 against what they sit on, in both themes (`src/styles/tokens.test.ts`).
+- AC-V.2 Every page still passes axe with no serious or critical issues in both themes, and all existing tests pass unchanged (behaviour is not changed by a restyle).
+- AC-V.3 Fonts are Source Sans 3, Newsreader and IBM Plex Mono, self-hosted (no third-party font requests); cards are rounded, buttons and badges are pills; the exam's answer sheet keeps square cells and mono numbers.
+- AC-V.4 Static brand files (favicon, app icons, link preview, manifest, `theme-color`) use the new palette, and `brandAssets.test.ts` still passes.
+- AC-V.5 The dashboard tags the weakest practice domain only once at least two domains have 20 answers each; it is the one with the lowest accuracy (`weakestDomain`).
+- AC-V.6 Recent attempts on the dashboard show the time used, in whole minutes rounded up.
+- AC-V.8 Learning mode sessions show an answer sheet like the exam's: one cell per question marked correct, incorrect, chosen but not checked, or not answered (each with its own icon and label), the current question, a summary and a legend; selecting a cell opens that question.
+- AC-V.9 The landing page animates lightly (hero entrance, the demo question picking an answer and counting down, sections and domain bars revealing on scroll, hover lift), ends with everything visible and passing axe, and shows everything at once with no movement under reduced motion.
+- AC-V.10 The default theme is System (follows the device); a saved choice (Dark or Light) still wins, both in the app and in `index.html`'s before-paint script; both themes pass axe.
+- AC-V.7 Guests opening `/` see the landing page (one h1, "Start learning" to `/practice`, "Sign in", the unofficial note) and it passes axe; signed-in users are sent to `/dashboard`.
 
 ## P10 — Optional features (v1.x, pick à la carte)
 

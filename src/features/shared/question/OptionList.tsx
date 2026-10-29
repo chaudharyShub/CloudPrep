@@ -69,11 +69,13 @@ export function OptionList({
               <label
                 htmlFor={inputId}
                 className={cn(
-                  'flex gap-3 rounded-md border p-4 transition-colors',
+                  'relative flex items-start gap-4 rounded-md border p-4 transition-colors sm:px-5',
                   !isChecked && 'cursor-pointer',
                   !isChecked && !isSelected && 'hover:border-border-strong hover:bg-surface-2',
                   !isChecked &&
-                    (isSelected ? 'border-accent bg-accent-subtle' : 'border-border bg-surface'),
+                    (isSelected
+                      ? 'border-accent bg-highlight shadow-[inset_0_0_0_1px_var(--cp-accent)]'
+                      : 'border-border bg-surface'),
                   isChecked && isCorrectOption && 'border-success/60 bg-success-subtle',
                   isChecked &&
                     outcome === 'incorrect-selected' &&
@@ -92,14 +94,24 @@ export function OptionList({
                   onChange={() => {
                     onToggle(optionId);
                   }}
-                  className="mt-0.5 size-4 shrink-0 accent-accent focus-visible:outline-none"
+                  // Invisible but covering the whole row, so it is what gets clicked and focused.
+                  className="absolute inset-0 m-0 size-full cursor-pointer opacity-0 disabled:cursor-default"
                 />
-                <span className="min-w-0 flex-1">
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    'flex size-8 shrink-0 items-center justify-center text-sm font-bold',
+                    inputType === 'radio' ? 'rounded-full' : 'rounded-sm',
+                    isSelected
+                      ? 'bg-accent text-on-accent'
+                      : 'border-[1.5px] border-border-strong text-fg-muted',
+                  )}
+                >
+                  {letter}
+                </span>
+                <span className="min-w-0 flex-1 pt-1">
                   <span className="flex flex-wrap items-start gap-x-3 gap-y-1">
-                    <span className="text-fg">
-                      <span className="mr-2 font-medium text-fg-subtle" aria-hidden="true">
-                        {letter}.
-                      </span>
+                    <span className={cn('text-[1.0625rem] text-fg', isSelected && 'font-semibold')}>
                       {option.text}
                     </span>
                     {label && (
