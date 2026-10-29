@@ -3,7 +3,7 @@ import { Menu } from 'lucide-react';
 import { IconButton } from '@/components/ui/Button';
 import { Dialog } from '@/components/ui/Dialog';
 import { cn } from '@/lib/cn';
-import { Brand, UnofficialNote } from './Brand';
+import { Brand, MadeBy, UnofficialNote } from './Brand';
 import { NavList } from './NavList';
 
 /** Top bar with a menu button that opens the navigation drawer (<1024px). */
@@ -45,8 +45,9 @@ export function MobileNav({
           </div>
           <NavList onNavigate={close} />
           {renderAccount?.(close)}
-          <div className="px-2">
+          <div className="flex flex-col gap-2 px-2">
             <UnofficialNote />
+            <MadeBy />
           </div>
         </div>
       </Dialog>

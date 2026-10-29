@@ -1,6 +1,6 @@
 # CloudPrep — Architecture
 
-> Status: **Describes the code as built** (version 2.3.0) · Last updated: 2026-10-29
+> Status: **Describes the code as built** (version 2.4.0) · Last updated: 2026-10-29
 > This replaces the first draft of 2026-10-21. Reasons for each choice are in DECISIONS.md.
 
 ## 1. Overview
@@ -68,6 +68,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │  ├─ routes.tsx           # Route table and guards
 │  │  ├─ pages.tsx            # Lazy page imports (one chunk per page)
 │  │  ├─ navigation.ts        # Sidebar / mobile navigation items
+│  │  ├─ developer.ts         # Developer name and portfolio URL for the credit (D-056)
 │  │  └─ layouts/             # RootLayout (watchers, theme), AppLayout (sidebar / drawer), ExamLayout
 │  ├─ backend/                # Supabase adapters behind interfaces, row types and mappers, fakes
 │  │                          # auth.ts, supabaseAuth.ts, questionSource.ts, contentRows.ts,

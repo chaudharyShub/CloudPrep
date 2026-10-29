@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/cn';
-import { Brand, UnofficialNote } from './Brand';
+import { Brand, MadeBy, UnofficialNote } from './Brand';
 import { NavList } from './NavList';
 
 /** Persistent desktop sidebar (≥1024px). Smaller screens use MobileNav instead. */
@@ -17,8 +17,9 @@ export function Sidebar({ className, account }: { className?: string; account?: 
       </div>
       <NavList />
       {account}
-      <div className="px-2">
+      <div className="flex flex-col gap-2 px-2">
         <UnofficialNote />
+        <MadeBy />
       </div>
     </div>
   );
