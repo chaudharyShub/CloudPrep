@@ -156,6 +156,13 @@ Saved attempts keep the exact wording you answered (question archive), so editin
 - `docs/KNOWN_LIMITATIONS.md`: what it can't do
 - `docs/CONTENT_REVIEW.md`: question review checklist
 
+## License
+
+- **Code:** [MIT](LICENSE).
+- **Questions** (`src/content/`, and the same questions served by the live site): [CC BY-NC-SA 4.0](LICENSE-CONTENT.md). Free to share and adapt with credit, not for commercial use, and under the same license.
+
+The questions were written with AI assistance from public AWS documentation and the official exam guide, then edited and checked against the pages they cite. They aren't copied from the real exam or other question banks.
+
 ## Made by
 
 - **Credit:** the sidebar, mobile menu and landing page footer say "Made by Shubham Chaudhary", linking to [his portfolio](https://shubhamworks.vercel.app/); under it, "Also by me: Frontend Interview Prep" links to the developer's [frontend interview practice site](https://frontend-interview-prod.vercel.app/); the Privacy page says who runs the site and mentions both.

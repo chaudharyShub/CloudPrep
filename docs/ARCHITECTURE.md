@@ -1,6 +1,6 @@
 # CloudPrep — Architecture
 
-> Status: **Describes the code as built** (version 3.2.0) · Last updated: 2026-10-31
+> Status: **Describes the code as built** (version 3.3.0) · Last updated: 2026-10-31
 > This replaces the first draft of 2026-10-21. Reasons for each choice are in DECISIONS.md.
 
 ## 1. Overview
@@ -56,6 +56,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 ```
 /
 ├─ CLAUDE.md, README.md
+├─ LICENSE, LICENSE-CONTENT.md  # MIT for the code; CC BY-NC-SA 4.0 for the questions in src/content/ (D-061)
 ├─ docs/                      # This folder; images/ holds the README screenshots (D-060)
 ├─ public/                    # favicon, app icons, manifest, og-image; proctor/ is generated (git-ignored)
 ├─ scripts/                   # validate-questions, publish-questions, check-published, check-references,

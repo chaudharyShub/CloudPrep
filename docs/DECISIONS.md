@@ -66,6 +66,7 @@
 | D-058 | An "i" explanation (toggletip) beside "Review due", version 3.1.0 | Accepted (live, PR #19) |
 | D-059 | Link to the developer's Frontend Interview Prep site under the credit; version 3.2.0 | Accepted (live, PR #21) |
 | D-060 | README refresh: header, badges, screenshots in `docs/images/` | Accepted |
+| D-061 | Open source: MIT for the code, CC BY-NC-SA 4.0 for the questions, with an AI-assistance note; version 3.3.0 | Accepted (not merged yet) |
 
 ---
 
@@ -434,3 +435,12 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Decision:** a centered header (logo, one-line pitch, live-site button, shields.io badges, quick links), the AWS disclaimer as a GitHub note, an at-a-glance strip matching the landing page's metrics, and three screenshots: the landing page, Learning mode with feedback (light) and a mock exam (dark). "What it does" keeps every bullet word for word, grouped under Practise, Accounts and your data, Practice integrity, Design and For the site owner; the credit moved to a "Made by" section with the Frontend Interview Prep link. One fact was fixed: the tech stack still named Inter, replaced in D-057.
 - **Screenshots:** 1280×800 at 2× from the E2E build (fake sign-in, reduced motion), stored in `docs/images/`. They show the UI as of 3.2.0; retake them after a visible UI change.
 - **Not added:** a GIF or video (large files in the repo), a dashboard shot (a new account shows mostly empty states).
+
+## D-061 — Open source licences
+
+- **Context:** the repo was public on GitHub with no licence, which means "all rights reserved": readable, but nobody may reuse it. The user wanted to open-source it while keeping the question bank from being sold or put behind a paywall. Similar projects (CloudCertPrep) are MIT for everything, so their banks can be copied freely.
+- **Decision:** the code is MIT (`LICENSE`); the questions in `src/content/`, and the same questions served from the database, are CC BY-NC-SA 4.0 (`LICENSE-CONTENT.md`): share and adapt with credit, non-commercial, same licence. `package.json` says `MIT`; the README's License section and `LICENSE-CONTENT.md` give the split.
+- **Honest authorship (user's request):** the questions were written with AI assistance from public AWS documentation and the exam guide, then selected, edited and checked by the project. `LICENSE-CONTENT.md`, the README and a new Privacy page section ("Licence and how the questions were made") say so. The licence covers the wording, explanations, selection and arrangement only to the extent they are protected; AWS facts belong to no one. Copyright in AI-assisted text is unsettled, so enforcement may be limited.
+- **Checked before publishing:** no secrets in the git history (`google_user_content.json` is git-ignored and was never committed; only `.env.example` is tracked).
+- **Not done:** contribution guidelines (`CONTRIBUTING.md`); the user hasn't decided whether to accept contributions.
+- **Version:** 3.3.0.
