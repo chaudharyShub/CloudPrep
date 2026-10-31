@@ -63,7 +63,7 @@
 | D-055 | Admin link for admins only; admin email in `.env.local` added by a script; version 2.3.0 | Accepted |
 | D-056 | Developer credit with a portfolio link; version 2.4.0 | Accepted |
 | D-057 | UI redesign "Study notes in aubergine" (with an exam-paper answer sheet), landing page, version 3.0.0; old UI kept on `archive/ui-v2` | Accepted (live, PR #15) |
-| D-058 | An "i" explanation (toggletip) beside "Review due", version 3.1.0 | Accepted (not merged yet) |
+| D-058 | An "i" explanation (toggletip) beside "Review due", version 3.1.0 | Accepted (live, PR #19) |
 
 ---
 
