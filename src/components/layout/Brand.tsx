@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { DEVELOPER } from '@/app/developer';
+import { DEVELOPER, FRONTEND_PREP } from '@/app/developer';
 import { LogoTile } from '@/components/brand/LogoMark';
 import { ExternalLink } from '@/components/ui/ExternalLink';
 
@@ -29,14 +29,22 @@ export function UnofficialNote() {
   );
 }
 
-/** Credit for the developer, under the unofficial note (D-056). */
+/** Credit for the developer (D-056) and a link to their other practice site (D-059). */
 export function MadeBy() {
   return (
-    <p className="text-xs text-fg-subtle">
-      Made by{' '}
-      <ExternalLink href={DEVELOPER.url} className="font-normal">
-        {DEVELOPER.name}
-      </ExternalLink>
-    </p>
+    <div className="space-y-1 text-xs text-fg-subtle">
+      <p>
+        Made by{' '}
+        <ExternalLink href={DEVELOPER.url} className="font-normal">
+          {DEVELOPER.name}
+        </ExternalLink>
+      </p>
+      <p>
+        Also by me:{' '}
+        <ExternalLink href={FRONTEND_PREP.url} className="font-normal">
+          {FRONTEND_PREP.name}
+        </ExternalLink>
+      </p>
+    </div>
   );
 }

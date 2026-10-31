@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { DEVELOPER } from '@/app/developer';
+import { DEVELOPER, FRONTEND_PREP } from '@/app/developer';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ExternalLink } from '@/components/ui/ExternalLink';
@@ -127,7 +127,9 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
       <>
         CloudPrep is a personal project built and run by{' '}
         <ExternalLink href={DEVELOPER.url}>{DEVELOPER.name}</ExternalLink>. It is not an AWS
-        product.
+        product. The same developer also made{' '}
+        <ExternalLink href={FRONTEND_PREP.url}>{FRONTEND_PREP.name}</ExternalLink>, a practice site
+        for React and JavaScript interview questions.
       </>
     ),
   },

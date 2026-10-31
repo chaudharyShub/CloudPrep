@@ -1,10 +1,11 @@
 import { screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { DEVELOPER } from '@/app/developer';
+import { DEVELOPER, FRONTEND_PREP } from '@/app/developer';
 import { createFakeAuthClient } from '@/backend/fakeAuth';
 import { renderApp } from '@/test/renderApp';
 
 const CREDIT = new RegExp(`^${DEVELOPER.name}`);
+const OTHER_SITE = new RegExp(`^${FRONTEND_PREP.name}`);
 
 describe('Developer credit', () => {
   it('AC-D.1 the navigation footer links the developer’s portfolio in a new tab', async () => {
@@ -22,5 +23,34 @@ describe('Developer credit', () => {
     expect(await screen.findByRole('heading', { name: 'Who runs CloudPrep' })).toBeVisible();
     const main = screen.getByRole('main');
     expect(within(main).getByRole('link', { name: CREDIT })).toHaveAttribute('href', DEVELOPER.url);
+  });
+
+  it('AC-D.3 the navigation footer links Frontend Interview Prep in a new tab, under the credit', async () => {
+    renderApp('/dashboard', { auth: createFakeAuthClient() });
+    await screen.findByRole('heading', { level: 1 });
+    const [link] = screen.getAllByRole('link', { name: OTHER_SITE });
+    expect(link).toHaveAttribute('href', FRONTEND_PREP.url);
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(link?.closest('p')).toHaveTextContent(`Also by me: ${FRONTEND_PREP.name}`);
+  });
+
+  it('AC-D.3 the landing page footer shows the same link to guests', async () => {
+    renderApp('/', { auth: createFakeAuthClient() });
+    await screen.findByRole('heading', { level: 1 });
+    expect(screen.getByRole('link', { name: OTHER_SITE })).toHaveAttribute(
+      'href',
+      FRONTEND_PREP.url,
+    );
+  });
+
+  it('AC-D.4 the Privacy page mentions Frontend Interview Prep under who runs CloudPrep', async () => {
+    renderApp('/privacy', { auth: createFakeAuthClient() });
+    await screen.findByRole('heading', { name: 'Who runs CloudPrep' });
+    const main = screen.getByRole('main');
+    expect(within(main).getByRole('link', { name: OTHER_SITE })).toHaveAttribute(
+      'href',
+      FRONTEND_PREP.url,
+    );
   });
 });
