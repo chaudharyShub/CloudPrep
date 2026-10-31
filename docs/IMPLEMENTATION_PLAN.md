@@ -28,8 +28,8 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Admin page (D-054) | Hidden `/admin` page listing signed-in accounts and their activity, for admins only (checked in the database); version 2.2.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-29) |
 | Admin link and `admin:add` (D-055) | Admin link in the navigation for admins only (checked with `is_admin()` in the database); `npm run admin:add` adds the accounts in `ADMIN_EMAIL` from `.env.local`; version 2.3.0; acceptance criteria below | Done and merged (PR #13) |
 | UI redesign (D-057) | "Study notes in aubergine" with an exam-paper answer sheet and a true-black dark mode; landing page at `/`; old UI kept on `archive/ui-v2` (tag `v2.4.0`); version 3.0.0 | Done, merged (PR #15) and live; old UI kept on `archive/ui-v2` / `v2.4.0` |
-| Headline highlight and light default (D-057) | "sit the exam." on the theme's selection tint; Light is the default theme; version 3.0.1 | Merged into `master` (PR #18) |
-| Review due "i" explanation (D-058) | An "i" button beside Review due that explains the schedule; version 3.1.0 | Implemented on `ui/review-due-info`; `npm run check` passes; not merged yet |
+| Headline highlight and light default (D-057) | "sit the exam." on the theme's selection tint; Light is the default theme; version 3.0.1 | Done, merged and live (PR #18) |
+| Review due "i" explanation (D-058) | An "i" button beside Review due that explains the schedule; version 3.1.0 | Done, merged and live (PR #19) |
 | Developer credit (D-056) | "Made by Shubham Chaudhary" with a portfolio link in the sidebar and mobile menu, and a "Who runs CloudPrep" section on the Privacy page; version 2.4.0; acceptance criteria below | Done and merged (PR #14) |
 | Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring, then multi-exam UI) | — |
 
