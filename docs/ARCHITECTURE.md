@@ -56,7 +56,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 ```
 /
 ├─ CLAUDE.md, README.md
-├─ docs/                      # This folder
+├─ docs/                      # This folder; images/ holds the README screenshots (D-060)
 ├─ public/                    # favicon, app icons, manifest, og-image; proctor/ is generated (git-ignored)
 ├─ scripts/                   # validate-questions, publish-questions, check-published, check-references,
 │                             # check-duplicates, setup-proctor-assets, generate-brand-assets (.mjs)

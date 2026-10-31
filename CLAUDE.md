@@ -29,6 +29,8 @@ npm run check               # typecheck, lint, format, validate, test, build, e2
 
 Deployment: static build in `dist/`; Vercel Web Analytics is mounted in `src/main.tsx` for production builds only (D-048); `vercel.json` sets the build, output, SPA fallback (everything except `/assets/*` and Vercel's `/_vercel/*`) and asset caching. `index.html` has a tiny inline script that applies the saved theme before first paint (no saved choice = Light, the default). Keep it in sync with `src/lib/theme.ts`, `DEFAULT_PREFERENCES` and the preferences storage key.
 
+README screenshots live in `docs/images/` (D-060): 1280×800 at 2×, taken from the E2E build with Playwright (fake sign-in, reduced motion). Retake them after a visible UI change.
+
 ## Hard rules
 
 - **Backend = Supabase only** (D-044): Postgres + Auth + RLS, called directly from the app with the publishable key. **No** separate API server, SSR, paid AI APIs, global state library or UI component library. Edge Functions only when server code is required.

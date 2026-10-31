@@ -65,6 +65,7 @@
 | D-057 | UI redesign "Study notes in aubergine" (with an exam-paper answer sheet), landing page, version 3.0.0; old UI kept on `archive/ui-v2` | Accepted (live, PR #15) |
 | D-058 | An "i" explanation (toggletip) beside "Review due", version 3.1.0 | Accepted (live, PR #19) |
 | D-059 | Link to the developer's Frontend Interview Prep site under the credit; version 3.2.0 | Accepted (live, PR #21) |
+| D-060 | README refresh: header, badges, screenshots in `docs/images/` | Accepted |
 
 ---
 
@@ -426,3 +427,10 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Decision (user's choice of placement):** a second line under the credit, "Also by me: Frontend Interview Prep", in `MadeBy` (`src/components/layout/Brand.tsx`), so it shows wherever the credit does: the sidebar, the mobile menu and the landing page footer. The Privacy page's "Who runs CloudPrep" section mentions it in one sentence. It uses `ExternalLink` (new tab, announced). The name and URL live next to the credit in `src/app/developer.ts` (`FRONTEND_PREP`).
 - **Not added:** a card on the landing page (it would take space from CloudPrep's own pitch), or anything on exam, practice or sign-in screens.
 - **Version:** 3.2.0 (a small feature).
+
+## D-060 — README refresh
+
+- **Context:** the README is the project's first impression on GitHub (CloudPrep is on the user's resume), but it opened with a wall of bullets and no pictures. The user asked to make it more appealing and keep content that already made sense.
+- **Decision:** a centered header (logo, one-line pitch, live-site button, shields.io badges, quick links), the AWS disclaimer as a GitHub note, an at-a-glance strip matching the landing page's metrics, and three screenshots: the landing page, Learning mode with feedback (light) and a mock exam (dark). "What it does" keeps every bullet word for word, grouped under Practise, Accounts and your data, Practice integrity, Design and For the site owner; the credit moved to a "Made by" section with the Frontend Interview Prep link. One fact was fixed: the tech stack still named Inter, replaced in D-057.
+- **Screenshots:** 1280×800 at 2× from the E2E build (fake sign-in, reduced motion), stored in `docs/images/`. They show the UI as of 3.2.0; retake them after a visible UI change.
+- **Not added:** a GIF or video (large files in the repo), a dashboard shot (a new account shows mostly empty states).

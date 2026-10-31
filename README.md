@@ -1,31 +1,75 @@
+<div align="center">
+
+<img src="public/icon-192.png" alt="" width="80" height="80" />
+
 # CloudPrep
+
+**Practise for the AWS Certified Cloud Practitioner (CLF-C02) exam: 2,000 original questions, timed mock exams and an explanation for every answer.**
+
+[![Live site](https://img.shields.io/badge/Live_site-cloud--prep--aws.vercel.app-6A2C5E?style=for-the-badge)](https://cloud-prep-aws.vercel.app/)
+
+![Version](https://img.shields.io/github/package-json/v/chaudharyShub/CloudPrep?color=6A2C5E)
+![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![Vite 8](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS 4](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-Postgres_%2B_Auth-3FCF8E?logo=supabase&logoColor=white)
+![Vercel](https://img.shields.io/badge/Hosted_on-Vercel-000000?logo=vercel&logoColor=white)
+
+[Live site](https://cloud-prep-aws.vercel.app/) · [What it does](#what-it-does) · [Getting started](#getting-started) · [Docs](#documentation) · [Known limitations](docs/KNOWN_LIMITATIONS.md)
+
+</div>
 
 An unofficial practice simulator for the **AWS Certified Cloud Practitioner (CLF-C02)** exam. Use Learning mode as a guest, or sign in with Google to take timed mock exams and keep your progress in sync across devices.
 
+> [!NOTE]
 > CloudPrep is not affiliated with or endorsed by Amazon Web Services. Practice scores don't predict or guarantee an official result.
 
+![The CloudPrep landing page: "Sit the exam before you sit the exam", with a sample question beside it](docs/images/landing.png)
+
+| 2,000                                     | 65 / 90                                   | 4                                     | Free               |
+| :---------------------------------------- | :---------------------------------------- | :------------------------------------ | :----------------- |
+| original questions, each option explained | questions and minutes, like the real exam | exam domains, weighted like the guide | no ads, no paywall |
+
 ## What it does
+
+### Practise
 
 - **Learning mode:** untimed practice by domain or topic, with instant feedback, an explanation for every option, and links to the AWS documentation each question is based on. You can bookmark questions, and **Review due** brings questions back on a schedule (1, 3, 7, 21, then 60 days) so missed ones come up again before you forget them. The "i" next to Review due explains how it works.
 - **Timed mock exam:** a 65-question / 90-minute exam that follows the CLF-C02 domain weightings, with flagging, a question grid, final review and automatic submission when time runs out.
 - **Results:** a practice score, per-domain breakdown, answer review with explanations, exam history, and progress guidance across attempts.
-- **Accounts and sync:** sign in with Google (email sign-in links can be switched on once custom email is set up). Signed-in users' progress, bookmarks, exam history, the exam in progress and settings are saved to their account and follow them to every device. The app keeps a copy in the browser, so it stays fast and works offline; changes are sent when you're back online. Progress made before signing in is added to the account only if you choose to.
-- **Guests:** Learning mode, bookmarks and settings work without an account, saved in the browser only. The dashboard, mock exams, history and progress need sign-in.
-- **Your data:** settings (theme, motion, benchmark, warnings), export/import to a file, automatic backups before risky changes, and separate "clear" actions. Signed in, clearing applies to the account on every device.
-- **Optional practice integrity:** a strict mode that asks for fullscreen and logs tab and focus changes, without judging them.
-- **AI-proctored exams (opt-in):** a check-in like an online proctored exam, then a strict AI proctor that runs on your device (MediaPipe face and object models plus microphone loudness). It watches your face, head, eyes and mouth, looks for phones, other people, books and screens, and blocks shortcuts. Two warnings, then the exam ends; a phone or another person ends it at once. Nothing is recorded or uploaded.
-- **Admin page:** an `/admin` page lists every signed-in account with its activity (questions answered, sessions, exams, best score) and totals. Only accounts marked as admins in the database get any data; everyone else sees "No admin access". Admins get an **Admin** link in the navigation; nobody else sees it. Guests aren't recorded there.
-- **Credit:** the sidebar, mobile menu and landing page footer say "Made by Shubham Chaudhary", linking to [his portfolio](https://shubhamworks.vercel.app/); under it, "Also by me: Frontend Interview Prep" links to the developer's [frontend interview practice site](https://frontend-interview-prod.vercel.app/); the Privacy page says who runs the site and mentions both.
-- **Landing page and design:** guests arrive on a landing page that explains CloudPrep and leads into Learning mode or sign-in; signed-in users go straight to the dashboard. The interface ("study notes in aubergine", light and true-black dark themes) has serif titles, rounded cards and an exam-paper answer sheet in mock exams and Learning mode (where it also marks right and wrong answers). The dashboard flags your weakest domain and shows the time used in recent exams.
-- **Installable look:** CloudPrep has its own logo, home-screen icons ("Add to Home Screen") and a link preview with an image and description when the site is shared.
+
+| Learning mode: instant feedback and an answer sheet                                       | Mock exam in the true-black dark theme                                                                |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| ![Learning mode with a checked answer and its explanation](docs/images/learning-mode.png) | ![A mock exam question with the timer and answer sheet, in dark mode](docs/images/mock-exam-dark.png) |
 
 The bank has **2,000 original questions** (400 / 600 / 753 / 247 across the four domains), written from public AWS documentation and the official exam guide. 1,995 are `checked` against the AWS pages they cite and 5 are still `unverified` (see [docs/CONTENT_REVIEW.md](docs/CONTENT_REVIEW.md)); none has had a second, human sign-off (`approved`) yet. Read [docs/KNOWN_LIMITATIONS.md](docs/KNOWN_LIMITATIONS.md) before relying on it.
 
+### Accounts and your data
+
+- **Accounts and sync:** sign in with Google (email sign-in links can be switched on once custom email is set up). Signed-in users' progress, bookmarks, exam history, the exam in progress and settings are saved to their account and follow them to every device. The app keeps a copy in the browser, so it stays fast and works offline; changes are sent when you're back online. Progress made before signing in is added to the account only if you choose to.
+- **Guests:** Learning mode, bookmarks and settings work without an account, saved in the browser only. The dashboard, mock exams, history and progress need sign-in.
+- **Your data:** settings (theme, motion, benchmark, warnings), export/import to a file, automatic backups before risky changes, and separate "clear" actions. Signed in, clearing applies to the account on every device.
+
 **Privacy in short:** accounts and synced data are stored with Supabase, and each user can read only their own data; the admin page shows the site owner a list of accounts with activity totals (never answers). The live site counts page views with Vercel Web Analytics (no cookies, no personal data). Details are on the in-app Privacy page.
+
+### Practice integrity
+
+- **Optional practice integrity:** a strict mode that asks for fullscreen and logs tab and focus changes, without judging them.
+- **AI-proctored exams (opt-in):** a check-in like an online proctored exam, then a strict AI proctor that runs on your device (MediaPipe face and object models plus microphone loudness). It watches your face, head, eyes and mouth, looks for phones, other people, books and screens, and blocks shortcuts. Two warnings, then the exam ends; a phone or another person ends it at once. Nothing is recorded or uploaded.
+
+### Design
+
+- **Landing page and design:** guests arrive on a landing page that explains CloudPrep and leads into Learning mode or sign-in; signed-in users go straight to the dashboard. The interface ("study notes in aubergine", light and true-black dark themes) has serif titles, rounded cards and an exam-paper answer sheet in mock exams and Learning mode (where it also marks right and wrong answers). The dashboard flags your weakest domain and shows the time used in recent exams.
+- **Installable look:** CloudPrep has its own logo, home-screen icons ("Add to Home Screen") and a link preview with an image and description when the site is shared.
+
+### For the site owner
+
+- **Admin page:** an `/admin` page lists every signed-in account with its activity (questions answered, sessions, exams, best score) and totals. Only accounts marked as admins in the database get any data; everyone else sees "No admin access". Admins get an **Admin** link in the navigation; nobody else sees it. Guests aren't recorded there.
 
 ## Tech stack
 
-- **App:** React 19, TypeScript (strict), Vite 8, Tailwind CSS 4, React Router 8, lucide-react icons and the Inter font. A static single-page app hosted on Vercel.
+- **App:** React 19, TypeScript (strict), Vite 8, Tailwind CSS 4, React Router 8, lucide-react icons, and self-hosted Newsreader, Source Sans 3 and IBM Plex Mono fonts. A static single-page app hosted on Vercel.
 - **Backend:** [Supabase](https://supabase.com) only: Postgres with Row Level Security, and Supabase Auth (Google). The app calls it directly with the public (publishable) key; there is no separate API server.
 - **Data:** questions are published from this repo to the database and loaded at runtime, then cached in IndexedDB. User data goes through a versioned storage layer (`src/storage/`) in `localStorage` and, for signed-in users, is synced to Supabase.
 - **Tests:** Vitest with Testing Library (including the database schema and security rules run in PGlite), and Playwright with axe for end-to-end and accessibility checks.
@@ -111,3 +155,9 @@ Saved attempts keep the exact wording you answered (question archive), so editin
 - `docs/DEPLOYMENT.md`: Vercel and Supabase setup
 - `docs/KNOWN_LIMITATIONS.md`: what it can't do
 - `docs/CONTENT_REVIEW.md`: question review checklist
+
+## Made by
+
+- **Credit:** the sidebar, mobile menu and landing page footer say "Made by Shubham Chaudhary", linking to [his portfolio](https://shubhamworks.vercel.app/); under it, "Also by me: Frontend Interview Prep" links to the developer's [frontend interview practice site](https://frontend-interview-prod.vercel.app/); the Privacy page says who runs the site and mentions both.
+
+Preparing for frontend interviews too? **[Frontend Interview Prep](https://frontend-interview-prod.vercel.app/)** has React and JavaScript interview questions with answers.
