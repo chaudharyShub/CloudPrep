@@ -1,6 +1,6 @@
 # CloudPrep — Test Plan
 
-> Status: **Describes the tests as built** (version 3.2.0) · Last updated: 2026-10-31
+> Status: **Describes the tests as built** (version 3.3.0) · Last updated: 2026-10-31
 > This replaces the first draft of 2026-10-21, which planned spec files and a fixture flag that were never created.
 
 ## 1. Strategy at a glance
@@ -65,7 +65,7 @@ Projects: `chromium`, `webkit` and `mobile` (Pixel 7) run everything except `@re
 
 ## 5. Acceptance-criteria tags
 
-Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`), Review due (`AC-R.x`, D-052) reloading after a deploy (`AC-U.x`, D-053) the admin page and its link (`AC-A.x`, D-054, D-055) the developer credit and the Frontend Interview Prep link (`AC-D.x`, D-056, D-059, `PrivacyPage.test.tsx`) the "i" explanation (`AC-I.x`, D-058: `InfoTip.test.tsx`, the Learning mode and dashboard page tests, and `learning-mode.spec.ts` on a phone screen with axe) and the UI redesign (`AC-V.x`, D-057: colour contrast of every token pair in `src/styles/tokens.test.ts`, `weakestDomain` and `formatMinutes`, the dashboard, the Learning mode answer sheet, and the landing page and its motion in `LandingPage.test.tsx`, `motion.test.ts`, `landing.spec.ts` and `auth.spec.ts`) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
+Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`), Review due (`AC-R.x`, D-052) reloading after a deploy (`AC-U.x`, D-053) the admin page and its link (`AC-A.x`, D-054, D-055) the developer credit and the Frontend Interview Prep link (`AC-D.x`, D-056, D-059, D-061, `PrivacyPage.test.tsx`) the "i" explanation (`AC-I.x`, D-058: `InfoTip.test.tsx`, the Learning mode and dashboard page tests, and `learning-mode.spec.ts` on a phone screen with axe) and the UI redesign (`AC-V.x`, D-057: colour contrast of every token pair in `src/styles/tokens.test.ts`, `weakestDomain` and `formatMinutes`, the dashboard, the Learning mode answer sheet, and the landing page and its motion in `LandingPage.test.tsx`, `motion.test.ts`, `landing.spec.ts` and `auth.spec.ts`) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
 
 ## 6. Manual checks (each release)
 

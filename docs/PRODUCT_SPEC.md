@@ -1,6 +1,6 @@
 # CloudPrep — Product Specification
 
-> Status: **Describes the app as built** (version 3.2.0) · Last updated: 2026-10-31
+> Status: **Describes the app as built** (version 3.3.0) · Last updated: 2026-10-31
 > CloudPrep is an unofficial practice tool. It is not affiliated with, endorsed by, or sponsored by Amazon Web Services.
 >
 > This replaces the first draft of 2026-10-21. What changed from that plan is in IMPLEMENTATION_PLAN.md ("Changes from the original plan") and the reasons are in DECISIONS.md.
@@ -91,7 +91,7 @@ Assumption: a current version of Chrome, Edge, Firefox or Safari on desktop, tab
 | Progress (`/progress`) | Practice readiness (D-033), recent exam scores, domain strengths and weaknesses, frequently missed topics, questions you keep missing, practice coverage |
 | Bookmarks (`/bookmarks`) | Bookmarked questions, with practice from the list |
 | Settings (`/settings`) | Preferences, account, data management (§8) |
-| Privacy (`/privacy`) | What is stored, what is monitored, analytics, how to delete records, who runs CloudPrep (D-056) and a link to Frontend Interview Prep (D-059) |
+| Privacy (`/privacy`) | What is stored, what is monitored, analytics, how to delete records, who runs CloudPrep (D-056) and a link to Frontend Interview Prep (D-059), the licences and how the questions were made (D-061) |
 | Sign-in (`/sign-in`, `/auth/callback`) | Google sign-in (and email links when enabled), return to the requested page |
 | Admin (`/admin`) | Admins only (D-054); admins get an **Admin** link in the navigation, nobody else sees it (D-055): totals (users, active in the last 7 days, questions answered, exams taken) and every signed-in account with name, email, sign-in method, sign-up date, last activity, questions answered, practice sessions, exams and best score. Others see "No admin access"; guests go to sign-in |
 

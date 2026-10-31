@@ -4,6 +4,10 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ExternalLink } from '@/components/ui/ExternalLink';
 
+const REPO_URL = 'https://github.com/chaudharyShub/CloudPrep';
+const CONTENT_LICENSE_URL = `${REPO_URL}/blob/master/LICENSE-CONTENT.md`;
+const CODE_LICENSE_URL = `${REPO_URL}/blob/master/LICENSE`;
+
 const SECTIONS: { title: string; body: React.ReactNode }[] = [
   {
     title: 'Where your data lives',
@@ -130,6 +134,18 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
         product. The same developer also made{' '}
         <ExternalLink href={FRONTEND_PREP.url}>{FRONTEND_PREP.name}</ExternalLink>, a practice site
         for React and JavaScript interview questions.
+      </>
+    ),
+  },
+  {
+    title: 'Licence and how the questions were made',
+    body: (
+      <>
+        The questions were written with AI assistance from public AWS documentation and the official
+        exam guide, then edited and checked against the AWS pages they cite. They are shared under{' '}
+        <ExternalLink href={CONTENT_LICENSE_URL}>CC BY-NC-SA 4.0</ExternalLink>: free to share and
+        adapt with credit, not for commercial use. The code is open source under the{' '}
+        <ExternalLink href={CODE_LICENSE_URL}>MIT License</ExternalLink>.
       </>
     ),
   },

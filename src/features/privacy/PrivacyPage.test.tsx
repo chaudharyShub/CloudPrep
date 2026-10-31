@@ -53,4 +53,22 @@ describe('Developer credit', () => {
       FRONTEND_PREP.url,
     );
   });
+
+  it('AC-D.5 the Privacy page says how the questions were made and links both licences', async () => {
+    renderApp('/privacy', { auth: createFakeAuthClient() });
+    const heading = await screen.findByRole('heading', {
+      name: 'Licence and how the questions were made',
+    });
+    expect(heading).toBeVisible();
+    const main = screen.getByRole('main');
+    expect(within(main).getByText(/written with AI assistance/)).toBeVisible();
+    expect(within(main).getByRole('link', { name: /^CC BY-NC-SA 4\.0/ })).toHaveAttribute(
+      'href',
+      'https://github.com/chaudharyShub/CloudPrep/blob/master/LICENSE-CONTENT.md',
+    );
+    expect(within(main).getByRole('link', { name: /^MIT License/ })).toHaveAttribute(
+      'href',
+      'https://github.com/chaudharyShub/CloudPrep/blob/master/LICENSE',
+    );
+  });
 });
