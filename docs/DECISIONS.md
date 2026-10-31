@@ -64,7 +64,7 @@
 | D-056 | Developer credit with a portfolio link; version 2.4.0 | Accepted |
 | D-057 | UI redesign "Study notes in aubergine" (with an exam-paper answer sheet), landing page, version 3.0.0; old UI kept on `archive/ui-v2` | Accepted (live, PR #15) |
 | D-058 | An "i" explanation (toggletip) beside "Review due", version 3.1.0 | Accepted (live, PR #19) |
-| D-059 | Link to the developer's Frontend Interview Prep site under the credit; version 3.2.0 | Accepted (not merged yet) |
+| D-059 | Link to the developer's Frontend Interview Prep site under the credit; version 3.2.0 | Accepted (live, PR #21) |
 
 ---
 
