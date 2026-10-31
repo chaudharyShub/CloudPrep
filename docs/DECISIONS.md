@@ -64,6 +64,7 @@
 | D-056 | Developer credit with a portfolio link; version 2.4.0 | Accepted |
 | D-057 | UI redesign "Study notes in aubergine" (with an exam-paper answer sheet), landing page, version 3.0.0; old UI kept on `archive/ui-v2` | Accepted (live, PR #15) |
 | D-058 | An "i" explanation (toggletip) beside "Review due", version 3.1.0 | Accepted (live, PR #19) |
+| D-059 | Link to the developer's Frontend Interview Prep site under the credit; version 3.2.0 | Accepted (not merged yet) |
 
 ---
 
@@ -419,3 +420,9 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Scope:** Review due only, by the user's choice. Other terms (practice benchmark, readiness, weakest domain) could use the same component later, after discussing it.
 - **Version:** 3.1.0 (a feature).
 
+## D-059 — Link to Frontend Interview Prep
+
+- **Context:** the user built a second practice site, Frontend Interview Prep (https://frontend-interview-prod.vercel.app/), with React and JavaScript interview questions, and it already links to CloudPrep. They asked for a link back, so developers can find both.
+- **Decision (user's choice of placement):** a second line under the credit, "Also by me: Frontend Interview Prep", in `MadeBy` (`src/components/layout/Brand.tsx`), so it shows wherever the credit does: the sidebar, the mobile menu and the landing page footer. The Privacy page's "Who runs CloudPrep" section mentions it in one sentence. It uses `ExternalLink` (new tab, announced). The name and URL live next to the credit in `src/app/developer.ts` (`FRONTEND_PREP`).
+- **Not added:** a card on the landing page (it would take space from CloudPrep's own pitch), or anything on exam, practice or sign-in screens.
+- **Version:** 3.2.0 (a small feature).
