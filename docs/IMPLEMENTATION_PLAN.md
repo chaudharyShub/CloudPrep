@@ -28,7 +28,8 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Admin page (D-054) | Hidden `/admin` page listing signed-in accounts and their activity, for admins only (checked in the database); version 2.2.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-29) |
 | Admin link and `admin:add` (D-055) | Admin link in the navigation for admins only (checked with `is_admin()` in the database); `npm run admin:add` adds the accounts in `ADMIN_EMAIL` from `.env.local`; version 2.3.0; acceptance criteria below | Done and merged (PR #13) |
 | UI redesign (D-057) | "Study notes in aubergine" with an exam-paper answer sheet and a true-black dark mode; landing page at `/`; old UI kept on `archive/ui-v2` (tag `v2.4.0`); version 3.0.0 | Done, merged (PR #15) and live; old UI kept on `archive/ui-v2` / `v2.4.0` |
-| Headline highlight and light default (D-057) | "sit the exam." on the theme's selection tint; Light is the default theme; version 3.0.1 | Implemented on `ui/headline-highlight`, not merged yet |
+| Headline highlight and light default (D-057) | "sit the exam." on the theme's selection tint; Light is the default theme; version 3.0.1 | Merged into `master` (PR #18) |
+| Review due "i" explanation (D-058) | An "i" button beside Review due that explains the schedule; version 3.1.0 | Implemented on `ui/review-due-info`; `npm run check` passes; not merged yet |
 | Developer credit (D-056) | "Made by Shubham Chaudhary" with a portfolio link in the sidebar and mobile menu, and a "Who runs CloudPrep" section on the Privacy page; version 2.4.0; acceptance criteria below | Done and merged (PR #14) |
 | Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring, then multi-exam UI) | — |
 
@@ -417,6 +418,16 @@ Acceptance criteria (tests are tagged `AC-V.x`):
 - AC-V.9 The landing page animates lightly (hero entrance, the demo question picking an answer and counting down, sections and domain bars revealing on scroll, hover lift), ends with everything visible and passing axe, and shows everything at once with no movement under reduced motion.
 - AC-V.10 The default theme is Light (since 3.0.1; it was System in 3.0.0); a saved choice (Dark or System) still wins, both in the app and in `index.html`'s before-paint script; both themes pass axe.
 - AC-V.7 Guests opening `/` see the landing page (one h1, "Start learning" to `/practice`, "Sign in", the unofficial note) and it passes axe; signed-in users are sent to `/dashboard`.
+
+## Review due explanation (D-058)
+
+An "i" button beside "Review due" (Learning mode card and dashboard quick action) opens a short explanation of the schedule.
+
+- AC-I.1 The "i" button ("About Review due") opens and closes the explanation and reports it with `aria-expanded`.
+- AC-I.2 It works from the keyboard; Escape closes it and returns focus to the button.
+- AC-I.3 A click outside closes it; a click inside doesn't.
+- AC-I.4 Learning mode and the dashboard show it beside Review due; the heading's name stays "Review due", and opening it doesn't follow the dashboard link.
+- AC-I.5 On a 375px phone screen the panel stays 16px inside the screen, doesn't widen the page, and passes axe.
 
 ## P10 — Optional features (v1.x, pick à la carte)
 

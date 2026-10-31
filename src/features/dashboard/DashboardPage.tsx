@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { History, Target } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -23,6 +23,7 @@ import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/cn';
 import { formatDateTime, formatMinutes, formatPercent } from '@/lib/format';
 import type { ExamConfig } from '@/domain/exam/config';
+import { ReviewDueInfo } from '@/features/practice/ReviewDueInfo';
 import {
   useExamAttempts,
   useExamQuestions,
@@ -40,6 +41,8 @@ interface QuickAction {
   count?: number;
   /** Router state, e.g. a practice session to start. */
   state?: unknown;
+  /** An "i" button shown beside the row, outside the link. */
+  info?: ReactNode;
 }
 
 const MINUTE = 60_000;
@@ -82,11 +85,13 @@ function reviewAction(due: number, setup: ReturnType<typeof reviewSessionSetup>)
         emphasis: true,
         count: due,
         state: sessionState(setup),
+        info: <ReviewDueInfo align="end" />,
       }
     : {
         to: '/practice',
         title: 'Review due',
         description: 'Nothing due for review today',
+        info: <ReviewDueInfo align="end" />,
       };
 }
 
@@ -195,12 +200,12 @@ export function DashboardPage() {
           <CardBody>
             <ul className="flex flex-col gap-2.5">
               {quickActions.map((action) => (
-                <li key={action.title}>
+                <li key={action.title} className="flex items-center gap-1.5">
                   <Link
                     to={action.to}
                     state={action.state}
                     className={cn(
-                      'flex min-h-14 items-center gap-3 rounded-md border px-4 py-2.5 transition-colors',
+                      'flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-md border px-4 py-2.5 transition-colors',
                       action.emphasis
                         ? 'border-accent bg-highlight text-on-highlight hover:bg-highlight-hover'
                         : 'border-border text-fg hover:bg-surface-2',
@@ -230,6 +235,7 @@ export function DashboardPage() {
                       </span>
                     )}
                   </Link>
+                  {action.info}
                 </li>
               ))}
             </ul>

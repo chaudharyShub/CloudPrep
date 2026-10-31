@@ -1,6 +1,6 @@
 # CloudPrep — Test Plan
 
-> Status: **Describes the tests as built** (version 3.0.1) · Last updated: 2026-10-29
+> Status: **Describes the tests as built** (version 3.1.0) · Last updated: 2026-10-29
 > This replaces the first draft of 2026-10-21, which planned spec files and a fixture flag that were never created.
 
 ## 1. Strategy at a glance
@@ -38,7 +38,7 @@ Test philosophy: test behaviour, not implementation. Query by role and label. No
 | `admin.spec.ts` | Admin page: guests go to sign-in, non-admins see no data, admins see the user list (AC-A.1–A.3); only admins get the Admin link (AC-A.5) |
 | `landing.spec.ts` | Landing page motion: entrance, demo answer, scroll reveals and bars end fully visible and pass axe; reduced motion shows everything at once (AC-V.9) |
 | `auth.spec.ts` | Guests get the landing page at `/` (AC-V.7), are sent to sign-in from account-only pages and keep Learning mode; email link request; Google sign-in returns to the page; sign-out (AC-B.6–B.10) |
-| `learning-mode.spec.ts` | Domain practice, checking answers, bookmarks, progress after reload, session summary, keyboard-only answers, phone layout, recovery from corrupt saved progress, old progress shown as review due (AC-R.7) |
+| `learning-mode.spec.ts` | Domain practice, checking answers, bookmarks, progress after reload, session summary, keyboard-only answers, phone layout, recovery from corrupt saved progress, old progress shown as review due (AC-R.7), the Review due "i" panel fitting a phone screen and passing axe (AC-I.5) |
 | `exam.spec.ts` | Full exam (answer, flag, review, confirm, results), restore after reload with absolute timing, low-time warnings and auto-submit at zero, expired while closed, mobile layout |
 | `integrity.spec.ts` | Strict practice (fullscreen, exit warning, neutral report); proctored check-in, warnings, ended by a phone; blocked copy and forced proctor restart after reload (AC-7.x); the real models load and analyse the camera (`@real-models`, its own project) |
 | `data.spec.ts` | Settings persist; export, reset everything, import; malformed file rejected |
@@ -65,7 +65,7 @@ Projects: `chromium`, `webkit` and `mobile` (Pixel 7) run everything except `@re
 
 ## 5. Acceptance-criteria tags
 
-Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`), Review due (`AC-R.x`, D-052) reloading after a deploy (`AC-U.x`, D-053) the admin page and its link (`AC-A.x`, D-054, D-055) the developer credit (`AC-D.x`, D-056, `PrivacyPage.test.tsx`) and the UI redesign (`AC-V.x`, D-057: colour contrast of every token pair in `src/styles/tokens.test.ts`, `weakestDomain` and `formatMinutes`, the dashboard, the Learning mode answer sheet, and the landing page and its motion in `LandingPage.test.tsx`, `motion.test.ts`, `landing.spec.ts` and `auth.spec.ts`) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
+Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`), Review due (`AC-R.x`, D-052) reloading after a deploy (`AC-U.x`, D-053) the admin page and its link (`AC-A.x`, D-054, D-055) the developer credit (`AC-D.x`, D-056, `PrivacyPage.test.tsx`) the "i" explanation (`AC-I.x`, D-058: `InfoTip.test.tsx`, the Learning mode and dashboard page tests, and `learning-mode.spec.ts` on a phone screen with axe) and the UI redesign (`AC-V.x`, D-057: colour contrast of every token pair in `src/styles/tokens.test.ts`, `weakestDomain` and `formatMinutes`, the dashboard, the Learning mode answer sheet, and the landing page and its motion in `LandingPage.test.tsx`, `motion.test.ts`, `landing.spec.ts` and `auth.spec.ts`) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
 
 ## 6. Manual checks (each release)
 

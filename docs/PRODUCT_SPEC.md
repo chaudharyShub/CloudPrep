@@ -1,6 +1,6 @@
 # CloudPrep — Product Specification
 
-> Status: **Describes the app as built** (version 3.0.1) · Last updated: 2026-10-29
+> Status: **Describes the app as built** (version 3.1.0) · Last updated: 2026-10-29
 > CloudPrep is an unofficial practice tool. It is not affiliated with, endorsed by, or sponsored by Amazon Web Services.
 >
 > This replaces the first draft of 2026-10-21. What changed from that plan is in IMPLEMENTATION_PLAN.md ("Changes from the original plan") and the reasons are in DECISIONS.md.
@@ -157,7 +157,7 @@ Within each domain, questions not used in earlier exams come first, spread acros
 - **Bookmark** on every question, in practice and in answer review.
 - **Session summary:** score, missed questions, "Retry incorrect". Sessions aren't restored after a reload (D-010), but every checked answer is saved.
 - **Mistakes:** questions whose latest answer, in practice or an exam, was incorrect. A correct answer clears them.
-- **Review due (D-052):** answered questions come back on a schedule. Each has a review level from 0 to 4, due again 1, 3, 7, 21 or 60 days (local calendar days) after its latest answer. A wrong answer sets level 0 (due the next day); a correct answer moves it up a level, but only when it was due, so a retry in the same sitting doesn't count. "Review due questions (n)" starts a session of the most important due questions (lowest level, then longest overdue), up to the default practice length. The dashboard's quick actions show the count and start the same session. Progress saved before this feature gets an estimated level. Random practice, Mistakes and exams are unchanged.
+- **Review due (D-052):** answered questions come back on a schedule. Each has a review level from 0 to 4, due again 1, 3, 7, 21 or 60 days (local calendar days) after its latest answer. A wrong answer sets level 0 (due the next day); a correct answer moves it up a level, but only when it was due, so a retry in the same sitting doesn't count. "Review due questions (n)" starts a session of the most important due questions (lowest level, then longest overdue), up to the default practice length. The dashboard's quick actions show the count and start the same session. Progress saved before this feature gets an estimated level. Random practice, Mistakes and exams are unchanged. An "i" button beside "Review due" (Learning mode card and dashboard quick action) explains the schedule in a small panel that opens on click or tap and closes on Escape or a click outside (D-058).
 - **Statistics** are question-level: "answered" counts unique questions, and accuracy uses each question's latest answer (D-019, D-023). Submitted exams add their answered questions (D-029).
 
 ## 8. Settings and data

@@ -5,6 +5,15 @@ import { makeAttempt, makeExam } from '@/test/exam';
 import { createTestStore, renderApp } from '@/test/renderApp';
 
 describe('DashboardPage', () => {
+  it('AC-I.4 explains Review due from the "i" beside its quick action', async () => {
+    const { user } = renderApp('/dashboard');
+    await screen.findByRole('heading', { level: 1, name: 'Dashboard' });
+    await user.click(screen.getByRole('button', { name: 'About Review due' }));
+    expect(screen.getByText(/after 1, 3, 7, 21 and then 60 days/)).toBeVisible();
+    // Opening the tip doesn't follow the Review due link.
+    expect(screen.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
+  });
+
   it('AC-R.6 starts a review session from the quick actions when questions are due', async () => {
     const store = createTestStore();
     for (const questionId of ['clf-d1-0001', 'clf-d2-0001']) {

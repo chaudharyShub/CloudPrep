@@ -148,6 +148,16 @@ describe('PracticePage', () => {
     expect(
       screen.getByText('Answer questions here or in a mock exam to start your review schedule.'),
     ).toBeVisible();
+  });
+
+  it('AC-I.4 explains Review due from the "i" beside its heading', async () => {
+    const { user } = renderApp('/practice');
+    await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
+    // The button sits beside the heading, so the heading's name stays "Review due".
+    expect(screen.getByRole('heading', { level: 3, name: 'Review due' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'About Review due' }));
+    expect(screen.getByText(/after 1, 3, 7, 21 and then 60 days/)).toBeVisible();
+    expect(screen.getByText(/A wrong answer brings it back the next day/)).toBeVisible();
     expect(screen.getByRole('button', { name: 'Practise mistakes (0)' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Practise bookmarks (0)' })).toBeDisabled();
     expect(screen.getByRole('heading', { name: 'No sessions yet' })).toBeVisible();
