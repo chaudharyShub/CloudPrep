@@ -68,7 +68,7 @@
 | D-060 | README refresh: header, badges, screenshots in `docs/images/` | Accepted |
 | D-061 | Open source: MIT for the code, CC BY-NC-SA 4.0 for the questions, with an AI-assistance note; version 3.3.0 | Accepted (live, PR #22) |
 | D-062 | "Shubham Works" umbrella: a shared footer (maker mark, umbrella line, credit, projects) for all the developer's sites; version 3.4.0 | Accepted (live, PR #23) |
-| D-063 | Search engine basics: `robots.txt` and `sitemap.xml` from the build, a descriptive page title, no trailing slashes; version 3.4.1 | Accepted (not merged yet) |
+| D-063 | Search engine basics: `robots.txt` and `sitemap.xml` from the build, a descriptive page title, no trailing slashes; version 3.4.1 | Accepted (live, PR #24) |
 
 ---
 
