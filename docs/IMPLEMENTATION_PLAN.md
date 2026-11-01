@@ -30,6 +30,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | UI redesign (D-057) | "Study notes in aubergine" with an exam-paper answer sheet and a true-black dark mode; landing page at `/`; old UI kept on `archive/ui-v2` (tag `v2.4.0`); version 3.0.0 | Done, merged (PR #15) and live; old UI kept on `archive/ui-v2` / `v2.4.0` |
 | Headline highlight and light default (D-057) | "sit the exam." on the theme's selection tint; Light is the default theme; version 3.0.1 | Done, merged and live (PR #18) |
 | Review due "i" explanation (D-058) | An "i" button beside Review due that explains the schedule; version 3.1.0 | Done, merged and live (PR #19) |
+| Search engine basics (D-063) | `robots.txt` and `sitemap.xml` written by the production build (`src/app/seo.ts`); one address per page (no trailing slash); a page title that names the exam; Google Search Console steps in DEPLOYMENT.md; version 3.4.1; acceptance criteria below | Implemented on `feature/seo-basics`, not merged yet |
 | Shubham Works footer (D-062) | The credit becomes a shared footer for all the developer's sites: the orange "Dial" maker mark (`maker` token; SVGs in `docs/brand/`), "A Shubham Works project", "Made by Shubham Chaudhary", and "Also: Frontend Interview Prep" (replaces "Also by me"); a less crowded sidebar bottom with a shorter unofficial note; the Privacy page says CloudPrep is a Shubham Works project; `docs/SHUBHAM_WORKS.md` for the other sites; version 3.4.0; acceptance criteria below | Done, merged and live (PR #23) |
 | Open source licences (D-061) | `LICENSE` (MIT, code) and `LICENSE-CONTENT.md` (CC BY-NC-SA 4.0, questions); README License section; a Privacy page section on the licences and how the questions were made (AI-assisted, checked against AWS pages); `license` in package.json; version 3.3.0; acceptance criteria below | Done, merged and live (PR #22) |
 | README refresh (D-060) | Centered header with the logo, live-site link and badges, an at-a-glance strip, three screenshots (`docs/images/`), "What it does" grouped under headings, a "Made by" section; tech stack fonts corrected (Inter → Newsreader, Source Sans 3, IBM Plex Mono). No app change, no version bump | Done, pushed to `master` |
@@ -406,6 +407,17 @@ Added on 2026-10-31 (D-061): licences.
 
 Added on 2026-11-01 (D-062): the Shubham Works umbrella.
 - AC-D.6 Wherever the credit shows (sidebar, mobile menu, landing page footer), "A Shubham Works project" sits above "Made by…", next to the Shubham Works "Dial" mark (decorative, hidden from screen readers). The `maker` colour has at least 3:1 contrast on `bg` and `surface` in both themes (`tokens.test.ts`). The Privacy page's "Who runs CloudPrep" section says CloudPrep is a Shubham Works project.
+
+## Search engine basics (D-063)
+
+Requested by the user on 2026-11-01, as the first step to bring visitors: let search engines find and describe the site.
+
+Acceptance criteria (tests are tagged `AC-S.x`, `src/app/seo.test.ts`):
+- AC-S.1 The production build serves `/robots.txt`: it allows the site, blocks signed-in areas, the sign-in flow, exam screens and `/admin`, and names the sitemap with an absolute address. Local builds (no production address) leave the sitemap line out. Neither file is kept in `public/`.
+- AC-S.2 The production build serves `/sitemap.xml` listing the public pages (`/`, `/practice`, `/privacy`) with absolute addresses; none of them is blocked by `robots.txt`.
+- AC-S.3 `index.html`'s title names the exam ("AWS Cloud Practitioner", "CLF-C02") and its description mentions CLF-C02, so search engines and link previews see them before the app loads.
+- AC-S.4 `vercel.json` sets `"trailingSlash": false`, so `/practice/` permanently redirects to `/practice` and each page has one address; sitemap addresses have no trailing slash.
+- Checked by hand after deploying: `/practice/` redirects to `/practice`; the live `/robots.txt` and `/sitemap.xml` return the files (not the app page), and the sitemap is submitted in Google Search Console (DEPLOYMENT.md).
 
 ## UI redesign (D-057)
 

@@ -1,6 +1,6 @@
 # CloudPrep — Product Specification
 
-> Status: **Describes the app as built** (version 3.4.0) · Last updated: 2026-11-01
+> Status: **Describes the app as built** (version 3.4.1) · Last updated: 2026-11-01
 > CloudPrep is an unofficial practice tool. It is not affiliated with, endorsed by, or sponsored by Amazon Web Services.
 >
 > This replaces the first draft of 2026-10-21. What changed from that plan is in IMPLEMENTATION_PLAN.md ("Changes from the original plan") and the reasons are in DECISIONS.md.

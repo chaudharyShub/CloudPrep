@@ -68,6 +68,7 @@
 | D-060 | README refresh: header, badges, screenshots in `docs/images/` | Accepted |
 | D-061 | Open source: MIT for the code, CC BY-NC-SA 4.0 for the questions, with an AI-assistance note; version 3.3.0 | Accepted (live, PR #22) |
 | D-062 | "Shubham Works" umbrella: a shared footer (maker mark, umbrella line, credit, projects) for all the developer's sites; version 3.4.0 | Accepted (live, PR #23) |
+| D-063 | Search engine basics: `robots.txt` and `sitemap.xml` from the build, a descriptive page title, no trailing slashes; version 3.4.1 | Accepted (not merged yet) |
 
 ---
 
@@ -455,3 +456,13 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Postponed (user's choice):** a shared domain with subdomains (it needs a paid domain; `vercel.app` allows one level only) and renaming the `vercel.app` addresses to a shared prefix (guests' browser data is tied to the address, and Supabase redirect URLs would need updating).
 - **Not added:** the mark in the link preview image or favicon; a "Portfolio" link (the credit already links it).
 - **Version:** 3.4.0 (a small feature).
+
+## D-063 — Search engine basics
+
+- **Context:** the site gets almost no visitors. The live site had no `robots.txt` or `sitemap.xml` (both addresses returned the app page, because of the single-page-app fallback), and the page title in `index.html` was just "CloudPrep" until the app loaded. The user asked to fix this first, before posting about the site.
+- **Decision:** `src/app/seo.ts` holds the lists of public pages (`/`, `/practice`, `/privacy`) and blocked areas, and builds both files; `vite.config.ts` writes them into the production build with the address from `VERCEL_PROJECT_PRODUCTION_URL` (the same one the link previews use, D-050). Local builds write `robots.txt` without the sitemap line and no `sitemap.xml`, because the sitemap needs absolute addresses. Vercel serves real files before the fallback rewrite, so the files are served as they are. The title in `index.html` became "CloudPrep: free AWS Cloud Practitioner (CLF-C02) practice exams"; pages still set their own titles once the app loads. The site is then added to Google Search Console by hand (DEPLOYMENT.md), verified with Google's file `public/googlec9536a809aa9ed01.html`, which must stay.
+- **One address per page:** the live site answered both `/practice` and `/practice/`, which search engines can count as two copies of a page. `vercel.json` now sets `"trailingSlash": false`, so Vercel permanently redirects the form with a slash to the one without; the sitemap uses the form without. The home page is always `/`.
+- **Blocked from crawling:** signed-in pages, the sign-in flow, exam and results screens, the practice session and `/admin`. They show nothing useful to a crawler and redirect guests to sign-in.
+- **Not done (would be new features, to discuss first):** crawlable pages with sample questions (questions load inside the app, so search engines can't read them), and a "not found" signal for unknown addresses (they return the app with status 200).
+- **Version:** 3.4.1 (a small fix with no visible change in the app).
+

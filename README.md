@@ -124,7 +124,7 @@ First-time setup for end-to-end tests: `npx playwright install chromium webkit`.
 
 ## Deployment
 
-CloudPrep is a static site on Vercel, deployed automatically from `master`. `vercel.json` sets the build (`npm run build`), the output (`dist`), a fallback to `index.html` so deep links work, and asset caching. Vercel needs `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; Web Analytics has to be enabled once in the Vercel project (Analytics → Enable). Supabase setup, Google sign-in, analytics and link-preview checks are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+CloudPrep is a static site on Vercel, deployed automatically from `master`. `vercel.json` sets the build (`npm run build`), the output (`dist`), a fallback to `index.html` so deep links work, no trailing slashes (each page has one address), and asset caching. The production build also writes `robots.txt` and `sitemap.xml` for search engines. Vercel needs `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; Web Analytics has to be enabled once in the Vercel project (Analytics → Enable). Supabase setup, Google sign-in, analytics and link-preview checks are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Updating the question bank
 
