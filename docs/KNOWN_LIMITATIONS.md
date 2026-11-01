@@ -82,6 +82,11 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 - Automated checks (axe, WCAG 2.2 AA rules) pass on every page in light and dark themes. The checks also cover keyboard-only exam and practice flows, visible focus, dialog focus handling and reduced motion.
 - **Not yet tested with a real screen reader** (NVDA, JAWS, VoiceOver or TalkBack).
 
+## Search engines
+
+- Search engines can read the landing page, Learning mode's start page and the Privacy page, but not the questions: they load inside the app after sign-in or a click (D-063).
+- An unknown address shows CloudPrep's "Page not found" screen, but the server answers it with status 200, so search engines may treat it as a normal page.
+
 ## Not built
 
 - First-visit onboarding or a welcome tour.

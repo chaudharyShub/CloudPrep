@@ -117,6 +117,21 @@ Every pushed branch and pull request gets its own Vercel **preview deployment** 
 
 The preview image's address comes from Vercel's `VERCEL_PROJECT_PRODUCTION_URL` during the build, so nothing needs setting while *Settings → Environment Variables → Automatically expose System Environment Variables* is on (the default). **Check:** paste the live link into a chat app (WhatsApp, Slack) or a preview checker such as opengraph.xyz; it should show the CloudPrep image and title. Apps cache previews, so a link shared before a change may show the old one for a while.
 
+## Search engines (D-063)
+
+The production build writes `robots.txt` and `sitemap.xml` (from `src/app/seo.ts`) using the same production address as the link previews. When you add a public page, add it to `INDEXED_PATHS` there; when you add a signed-in area, add it to `BLOCKED_PATHS`.
+
+**Check after deploying:** open `/robots.txt` and `/sitemap.xml` on the live site. Each should show plain text or XML, not the CloudPrep app. Opening `/practice/` should land on `/practice` (`vercel.json` sets `"trailingSlash": false`, so each page has one address).
+
+**Google Search Console (once):**
+1. Go to https://search.google.com/search-console and sign in with Google.
+2. *Add property* → *URL prefix* → enter the live address (for example `https://cloud-prep-aws.vercel.app/`).
+3. Verify with the *HTML file* method: put the file Google offers (`google<code>.html`) in `public/`, deploy, check that the live address `/google<code>.html` shows its one line, then press *Verify*. Keep the file, or the site stops being verified. (A `*.vercel.app` address can't use the DNS method.) CloudPrep's file is `public/googlec9536a809aa9ed01.html` (added 2026-11-01).
+4. Open *Sitemaps*, enter `sitemap.xml` and press *Submit*.
+5. Optional: use *URL inspection* on the home page and press *Request indexing*.
+
+Google takes a few days to a few weeks to list a new site. *Performance* then shows the searches that bring visitors. If the address changes (for example a custom domain later), add the new address as another property and submit its sitemap.
+
 ## Other static hosts
 
 Any static host works if it can serve `index.html` for unknown paths and set the two `VITE_SUPABASE_*` variables at build time. Web Analytics only works on Vercel.

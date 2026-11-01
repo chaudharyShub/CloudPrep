@@ -7,3 +7,5 @@ package-lock.json
 docs
 public/proctor
 supabase/.temp
+# Google Search Console verification file: keep exactly as Google issued it (D-063)
+public/google*.html

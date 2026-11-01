@@ -3,10 +3,12 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
+import { robotsTxt, sitemapXml } from './src/app/seo.ts';
 
 /**
  * Link previews need absolute URLs (D-050). On Vercel the production address comes from its
- * system variable; elsewhere the tags fall back to site-relative paths.
+ * system variable; elsewhere the tags fall back to site-relative paths. The same address goes
+ * into robots.txt and sitemap.xml (D-063).
  */
 function siteUrl(): Plugin {
   const host = process.env['VERCEL_PROJECT_PRODUCTION_URL'];
@@ -14,6 +16,13 @@ function siteUrl(): Plugin {
   return {
     name: 'cloudprep-site-url',
     transformIndexHtml: (html) => html.replaceAll('%SITE_URL%', origin),
+    // Search engine files (D-063). The sitemap needs absolute addresses, so local builds skip it.
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'robots.txt', source: robotsTxt(origin) });
+      if (origin) {
+        this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: sitemapXml(origin) });
+      }
+    },
   };
 }
 
