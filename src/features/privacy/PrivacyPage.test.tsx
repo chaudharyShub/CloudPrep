@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { DEVELOPER, FRONTEND_PREP } from '@/app/developer';
+import { DEVELOPER, FRONTEND_PREP, MAKER_BRAND } from '@/app/developer';
 import { createFakeAuthClient } from '@/backend/fakeAuth';
 import { renderApp } from '@/test/renderApp';
 
@@ -32,7 +32,7 @@ describe('Developer credit', () => {
     expect(link).toHaveAttribute('href', FRONTEND_PREP.url);
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-    expect(link?.closest('p')).toHaveTextContent(`Also by me: ${FRONTEND_PREP.name}`);
+    expect(link?.closest('p')).toHaveTextContent(`Also: ${FRONTEND_PREP.name}`);
   });
 
   it('AC-D.3 the landing page footer shows the same link to guests', async () => {
@@ -52,6 +52,30 @@ describe('Developer credit', () => {
       'href',
       FRONTEND_PREP.url,
     );
+  });
+
+  it('AC-D.6 the navigation footer says CloudPrep is a Shubham Works project, above the credit', async () => {
+    renderApp('/dashboard', { auth: createFakeAuthClient() });
+    await screen.findByRole('heading', { level: 1 });
+    const [umbrella] = screen.getAllByText(`A ${MAKER_BRAND} project`);
+    const [credit] = screen.getAllByText(/^Made by/);
+    expect(umbrella).toBeVisible();
+    expect(umbrella?.compareDocumentPosition(credit as Node)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
+  it('AC-D.6 the landing page footer shows the same umbrella line to guests', async () => {
+    renderApp('/', { auth: createFakeAuthClient() });
+    await screen.findByRole('heading', { level: 1 });
+    expect(screen.getByText(`A ${MAKER_BRAND} project`)).toBeVisible();
+  });
+
+  it('AC-D.6 the Privacy page says CloudPrep is a Shubham Works project', async () => {
+    renderApp('/privacy', { auth: createFakeAuthClient() });
+    await screen.findByRole('heading', { name: 'Who runs CloudPrep' });
+    const main = screen.getByRole('main');
+    expect(within(main).getByText(new RegExp(`is a ${MAKER_BRAND} project`))).toBeVisible();
   });
 
   it('AC-D.5 the Privacy page says how the questions were made and links both licences', async () => {

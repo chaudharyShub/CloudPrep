@@ -30,6 +30,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | UI redesign (D-057) | "Study notes in aubergine" with an exam-paper answer sheet and a true-black dark mode; landing page at `/`; old UI kept on `archive/ui-v2` (tag `v2.4.0`); version 3.0.0 | Done, merged (PR #15) and live; old UI kept on `archive/ui-v2` / `v2.4.0` |
 | Headline highlight and light default (D-057) | "sit the exam." on the theme's selection tint; Light is the default theme; version 3.0.1 | Done, merged and live (PR #18) |
 | Review due "i" explanation (D-058) | An "i" button beside Review due that explains the schedule; version 3.1.0 | Done, merged and live (PR #19) |
+| Shubham Works footer (D-062) | The credit becomes a shared footer for all the developer's sites: the orange "Dial" maker mark (`maker` token; SVGs in `docs/brand/`), "A Shubham Works project", "Made by Shubham Chaudhary", and "Also: Frontend Interview Prep" (replaces "Also by me"); a less crowded sidebar bottom with a shorter unofficial note; the Privacy page says CloudPrep is a Shubham Works project; `docs/SHUBHAM_WORKS.md` for the other sites; version 3.4.0; acceptance criteria below | Implemented on `feature/shubham-works-umbrella` (on top of the licences branch), not merged yet |
 | Open source licences (D-061) | `LICENSE` (MIT, code) and `LICENSE-CONTENT.md` (CC BY-NC-SA 4.0, questions); README License section; a Privacy page section on the licences and how the questions were made (AI-assisted, checked against AWS pages); `license` in package.json; version 3.3.0; acceptance criteria below | Implemented on `feature/open-source-licences`, not merged yet |
 | README refresh (D-060) | Centered header with the logo, live-site link and badges, an at-a-glance strip, three screenshots (`docs/images/`), "What it does" grouped under headings, a "Made by" section; tech stack fonts corrected (Inter → Newsreader, Source Sans 3, IBM Plex Mono). No app change, no version bump | Done, pushed to `master` |
 | Frontend Interview Prep link (D-059) | "Also by me: Frontend Interview Prep" under the credit (sidebar, mobile menu, landing footer) and a sentence on the Privacy page; version 3.2.0; acceptance criteria below | Done, merged and live (PR #21) |
@@ -397,11 +398,14 @@ Acceptance criteria (tests are tagged `AC-D.x`):
 - AC-D.2 The Privacy page has a "Who runs CloudPrep" section with the same link.
 
 Added on 2026-10-31 (D-059): a link to the developer's other practice site.
-- AC-D.3 Under "Made by…", wherever it shows (sidebar, mobile menu, landing page footer), "Also by me: Frontend Interview Prep" links to https://frontend-interview-prod.vercel.app/ in a new tab (`rel="noopener noreferrer"`).
+- AC-D.3 (changed in D-062) Under "Made by…", wherever it shows (sidebar, mobile menu, landing page footer), "Also: Frontend Interview Prep" (until 3.4.0: "Also by me: Frontend Interview Prep") links to https://frontend-interview-prepare.vercel.app/ in a new tab (`rel="noopener noreferrer"`).
 - AC-D.4 The Privacy page's "Who runs CloudPrep" section mentions Frontend Interview Prep with the same link.
 
 Added on 2026-10-31 (D-061): licences.
 - AC-D.5 The Privacy page has a "Licence and how the questions were made" section: it says the questions were written with AI assistance from public AWS documentation and checked against the cited pages, and links `LICENSE-CONTENT.md` (CC BY-NC-SA 4.0) and `LICENSE` (MIT) on GitHub.
+
+Added on 2026-11-01 (D-062): the Shubham Works umbrella.
+- AC-D.6 Wherever the credit shows (sidebar, mobile menu, landing page footer), "A Shubham Works project" sits above "Made by…", next to the Shubham Works "Dial" mark (decorative, hidden from screen readers). The `maker` colour has at least 3:1 contrast on `bg` and `surface` in both themes (`tokens.test.ts`). The Privacy page's "Who runs CloudPrep" section says CloudPrep is a Shubham Works project.
 
 ## UI redesign (D-057)
 

@@ -67,6 +67,7 @@
 | D-059 | Link to the developer's Frontend Interview Prep site under the credit; version 3.2.0 | Accepted (live, PR #21) |
 | D-060 | README refresh: header, badges, screenshots in `docs/images/` | Accepted |
 | D-061 | Open source: MIT for the code, CC BY-NC-SA 4.0 for the questions, with an AI-assistance note; version 3.3.0 | Accepted (not merged yet) |
+| D-062 | "Shubham Works" umbrella: a shared footer (maker mark, umbrella line, credit, projects) for all the developer's sites; version 3.4.0 | Accepted (not merged yet) |
 
 ---
 
@@ -444,3 +445,13 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Checked before publishing:** no secrets in the git history (`google_user_content.json` is git-ignored and was never committed; only `.env.example` is tracked).
 - **Not done:** contribution guidelines (`CONTRIBUTING.md`); the user hasn't decided whether to accept contributions.
 - **Version:** 3.3.0.
+
+## D-062 — Shubham Works umbrella footer
+
+- **Context:** the user has three sites (the portfolio at https://shubhamworks.vercel.app/, CloudPrep and Frontend Interview Prep), each with its own logo and URL, and asked for something that shows they belong together.
+- **Decision (user's choice):** keep every site's own logo and URL, and add the same small footer block to all of them, under the name "Shubham Works" (already the portfolio's address): an "SW" maker mark (`MakerMark`, `src/components/brand/MakerMark.tsx`, decorative), "A Shubham Works project", "Made by Shubham Chaudhary" (D-056), and "Also: Frontend Interview Prep", which links the developer's other sites (the current site is already named in its own header). A first version listed every project ("CloudPrep · Frontend Interview Prep"), but it wrapped badly in the narrow sidebar. In CloudPrep this is `MadeBy`, so it shows in the sidebar, the mobile menu and the landing page footer; it replaces "Also by me: Frontend Interview Prep" (D-059). The sidebar's bottom was also made less crowded (user's request): the credit comes before the unofficial note, both in the same small size, with more space around them, and the sidebar and mobile menu use a shorter note ("Unofficial practice tool, not affiliated with or endorsed by AWS."); the landing page footer keeps the full sentence. The Privacy page says CloudPrep is a Shubham Works project. `docs/SHUBHAM_WORKS.md` holds the wording, rules and the mark's SVG for the other two sites.
+- **The mark (user's choice):** the "Dial", a wide, squared SW inside a ring, in orange, picked from two rounds of mockups (six simple outlines, then eight developer-style marks modelled on two images the user supplied). It is drawn as plain shapes, not a font, so it looks the same everywhere. The detailed version (inner ring and tick marks) is for 32px and up; a simpler one (thick ring, larger letters) is used at footer and favicon size. In CloudPrep it is coloured with a new `maker` token (`#c2410c` light, `#fb923c` dark), checked in `tokens.test.ts` for 3:1 against `bg` and `surface`. Both versions are exported to `docs/brand/` for the other sites.
+- **New address for Frontend Interview Prep:** the user renamed it to https://frontend-interview-prepare.vercel.app/ (to match "Prep"); the old address (`frontend-interview-prod`) no longer works, so the link in `FRONTEND_PREP` changed with this release.
+- **Postponed (user's choice):** a shared domain with subdomains (it needs a paid domain; `vercel.app` allows one level only) and renaming the `vercel.app` addresses to a shared prefix (guests' browser data is tied to the address, and Supabase redirect URLs would need updating).
+- **Not added:** the mark in the link preview image or favicon; a "Portfolio" link (the credit already links it).
+- **Version:** 3.4.0 (a small feature).

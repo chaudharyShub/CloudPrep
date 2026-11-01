@@ -13,6 +13,7 @@
  * - highlight: the soft tint for selected/active backgrounds; text on it is on-highlight.
  * - primary: main buttons. meter: progress fills. ink: the answer sheet's hairlines.
  * - flag: flagged questions (orange, so it never looks like "selected").
+ * - maker: the Shubham Works dial mark in the credit (D-062), shared with the developer's other sites.
  * src/styles/tokens.test.ts checks the contrast of every pair below.
  */
 
@@ -53,6 +54,7 @@
   --cp-flag: #fbe7d3;
   --cp-flag-border: #1f1a1e;
   --cp-on-flag: #1f1a1e;
+  --cp-maker: #c2410c;
 
   --cp-success: #166534;
   --cp-warning: #8a3f06;
@@ -110,6 +112,7 @@
   --cp-flag: #3a2a1e;
   --cp-flag-border: #f0a060;
   --cp-on-flag: #ffd9b8;
+  --cp-maker: #fb923c;
 
   /* Status */
   --cp-success: #5cc48e;
@@ -178,6 +181,7 @@
   --color-flag: var(--cp-flag);
   --color-flag-border: var(--cp-flag-border);
   --color-on-flag: var(--cp-on-flag);
+  --color-maker: var(--cp-maker);
   --color-ink: var(--cp-ink);
   --color-success: var(--cp-success);
   --color-success-subtle: color-mix(in oklab, var(--cp-success) 14%, transparent);
