@@ -1,6 +1,6 @@
 # CloudPrep — Architecture
 
-> Status: **Describes the code as built** (version 3.3.0) · Last updated: 2026-10-31
+> Status: **Describes the code as built** (version 3.4.0) · Last updated: 2026-11-01
 > This replaces the first draft of 2026-10-21. Reasons for each choice are in DECISIONS.md.
 
 ## 1. Overview
@@ -69,7 +69,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │  ├─ routes.tsx           # Route table and guards
 │  │  ├─ pages.tsx            # Lazy page imports (one chunk per page)
 │  │  ├─ navigation.ts        # Sidebar / mobile navigation items
-│  │  ├─ developer.ts         # Developer credit (D-056) and the Frontend Interview Prep link (D-059)
+│  │  ├─ developer.ts         # Developer credit (D-056), Frontend Interview Prep link (D-059), Shubham Works name (D-062)
 │  │  └─ layouts/             # RootLayout (watchers, theme), AppLayout (sidebar / drawer), ExamLayout
 │  ├─ backend/                # Supabase adapters behind interfaces, row types and mappers, fakes
 │  │                          # auth.ts, supabaseAuth.ts, questionSource.ts, contentRows.ts,
@@ -79,7 +79,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │  ├─ ui/                  # Design-system primitives: Button, Card, Badge, Dialog, ConfirmDialog,
 │  │  │                       # FormControls, Notice, ProgressBar, Skeleton, Toast, EmptyState, ExternalLink
 │  │  ├─ layout/              # Sidebar, MobileNav, NavList, PageHeader, Brand, pageIcons
-│  │  └─ brand/               # LogoMark, LogoTile, logoPaths, BrandLoading
+│  │  └─ brand/               # LogoMark, LogoTile, logoPaths, BrandLoading, MakerMark (D-062)
 │  ├─ content/questions/      # The authored bank (d1–d4 files, batches/, author.ts, refs.ts, index.ts)
 │  ├─ domain/                 # Pure logic
 │  │  ├─ exam-guide/clf-c02.ts  # Domains, weights, task statements, 65 questions, 90 minutes, EXAM_ID
@@ -267,7 +267,7 @@ Every value is `{ app: "cloudprep", schemaVersion, savedAt, data }`. `decodeArea
 - **Tokens:** colours, radii and shadows are CSS variables in `src/styles/index.css`, defined for the dark and light themes and exposed to Tailwind with `@theme`. Feature code uses only these tokens and the primitives in `src/components/ui/`. `InfoTip` is the "i" button for short explanations (D-058): a toggletip, not a hover tooltip; its panel is `position: fixed` and kept 16px inside the screen, so it never widens the page on a phone. `CardHeader` takes it as `info`, beside the heading rather than inside it. Contrast is checked against WCAG 2.2 AA in both themes (D-024): `src/styles/tokens.test.ts` checks every token pair, and axe runs in the E2E tests.
 - **Look (D-057, "study notes in aubergine"):** rounded cards (`rounded-lg`, 18px), pill buttons, badges and nav items (`rounded-full`), Source Sans 3 for text, Newsreader (`font-serif`) for page, card and dialog titles, IBM Plex Mono (`font-mono`, tabular numbers) for numbers and the exam's answer sheet, which keeps the exam-paper look (square cells, `ink` hairline). Colour roles: `accent` (aubergine: text, links, borders, fills under `on-accent`), `highlight` / `on-highlight` (soft tint for selected and active states), `primary` / `on-primary` (main buttons), `meter` (progress fills), `flag` / `flag-border` / `on-flag` (flagged questions, orange), `ink` (answer-sheet hairlines), blue `focus`. Dark mode is true black (`#000000`) with neutral grey layers and a lighter aubergine.
 - **Theme:** light (the default since 3.0.1, D-057), dark or system, applied before first paint by an inline script in `index.html` (D-039) and then by `src/lib/theme.ts`; keep the two in sync.
-- **Brand:** `LogoMark` / `LogoTile` (`src/components/brand/`), an aubergine tile (D-050, D-057). Navigation and page titles have no icons since D-057.
+- **Brand:** `LogoMark` / `LogoTile` (`src/components/brand/`), an aubergine tile (D-050, D-057). Navigation and page titles have no icons since D-057. The Shubham Works `MakerMark` (D-062, the "Dial") appears only in the footer credit (`MadeBy`), coloured with the `maker` token; it is shared with the developer's other sites (`docs/SHUBHAM_WORKS.md`).
 - **Layout:** sidebar from 1024 px, otherwise a top bar and drawer; content up to the `max-w-content` width. The exam layout has no sidebar: a header with the timer, then the exam page with "Question n of 65", the question grid and a link to the final review.
 - **Controls:** native radio and checkbox inputs in a `<fieldset>`, native `<dialog>` with `showModal()`, native buttons and links (D-014). Every interactive element has a visible focus style and an accessible name.
 - **Motion:** short colour and opacity transitions, off under `prefers-reduced-motion` or the setting. The landing page alone adds `animate-rise`, `hover-lift` (utilities in `index.css`) and `useReveal` / `useExamDemo` (`src/features/landing/motion.ts`); the reduce-motion rules also remove animation delays and the hover lift.

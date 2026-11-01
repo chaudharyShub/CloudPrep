@@ -153,6 +153,7 @@ Saved attempts keep the exact wording you answered (question archive), so editin
 - `docs/DECISIONS.md`: decision log
 - `docs/TEST_PLAN.md`: test strategy
 - `docs/DEPLOYMENT.md`: Vercel and Supabase setup
+- `docs/SHUBHAM_WORKS.md`: the shared Shubham Works footer and mark, for the developer's other sites
 - `docs/KNOWN_LIMITATIONS.md`: what it can't do
 - `docs/CONTENT_REVIEW.md`: question review checklist
 
@@ -165,6 +166,6 @@ The questions were written with AI assistance from public AWS documentation and 
 
 ## Made by
 
-- **Credit:** the sidebar, mobile menu and landing page footer say "Made by Shubham Chaudhary", linking to [his portfolio](https://shubhamworks.vercel.app/); under it, "Also by me: Frontend Interview Prep" links to the developer's [frontend interview practice site](https://frontend-interview-prod.vercel.app/); the Privacy page says who runs the site and mentions both.
+- **Credit:** CloudPrep is a **Shubham Works** project. The sidebar, mobile menu and landing page footer show the Shubham Works mark and "A Shubham Works project", then "Made by Shubham Chaudhary", linking to [his portfolio](https://shubhamworks.vercel.app/), then "Also: [Frontend Interview Prep](https://frontend-interview-prepare.vercel.app/)". The same footer goes on all the developer's sites ([docs/SHUBHAM_WORKS.md](docs/SHUBHAM_WORKS.md)). The Privacy page says who runs the site.
 
-Preparing for frontend interviews too? **[Frontend Interview Prep](https://frontend-interview-prod.vercel.app/)** has React and JavaScript interview questions with answers.
+Preparing for frontend interviews too? **[Frontend Interview Prep](https://frontend-interview-prepare.vercel.app/)** has React and JavaScript interview questions with answers.

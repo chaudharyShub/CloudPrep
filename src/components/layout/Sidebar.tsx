@@ -17,11 +17,12 @@ export function Sidebar({ className, account }: { className?: string; account?: 
         <Brand />
       </div>
       <NavList />
-      <div className="mt-auto flex flex-col gap-3">
+      <div className="mt-auto flex flex-col gap-5">
         {account}
-        <div className="flex flex-col gap-2 px-2">
-          <UnofficialNote />
+        {/* Small print: the credit, then the unofficial note, each its own group. */}
+        <div className="flex flex-col gap-3 px-2">
           <MadeBy />
+          <UnofficialNote compact />
         </div>
       </div>
     </div>

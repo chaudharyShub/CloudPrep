@@ -66,6 +66,8 @@ const UI_PARTS = [
   ['focus', 'surface'],
   ['ink', 'surface'],
   ['flag-border', 'surface'],
+  ['maker', 'bg'],
+  ['maker', 'surface'],
 ] as const;
 
 describe.each(Object.entries(THEMES))('AC-V.1 %s theme contrast', (_theme, tokens) => {

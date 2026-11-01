@@ -46,9 +46,9 @@ export function MobileNav({
           <NavList onNavigate={close} />
           <div className="mt-auto flex flex-col gap-4">
             {renderAccount?.(close)}
-            <div className="flex flex-col gap-2 px-2">
-              <UnofficialNote />
+            <div className="flex flex-col gap-3 px-2">
               <MadeBy />
+              <UnofficialNote compact />
             </div>
           </div>
         </div>
