@@ -434,7 +434,7 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 
 - **Context:** the README is the project's first impression on GitHub (CloudPrep is on the user's resume), but it opened with a wall of bullets and no pictures. The user asked to make it more appealing and keep content that already made sense.
 - **Decision:** a centered header (logo, one-line pitch, live-site button, shields.io badges, quick links), the AWS disclaimer as a GitHub note, an at-a-glance strip matching the landing page's metrics, and three screenshots: the landing page, Learning mode with feedback (light) and a mock exam (dark). "What it does" keeps every bullet word for word, grouped under Practise, Accounts and your data, Practice integrity, Design and For the site owner; the credit moved to a "Made by" section with the Frontend Interview Prep link. One fact was fixed: the tech stack still named Inter, replaced in D-057.
-- **Screenshots:** 1280×800 at 2× from the E2E build (fake sign-in, reduced motion), stored in `docs/images/`. They show the UI as of 3.2.0; retake them after a visible UI change.
+- **Screenshots:** 1280×800 at 2× from the E2E build (fake sign-in, reduced motion), stored in `docs/images/`. They show the UI as of 3.2.0, except the Learning mode shot, retaken for 3.4.0 to show the Shubham Works footer (D-062); retake them after a visible UI change.
 - **Not added:** a GIF or video (large files in the repo), a dashboard shot (a new account shows mostly empty states).
 
 ## D-061 — Open source licences
