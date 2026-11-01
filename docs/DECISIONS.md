@@ -66,8 +66,8 @@
 | D-058 | An "i" explanation (toggletip) beside "Review due", version 3.1.0 | Accepted (live, PR #19) |
 | D-059 | Link to the developer's Frontend Interview Prep site under the credit; version 3.2.0 | Accepted (live, PR #21) |
 | D-060 | README refresh: header, badges, screenshots in `docs/images/` | Accepted |
-| D-061 | Open source: MIT for the code, CC BY-NC-SA 4.0 for the questions, with an AI-assistance note; version 3.3.0 | Accepted (not merged yet) |
-| D-062 | "Shubham Works" umbrella: a shared footer (maker mark, umbrella line, credit, projects) for all the developer's sites; version 3.4.0 | Accepted (not merged yet) |
+| D-061 | Open source: MIT for the code, CC BY-NC-SA 4.0 for the questions, with an AI-assistance note; version 3.3.0 | Accepted (live, PR #22) |
+| D-062 | "Shubham Works" umbrella: a shared footer (maker mark, umbrella line, credit, projects) for all the developer's sites; version 3.4.0 | Accepted (live, PR #23) |
 
 ---
 
