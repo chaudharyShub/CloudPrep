@@ -14,7 +14,7 @@ const TEXT = import.meta.glob<string>(
   { query: '?raw', import: 'default', eager: true },
 );
 const PUBLIC = new Set(
-  Object.keys(import.meta.glob('/public/*.{png,svg,webmanifest}')).map((path) =>
+  Object.keys(import.meta.glob('/public/*.{png,svg,ico,webmanifest}')).map((path) =>
     path.slice('/public'.length),
   ),
 );
@@ -35,10 +35,28 @@ describe('brand assets (D-050)', () => {
     const hrefs = [
       ...html.matchAll(/<link rel="(?:icon|apple-touch-icon|manifest)"[^>]*href="([^"]+)"/g),
     ].map((m) => m[1] ?? '');
-    expect(hrefs).toEqual(['/favicon.svg', '/apple-touch-icon.png', '/manifest.webmanifest']);
+    expect(hrefs).toEqual([
+      '/icon-192.png',
+      '/favicon.svg',
+      '/apple-touch-icon.png',
+      '/manifest.webmanifest',
+    ]);
     for (const href of hrefs) expect(inPublic(href)).toBe(true);
     expect(html).toContain('<meta property="og:image" content="%SITE_URL%/og-image.png" />');
     expect(inPublic('/og-image.png')).toBe(true);
+  });
+
+  it('AC-S.6 search results get a PNG icon sized in multiples of 48 px and a real /favicon.ico', () => {
+    const html = read('index.html');
+    const png = /<link rel="icon" type="image\/png" sizes="(\d+)x(\d+)" href="([^"]+)"/.exec(html);
+    expect(png).not.toBeNull();
+    const [, width, height, href] = png ?? [];
+    expect(width).toBe(height);
+    expect(Number(width) % 48).toBe(0);
+    expect(inPublic(href ?? '')).toBe(true);
+    // Without the file, Vercel's fallback answers /favicon.ico with the app page.
+    expect(inPublic('/favicon.ico')).toBe(true);
+    expect(read('scripts/generate-brand-assets.mjs')).toContain("file: 'favicon.ico'");
   });
 
   it('the manifest names the app and lists icons that exist, including a maskable one', () => {

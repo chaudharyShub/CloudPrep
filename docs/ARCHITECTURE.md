@@ -1,6 +1,6 @@
 # CloudPrep — Architecture
 
-> Status: **Describes the code as built** (version 3.4.1) · Last updated: 2026-11-01
+> Status: **Describes the code as built** (version 3.4.2) · Last updated: 2026-11-02
 > This replaces the first draft of 2026-10-21. Reasons for each choice are in DECISIONS.md.
 
 ## 1. Overview

@@ -3,6 +3,12 @@
  * Pure functions with no React, so the build and the tests can both use them.
  */
 
+/**
+ * The live address (D-064). Set by hand: Vercel's own production-address variable picks the
+ * project's shortest domain, which is the old address that now redirects here.
+ */
+export const SITE_ORIGIN = 'https://aws-cloud-prepare.vercel.app';
+
 /** Public pages worth listing in search results. Everything else needs sign-in or is a flow. */
 export const INDEXED_PATHS = ['/', '/practice', '/privacy'] as const;
 

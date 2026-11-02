@@ -1,6 +1,6 @@
 # CloudPrep — Test Plan
 
-> Status: **Describes the tests as built** (version 3.4.1) · Last updated: 2026-11-01
+> Status: **Describes the tests as built** (version 3.4.2) · Last updated: 2026-11-02
 > This replaces the first draft of 2026-10-21, which planned spec files and a fixture flag that were never created.
 
 ## 1. Strategy at a glance

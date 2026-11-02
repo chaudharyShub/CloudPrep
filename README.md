@@ -6,7 +6,7 @@
 
 **Practise for the AWS Certified Cloud Practitioner (CLF-C02) exam: 2,000 original questions, timed mock exams and an explanation for every answer.**
 
-[![Live site](https://img.shields.io/badge/Live_site-cloud--prep--aws.vercel.app-6A2C5E?style=for-the-badge)](https://cloud-prep-aws.vercel.app/)
+[![Live site](https://img.shields.io/badge/Live_site-aws--cloud--prepare.vercel.app-6A2C5E?style=for-the-badge)](https://aws-cloud-prepare.vercel.app/)
 
 ![Version](https://img.shields.io/github/package-json/v/chaudharyShub/CloudPrep?color=6A2C5E)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
@@ -16,7 +16,7 @@
 ![Supabase](https://img.shields.io/badge/Supabase-Postgres_%2B_Auth-3FCF8E?logo=supabase&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Hosted_on-Vercel-000000?logo=vercel&logoColor=white)
 
-[Live site](https://cloud-prep-aws.vercel.app/) · [What it does](#what-it-does) · [Getting started](#getting-started) · [Docs](#documentation) · [Known limitations](docs/KNOWN_LIMITATIONS.md)
+[Live site](https://aws-cloud-prepare.vercel.app/) · [What it does](#what-it-does) · [Getting started](#getting-started) · [Docs](#documentation) · [Known limitations](docs/KNOWN_LIMITATIONS.md)
 
 </div>
 

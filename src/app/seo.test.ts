@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BLOCKED_PATHS, INDEXED_PATHS, robotsTxt, sitemapXml } from './seo';
+import { BLOCKED_PATHS, INDEXED_PATHS, robotsTxt, SITE_ORIGIN, sitemapXml } from './seo';
 
 const ORIGIN = 'https://cloudprep.example';
 const INDEX_HTML =
@@ -11,6 +11,10 @@ const VERCEL_JSON =
   Object.values(
     import.meta.glob<string>('/vercel.json', { query: '?raw', import: 'default', eager: true }),
   )[0] ?? '{}';
+const README =
+  Object.values(
+    import.meta.glob<string>('/README.md', { query: '?raw', import: 'default', eager: true }),
+  )[0] ?? '';
 const PUBLIC_SEO_FILES = Object.keys(import.meta.glob('/public/{robots.txt,sitemap.xml}'));
 
 describe('Search engine files', () => {
@@ -58,5 +62,12 @@ describe('Search engine files', () => {
     for (const path of INDEXED_PATHS) {
       if (path !== '/') expect(path.endsWith('/')).toBe(false);
     }
+  });
+
+  it('AC-S.5 the live address is the new one, absolute and without a trailing slash', () => {
+    expect(SITE_ORIGIN).toBe('https://aws-cloud-prepare.vercel.app');
+    expect(sitemapXml(SITE_ORIGIN)).toContain('<loc>https://aws-cloud-prepare.vercel.app/</loc>');
+    expect(README).toContain(`(${SITE_ORIGIN}/)`);
+    expect(README).not.toContain('cloud-prep-aws.vercel.app');
   });
 });

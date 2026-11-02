@@ -61,6 +61,20 @@ const og = page(
   BG,
 );
 
+/** Wraps one PNG in an .ico file (ICO allows PNG entries). Google asks for /favicon.ico. */
+const ico = (png, size) => {
+  const header = Buffer.alloc(22);
+  header.writeUInt16LE(1, 2); // type: icon
+  header.writeUInt16LE(1, 4); // one image
+  header.writeUInt8(size, 6);
+  header.writeUInt8(size, 7);
+  header.writeUInt16LE(1, 10); // colour planes
+  header.writeUInt16LE(32, 12); // bits per pixel
+  header.writeUInt32LE(png.length, 14);
+  header.writeUInt32LE(22, 18); // image data follows the header
+  return Buffer.concat([header, png]);
+};
+
 const ASSETS = [
   {
     file: 'apple-touch-icon.png',
@@ -68,6 +82,8 @@ const ASSETS = [
     w: 180,
     h: 180,
   },
+  // Search results want a square icon whose size is a multiple of 48 px (D-064).
+  { file: 'favicon.ico', html: icon(48), w: 48, h: 48, ico: true },
   { file: 'icon-192.png', html: icon(192), w: 192, h: 192 },
   { file: 'icon-512.png', html: icon(512), w: 512, h: 512 },
   // Maskable: launchers crop to a circle or squircle, so the mark stays inside the safe zone.
@@ -86,7 +102,8 @@ try {
     const tab = await browser.newPage({ viewport: { width: asset.w, height: asset.h } });
     await tab.setContent(asset.html);
     await tab.evaluate(() => document.fonts.ready);
-    writeFileSync(out(asset.file), await tab.screenshot({ omitBackground: true }));
+    const png = await tab.screenshot({ omitBackground: true });
+    writeFileSync(out(asset.file), asset.ico ? ico(png, asset.w) : png);
     await tab.close();
     console.log(`public/${asset.file}`);
   }

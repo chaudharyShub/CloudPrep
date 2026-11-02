@@ -115,22 +115,26 @@ Every pushed branch and pull request gets its own Vercel **preview deployment** 
 
 ## Link previews (D-050)
 
-The preview image's address comes from Vercel's `VERCEL_PROJECT_PRODUCTION_URL` during the build, so nothing needs setting while *Settings → Environment Variables → Automatically expose System Environment Variables* is on (the default). **Check:** paste the live link into a chat app (WhatsApp, Slack) or a preview checker such as opengraph.xyz; it should show the CloudPrep image and title. Apps cache previews, so a link shared before a change may show the old one for a while.
+The preview image's address is `SITE_ORIGIN` in `src/app/seo.ts` (https://aws-cloud-prepare.vercel.app, D-064), used when the build runs on Vercel; nothing needs setting there. If the live address changes, change `SITE_ORIGIN` (and the README links), keep the old domain on the project as a permanent redirect, and update Supabase's URLs and Search Console (below). **Check:** paste the live link into a chat app (WhatsApp, Slack) or a preview checker such as opengraph.xyz; it should show the CloudPrep image and title. Apps cache previews, so a link shared before a change may show the old one for a while.
 
 ## Search engines (D-063)
 
-The production build writes `robots.txt` and `sitemap.xml` (from `src/app/seo.ts`) using the same production address as the link previews. When you add a public page, add it to `INDEXED_PATHS` there; when you add a signed-in area, add it to `BLOCKED_PATHS`.
+The production build writes `robots.txt` and `sitemap.xml` (from `src/app/seo.ts`) using the same live address as the link previews (`SITE_ORIGIN`). When you add a public page, add it to `INDEXED_PATHS` there; when you add a signed-in area, add it to `BLOCKED_PATHS`.
 
 **Check after deploying:** open `/robots.txt` and `/sitemap.xml` on the live site. Each should show plain text or XML, not the CloudPrep app. Opening `/practice/` should land on `/practice` (`vercel.json` sets `"trailingSlash": false`, so each page has one address).
 
 **Google Search Console (once):**
 1. Go to https://search.google.com/search-console and sign in with Google.
-2. *Add property* → *URL prefix* → enter the live address (for example `https://cloud-prep-aws.vercel.app/`).
+2. *Add property* → *URL prefix* → enter the live address (`https://aws-cloud-prepare.vercel.app/`).
 3. Verify with the *HTML file* method: put the file Google offers (`google<code>.html`) in `public/`, deploy, check that the live address `/google<code>.html` shows its one line, then press *Verify*. Keep the file, or the site stops being verified. (A `*.vercel.app` address can't use the DNS method.) CloudPrep's file is `public/googlec9536a809aa9ed01.html` (added 2026-11-01).
 4. Open *Sitemaps*, enter `sitemap.xml` and press *Submit*.
-5. Optional: use *URL inspection* on the home page and press *Request indexing*.
+5. Optional: use *URL inspection* on the home page and press *Request indexing*. Do this after icon changes too: the icon beside the result comes from the home page's PNG icon (a multiple of 48 px) or `/favicon.ico`, and Google refreshes it slowly.
 
-Google takes a few days to a few weeks to list a new site. *Performance* then shows the searches that bring visitors. If the address changes (for example a custom domain later), add the new address as another property and submit its sitemap.
+Google takes a few days to a few weeks to list a new site. *Performance* then shows the searches that bring visitors. **When the address changes** (done on 2026-11-02, from `cloud-prep-aws.vercel.app`, D-064; again later for a custom domain):
+1. Add the new domain in Vercel and make the old one redirect to it (*Settings → Domains*, permanent redirect). Keep the old domain on the project.
+2. Change `SITE_ORIGIN` in `src/app/seo.ts` and the README links, and deploy. Check that `/sitemap.xml` and `/robots.txt` name the new address.
+3. Supabase, *Authentication → URL Configuration*: set the Site URL to the new address and add `https://<new address>/**` to Redirect URLs, or Google sign-in may return to the old address.
+4. Search Console: add the new address as a property (the same verification file works), then on the **old** property open *Settings → Change of address* and pick the new one, and submit `sitemap.xml` in the new property. Don't use the *Removals* tool on the old address; the redirect is enough. The old property can be deleted afterwards.
 
 ## Other static hosts
 
