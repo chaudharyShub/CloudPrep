@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import '@fontsource-variable/source-sans-3';
 import '@fontsource-variable/newsreader';
 import '@fontsource/ibm-plex-mono/400.css';
@@ -18,7 +19,13 @@ if (!container) throw new Error('Root element #root not found.');
 createRoot(container).render(
   <StrictMode>
     <App />
-    {/* Vercel Web Analytics (D-048): production builds only, so dev and E2E builds send nothing. */}
-    {import.meta.env.MODE === 'production' && <Analytics />}
+    {/* Vercel Web Analytics (D-048) and Speed Insights (D-065): production builds only,
+        so dev and E2E builds send nothing. */}
+    {import.meta.env.MODE === 'production' && (
+      <>
+        <Analytics />
+        <SpeedInsights />
+      </>
+    )}
   </StrictMode>,
 );

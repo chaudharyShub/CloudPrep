@@ -1,6 +1,6 @@
 # CloudPrep — Implementation Plan
 
-> Status: **In progress** · Last updated: 2026-10-29
+> Status: **In progress** · Last updated: 2026-11-04
 >
 > The phase sections below (P0–P10, C1–C3) are the original plan from 2026-10-21, kept for history; the Progress table and "Changes from the original plan" say what was actually built. For how the app works today, see PRODUCT_SPEC.md and ARCHITECTURE.md.
 
@@ -32,6 +32,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Review due "i" explanation (D-058) | An "i" button beside Review due that explains the schedule; version 3.1.0 | Done, merged and live (PR #19) |
 | Search engine basics (D-063) | `robots.txt` and `sitemap.xml` written by the production build (`src/app/seo.ts`); one address per page (no trailing slash); a page title that names the exam; Google Search Console steps in DEPLOYMENT.md; version 3.4.1; acceptance criteria below | Done, merged and live (PR #24); Search Console verification file is live, verify and submit the sitemap there |
 | New live address (D-064) | https://aws-cloud-prepare.vercel.app (the old address 308-redirects to it) in `SITE_ORIGIN` for link previews, `robots.txt` and `sitemap.xml`; README links; address-change steps in DEPLOYMENT.md; a PNG icon link and `favicon.ico` for the icon in search results; version 3.4.2; acceptance criteria below | Done, pushed to `master` (user's choice, approved 2026-11-02); Supabase URLs and Search Console by hand |
+| Speed Insights (D-065) | Vercel Speed Insights (Core Web Vitals) beside Web Analytics, production builds only; the Privacy page says what it measures; version 3.5.0; acceptance criteria below | Implemented on `feature/speed-insights`; enable *Speed Insights* in Vercel, then merge |
 | Shubham Works footer (D-062) | The credit becomes a shared footer for all the developer's sites: the orange "Dial" maker mark (`maker` token; SVGs in `docs/brand/`), "A Shubham Works project", "Made by Shubham Chaudhary", and "Also: Frontend Interview Prep" (replaces "Also by me"); a less crowded sidebar bottom with a shorter unofficial note; the Privacy page says CloudPrep is a Shubham Works project; `docs/SHUBHAM_WORKS.md` for the other sites; version 3.4.0; acceptance criteria below | Done, merged and live (PR #23) |
 | Open source licences (D-061) | `LICENSE` (MIT, code) and `LICENSE-CONTENT.md` (CC BY-NC-SA 4.0, questions); README License section; a Privacy page section on the licences and how the questions were made (AI-assisted, checked against AWS pages); `license` in package.json; version 3.3.0; acceptance criteria below | Done, merged and live (PR #22) |
 | README refresh (D-060) | Centered header with the logo, live-site link and badges, an at-a-glance strip, three screenshots (`docs/images/`), "What it does" grouped under headings, a "Made by" section; tech stack fonts corrected (Inter → Newsreader, Source Sans 3, IBM Plex Mono). No app change, no version bump | Done, pushed to `master` |
@@ -427,6 +428,15 @@ Acceptance criteria (`src/app/seo.test.ts`):
 - AC-S.5 `SITE_ORIGIN` is https://aws-cloud-prepare.vercel.app, absolute and without a trailing slash; builds on Vercel use it for the link-preview tags, `robots.txt` and `sitemap.xml`; the README links to it and no longer names the old address.
 - AC-S.6 `index.html` links a square PNG icon whose size is a multiple of 48 px, and `public/favicon.ico` exists (written by `npm run brand:assets`), so `/favicon.ico` serves an icon instead of the app page (`src/app/brandAssets.test.ts`).
 - Checked by hand after deploying: `/practice/` redirects to `/practice`; the live `/robots.txt` and `/sitemap.xml` return the files (not the app page), and the sitemap is submitted in Google Search Console (DEPLOYMENT.md).
+
+## Speed Insights (D-065)
+
+Requested by the user on 2026-11-04: measure how fast the live site loads and responds for real visitors. Version 3.5.0.
+
+Acceptance criteria:
+- AC-W.1 The Privacy page's "Usage statistics" section says the live site measures page speed with Vercel Speed Insights, lists what is sent with each measurement, and says app data is never sent (`PrivacyPage.test.tsx`).
+- AC-W.2 `<SpeedInsights />` (`@vercel/speed-insights/react`) is mounted in `src/main.tsx` beside `<Analytics />`, only when `import.meta.env.MODE === 'production'`, so development and E2E builds load and send nothing.
+- Checked by hand after deploying (DEPLOYMENT.md): `/_vercel/speed-insights/script.js` loads with status 200 on the live site and Core Web Vitals appear in the Vercel dashboard.
 
 ## UI redesign (D-057)
 

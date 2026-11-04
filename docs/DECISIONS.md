@@ -70,6 +70,7 @@
 | D-062 | "Shubham Works" umbrella: a shared footer (maker mark, umbrella line, credit, projects) for all the developer's sites; version 3.4.0 | Accepted (live, PR #23) |
 | D-063 | Search engine basics: `robots.txt` and `sitemap.xml` from the build, a descriptive page title, no trailing slashes; version 3.4.1 | Accepted (live, PR #24) |
 | D-064 | New live address https://aws-cloud-prepare.vercel.app, written in `SITE_ORIGIN`; icons for search results; version 3.4.2 | Accepted |
+| D-065 | Vercel Speed Insights for Core Web Vitals, production builds only; version 3.5.0 | Accepted |
 
 ---
 
@@ -476,3 +477,12 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Icon in search results:** Google showed no logo beside CloudPrep's result (it did for the portfolio, which serves `.ico` and PNG icons). Google wants a square icon whose size is a multiple of 48 px and often asks for `/favicon.ico`, which returned the app page (the fallback rewrite). `index.html` now also links `icon-192.png` (before the SVG, so browsers still use the SVG in tabs), and `npm run brand:assets` writes a 48 px `public/favicon.ico` (one PNG inside an ICO file). Google refreshes icons slowly, so it can take days to weeks to appear.
 - **Known cost:** guests' browser data is tied to the address, so guests from the old address start fresh (there were no users yet). Signed-in data is on the server.
 - **Version:** 3.4.2 (a fix with no visible change in the app).
+
+## D-065 — Speed Insights (Core Web Vitals)
+
+- **Requested by the user (2026-11-04):** to see how fast the live site is for real visitors; first impressions matter for a public product.
+- **Decision:** `@vercel/speed-insights` (`<SpeedInsights />` from `@vercel/speed-insights/react`) is mounted in `src/main.tsx` beside Web Analytics (D-048), with the same rule: production builds only, so development and E2E builds load and send nothing. It reports LCP, INP, CLS, FCP and TTFB per page address and follows React Router's history changes on its own.
+- **What it collects:** the timings, the page address, country, browser, operating system, device type and connection speed. No cookies. App data (answers, progress, results, account details) is never sent. The Privacy page's "Usage statistics" section says so.
+- **Hosting:** the script and its endpoint are under `/_vercel/speed-insights/`, already left alone by the SPA rewrite (D-038, D-048). Speed Insights must be enabled once in the Vercel project (*Speed Insights → Enable*); until then nothing is collected.
+- **Deployment:** through the usual Git flow (merge the PR; Vercel deploys `master`), not `vercel --prod` from a local folder, as in D-048.
+- **Version:** 3.5.0.

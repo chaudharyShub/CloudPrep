@@ -1,6 +1,6 @@
 # CloudPrep — Architecture
 
-> Status: **Describes the code as built** (version 3.4.2) · Last updated: 2026-11-02
+> Status: **Describes the code as built** (version 3.5.0) · Last updated: 2026-11-04
 > This replaces the first draft of 2026-10-21. Reasons for each choice are in DECISIONS.md.
 
 ## 1. Overview
@@ -47,7 +47,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 | Validation | Hand-written parsers (D-005); no schema library |
 | Backend | `@supabase/supabase-js` (loaded in its own chunk), Supabase CLI for migrations |
 | AI proctor | `@mediapipe/tasks-vision` with self-hosted models (D-043) |
-| Analytics | `@vercel/analytics`, production builds only (D-048) |
+| Analytics | `@vercel/analytics` (page views, D-048) and `@vercel/speed-insights` (Core Web Vitals, D-065), production builds only |
 | Tests | Vitest + jsdom + Testing Library; PGlite for the database schema; Playwright + axe |
 | Lint / format | ESLint 9 (typescript-eslint, react-hooks, jsx-a11y) + Prettier |
 
@@ -284,7 +284,7 @@ Every value is `{ app: "cloudprep", schemaVersion, savedAt, data }`. `decodeArea
 
 - The browser only has the publishable key; RLS protects every row. The secret key is used only by scripts in `.env.local`.
 - Admin access (D-054) is decided in the database, not the app: the `/admin` page's code is public like the rest of the site, but `admin_user_overview()` returns other users' details only to accounts listed in `admins`, which is changed only with the secret key: `npm run admin:add` (adds the accounts in `ADMIN_EMAIL` from `.env.local`, D-055) or the Supabase SQL editor. `is_admin()` only decides whether the navigation shows the Admin link; hiding it protects nothing, and the page shows no data to a non-admin anyway. The admin email is never in the app or its env (`VITE_` values are public).
-- Network: the app's own files, Supabase, and Vercel Web Analytics in production (page views only, no cookies).
+- Network: the app's own files, Supabase, and in production Vercel Web Analytics (page views) and Speed Insights (page-speed timings); no cookies.
 - External links use `rel="noopener noreferrer"`. Imported files and server data are untrusted: parsed strictly, rendered as text, never with `dangerouslySetInnerHTML`.
 - Integrity logs store only `{type, at}`. Camera and microphone data are analysed in memory and never stored or sent.
 

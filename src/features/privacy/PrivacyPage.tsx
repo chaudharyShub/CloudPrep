@@ -33,8 +33,11 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
         The live site counts page visits with Vercel Web Analytics, from Vercel, which hosts
         CloudPrep: which pages are opened, the site you came from, and your country, browser,
         operating system and type of device. It uses no cookies and doesn&apos;t identify you;
-        visitors are told apart only by a value that changes every day. Your answers, progress, exam
-        results and account details are never sent to it.
+        visitors are told apart only by a value that changes every day. It also measures how fast
+        pages load and respond with Vercel Speed Insights: timings such as how long a page took to
+        show, with the page address, your country, browser, operating system, type of device and
+        connection speed. Your answers, progress, exam results and account details are never sent to
+        either.
       </>
     ),
   },
