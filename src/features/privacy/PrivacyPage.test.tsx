@@ -78,6 +78,13 @@ describe('Developer credit', () => {
     expect(within(main).getByText(new RegExp(`is a ${MAKER_BRAND} project`))).toBeVisible();
   });
 
+  it('AC-W.1 the Privacy page says the live site measures page speed with Speed Insights', async () => {
+    renderApp('/privacy', { auth: createFakeAuthClient() });
+    await screen.findByRole('heading', { name: 'Usage statistics' });
+    const main = screen.getByRole('main');
+    expect(within(main).getByText(/Vercel Speed Insights/)).toBeVisible();
+  });
+
   it('AC-D.5 the Privacy page says how the questions were made and links both licences', async () => {
     renderApp('/privacy', { auth: createFakeAuthClient() });
     const heading = await screen.findByRole('heading', {

@@ -51,7 +51,7 @@ The bank has **2,000 original questions** (400 / 600 / 753 / 247 across the four
 - **Guests:** Learning mode, bookmarks and settings work without an account, saved in the browser only. The dashboard, mock exams, history and progress need sign-in.
 - **Your data:** settings (theme, motion, benchmark, warnings), export/import to a file, automatic backups before risky changes, and separate "clear" actions. Signed in, clearing applies to the account on every device.
 
-**Privacy in short:** accounts and synced data are stored with Supabase, and each user can read only their own data; the admin page shows the site owner a list of accounts with activity totals (never answers). The live site counts page views with Vercel Web Analytics (no cookies, no personal data). Details are on the in-app Privacy page.
+**Privacy in short:** accounts and synced data are stored with Supabase, and each user can read only their own data; the admin page shows the site owner a list of accounts with activity totals (never answers). The live site counts page views with Vercel Web Analytics and measures page speed with Vercel Speed Insights (no cookies, no personal data). Details are on the in-app Privacy page.
 
 ### Practice integrity
 
@@ -124,7 +124,7 @@ First-time setup for end-to-end tests: `npx playwright install chromium webkit`.
 
 ## Deployment
 
-CloudPrep is a static site on Vercel, deployed automatically from `master`. `vercel.json` sets the build (`npm run build`), the output (`dist`), a fallback to `index.html` so deep links work, no trailing slashes (each page has one address), and asset caching. The production build also writes `robots.txt` and `sitemap.xml` for search engines. Vercel needs `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; Web Analytics has to be enabled once in the Vercel project (Analytics → Enable). Supabase setup, Google sign-in, analytics and link-preview checks are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+CloudPrep is a static site on Vercel, deployed automatically from `master`. `vercel.json` sets the build (`npm run build`), the output (`dist`), a fallback to `index.html` so deep links work, no trailing slashes (each page has one address), and asset caching. The production build also writes `robots.txt` and `sitemap.xml` for search engines. Vercel needs `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; Web Analytics and Speed Insights each have to be enabled once in the Vercel project (Analytics → Enable, Speed Insights → Enable). Supabase setup, Google sign-in, analytics and link-preview checks are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Updating the question bank
 

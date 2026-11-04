@@ -75,7 +75,7 @@ Reload the site: admins get an **Admin** link in the navigation, which opens `/a
 
 1. Sign in at vercel.com, choose *Add New → Project*, and import the GitHub repository. Vercel reads `vercel.json`; leave the settings as detected.
 2. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` under *Settings → Environment Variables* (Production and Preview). Never add the secret key.
-3. Enable Web Analytics once (*Analytics → Enable*; see below).
+3. Enable Web Analytics and Speed Insights once (*Analytics → Enable*, *Speed Insights → Enable*; see below).
 4. Deploy, then run the smoke test below.
 
 ## Updating
@@ -113,6 +113,12 @@ Every pushed branch and pull request gets its own Vercel **preview deployment** 
 2. Deploy as usual. The app loads Vercel's script only in production builds.
 3. **Check:** open the live site and visit a few pages, then look at *Analytics* in the Vercel dashboard; visits appear within a minute or so. Ad blockers can block the script, so test in a normal window without one. In the browser's network panel, `/_vercel/insights/script.js` should load with status 200.
 
+## Speed Insights (D-065)
+
+1. In the Vercel project, open *Speed Insights* and choose *Enable* (the free tier is enough for this site).
+2. Deploy as usual (merge the pull request). The app loads Vercel's script only in production builds.
+3. **Check:** open the live site in a normal window without an ad blocker and move between a few pages. In the browser's network panel, `/_vercel/speed-insights/script.js` should load with status 200, and requests to `/_vercel/speed-insights/vitals` appear as you use or leave the page. Core Web Vitals (LCP, INP, CLS, FCP, TTFB) appear under *Speed Insights* in the Vercel dashboard once enough visits have been measured; on a quiet site this can take a while.
+
 ## Link previews (D-050)
 
 The preview image's address is `SITE_ORIGIN` in `src/app/seo.ts` (https://aws-cloud-prepare.vercel.app, D-064), used when the build runs on Vercel; nothing needs setting there. If the live address changes, change `SITE_ORIGIN` (and the README links), keep the old domain on the project as a permanent redirect, and update Supabase's URLs and Search Console (below). **Check:** paste the live link into a chat app (WhatsApp, Slack) or a preview checker such as opengraph.xyz; it should show the CloudPrep image and title. Apps cache previews, so a link shared before a change may show the old one for a while.
@@ -138,7 +144,7 @@ Google takes a few days to a few weeks to list a new site. *Performance* then sh
 
 ## Other static hosts
 
-Any static host works if it can serve `index.html` for unknown paths and set the two `VITE_SUPABASE_*` variables at build time. Web Analytics only works on Vercel.
+Any static host works if it can serve `index.html` for unknown paths and set the two `VITE_SUPABASE_*` variables at build time. Web Analytics and Speed Insights only work on Vercel.
 - **Netlify:** build `npm run build`, publish `dist`, and add `public/_redirects` containing `/*  /index.html  200`.
 - **Cloudflare Pages:** build `npm run build`, output `dist`. Single-page-app fallback is automatic when there is no `404.html`.
 - **GitHub Pages:** it has no fallback, so deep links would 404. It would need a hash router (D-004 option B); that isn't set up.
@@ -154,6 +160,6 @@ npm run preview    # inspect the production build at http://localhost:4173
 
 What to expect in the production build (`dist/`):
 - **Keys:** only the public Supabase URL and publishable key. The secret key is never read by app code.
-- **Network:** the app talks to its own files, the Supabase project and, in production, Vercel Web Analytics. Links to AWS documentation open in a new tab.
+- **Network:** the app talks to its own files, the Supabase project and, in production, Vercel Web Analytics and Speed Insights. Links to AWS documentation open in a new tab.
 - **No test code:** the fake sign-in used by E2E builds is removed from production builds (D-045), and the bundle contains no questions; they're downloaded from Supabase (D-046).
 - **Paths:** asset paths are absolute (`/assets/...`), which is correct for a root-domain deployment.
