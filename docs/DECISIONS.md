@@ -70,7 +70,7 @@
 | D-062 | "Shubham Works" umbrella: a shared footer (maker mark, umbrella line, credit, projects) for all the developer's sites; version 3.4.0 | Accepted (live, PR #23) |
 | D-063 | Search engine basics: `robots.txt` and `sitemap.xml` from the build, a descriptive page title, no trailing slashes; version 3.4.1 | Accepted (live, PR #24) |
 | D-064 | New live address https://aws-cloud-prepare.vercel.app, written in `SITE_ORIGIN`; icons for search results; version 3.4.2 | Accepted |
-| D-065 | Vercel Speed Insights for Core Web Vitals, production builds only; version 3.5.0 | Accepted |
+| D-065 | Vercel Speed Insights for Core Web Vitals, production builds only; version 3.5.0 | Accepted (live, PR #25) |
 
 ---
 
