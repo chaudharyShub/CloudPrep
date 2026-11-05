@@ -1,9 +1,11 @@
-import { EXAM_DURATION_MINUTES, EXAM_QUESTION_COUNT } from '@/domain/exam-guide/clf-c02';
+import type { ExamGuide } from '@/domain/exam-guide/types';
 import type { ReviewStatus } from '@/domain/questions/types';
 
 export type ExamKind = 'full' | 'short';
 
 export interface ExamConfig {
+  /** The exam this practice exam is for (D-066). */
+  examId: string;
   kind: ExamKind;
   questionCount: number;
   durationMs: number;
@@ -11,23 +13,26 @@ export interface ExamConfig {
 
 const MINUTE = 60_000;
 
-/** The default practice exam: same length and time as the real CLF-C02 exam. */
-export const FULL_EXAM: ExamConfig = {
-  kind: 'full',
-  questionCount: EXAM_QUESTION_COUNT,
-  durationMs: EXAM_DURATION_MINUTES * MINUTE,
-};
+/** The default practice exam: same length and time as the real exam. */
+export function fullExamConfig(exam: ExamGuide): ExamConfig {
+  return {
+    examId: exam.id,
+    kind: 'full',
+    questionCount: exam.questionCount,
+    durationMs: exam.durationMinutes * MINUTE,
+  };
+}
 
 /** A shorter timed exam is only offered if at least this many balanced questions exist. */
 export const MIN_SHORT_EXAM_QUESTIONS = 10;
 
 /**
- * A shorter exam keeps the real exam's pace (90 minutes for 65 questions), rounded up
- * to a whole minute: e.g. 41 questions → ceil(41 × 90 / 65) = 57 minutes.
+ * A shorter exam keeps the real exam's pace, rounded up to a whole minute: e.g. 41 CLF-C02
+ * questions → ceil(41 × 90 / 65) = 57 minutes.
  */
-export function shortExamConfig(questionCount: number): ExamConfig {
-  const minutes = Math.ceil((questionCount * EXAM_DURATION_MINUTES) / EXAM_QUESTION_COUNT);
-  return { kind: 'short', questionCount, durationMs: minutes * MINUTE };
+export function shortExamConfig(exam: ExamGuide, questionCount: number): ExamConfig {
+  const minutes = Math.ceil((questionCount * exam.durationMinutes) / exam.questionCount);
+  return { examId: exam.id, kind: 'short', questionCount, durationMs: minutes * MINUTE };
 }
 
 /**

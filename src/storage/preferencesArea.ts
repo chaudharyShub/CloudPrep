@@ -1,3 +1,4 @@
+import { DEFAULT_EXAM, isExamId } from '@/domain/exam-guide';
 import { DEFAULT_BENCHMARK_PERCENT } from '@/domain/exam/config';
 import { isValidBenchmark } from '@/domain/exam/scoring';
 import {
@@ -22,6 +23,8 @@ export interface Preferences {
   readonly examTimeWarnings: boolean;
   readonly shuffleOptions: boolean;
   readonly practiceSessionLength: PracticeLength;
+  /** The exam the learner used last; pages without an exam in the address open it (D-066). */
+  readonly exam: string;
 }
 
 /**
@@ -36,6 +39,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   examTimeWarnings: true,
   shuffleOptions: true,
   practiceSessionLength: '10',
+  exam: DEFAULT_EXAM.id,
 };
 
 /** What is persisted: only the settings the learner changed. */
@@ -50,6 +54,7 @@ const VALIDATORS: { [K in keyof Preferences]: (value: unknown) => value is Prefe
   shuffleOptions: (v): v is boolean => typeof v === 'boolean',
   practiceSessionLength: (v): v is PracticeLength =>
     (PRACTICE_LENGTHS as readonly unknown[]).includes(v),
+  exam: isExamId,
 };
 const KEYS = Object.keys(VALIDATORS) as (keyof Preferences)[];
 

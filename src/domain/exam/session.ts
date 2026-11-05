@@ -29,6 +29,8 @@ export type SubmitReason = 'manual' | 'time_expired' | 'expired_while_away' | 'p
 
 export interface ExamSession {
   readonly id: string;
+  /** The exam it belongs to (D-066); saved sessions without one are CLF-C02. */
+  readonly examId: string;
   readonly kind: ExamKind;
   readonly bankVersion: string;
   readonly seed: number;
@@ -77,6 +79,7 @@ export function createExamSession(input: CreateExamSessionInput): ExamSession {
   }
   return {
     id: input.id,
+    examId: input.config.examId,
     kind: input.config.kind,
     bankVersion: input.bankVersion,
     seed: input.seed,

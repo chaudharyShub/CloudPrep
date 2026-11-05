@@ -1,4 +1,4 @@
-// Re-checks that every cited AWS page still exists (needs internet access).
+// Re-checks that every cited AWS page of every exam's bank still exists (needs internet access).
 // Usage: node scripts/check-references.mjs   (exits 1 if any URL doesn't return HTTP 200)
 import { createServer } from 'vite';
 
@@ -10,8 +10,9 @@ const server = await createServer({
 
 let exitCode = 0;
 try {
-  const { QUESTION_BANK } = await server.ssrLoadModule('/src/content/questions/index.ts');
-  const urls = [...new Set(QUESTION_BANK.flatMap((q) => q.references.map((r) => r.url)))];
+  const { BANKS } = await server.ssrLoadModule('/src/content/banks.ts');
+  const questions = Object.values(BANKS).flatMap((bank) => bank.questions);
+  const urls = [...new Set(questions.flatMap((q) => q.references.map((r) => r.url)))];
   console.log(`Checking ${urls.length} URLs…`);
   const failures = [];
   for (let i = 0; i < urls.length; i += 8) {

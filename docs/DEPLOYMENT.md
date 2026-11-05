@@ -81,7 +81,8 @@ Reload the site: admins get an **Admin** link in the navigation, which opens `/a
 ## Updating
 
 - **App changes:** work on a branch, open a pull request and merge it into `master`. Vercel builds and deploys `master` automatically; pull requests get preview deployments.
-- **Question changes:** bump `BANK_VERSION`, then run `npm run publish:questions` and `npm run check:published`. **The live site only shows published questions**, and visitors get the new set on their next visit (it's cached in their browser by version).
+- **Question changes:** bump the exam's `BANK_VERSION`, then run `npm run publish:questions` and `npm run check:published` (both handle every exam, D-066). **The live site only shows published questions**, and visitors get the new set on their next visit (it's cached in their browser by version).
+- **More exams (4.0.0, D-066):** after merging 4.0.0, run `npm run publish:questions` once. It publishes the SAA-C03 and DVA-C03 catalogue rows (exam, domains, topics; no questions yet, so they stay unpublished), which their user data refers to. No migration is needed. An exam appears on the live site when its guide in `src/domain/exam-guide/` has `launched: true`; set that only once its bank is published, then add its landing figure in `src/features/landing/landingContent.ts`.
 - **Database changes:** add a new migration in `supabase/migrations/` and run `npm run db:push` before deploying app code that needs it.
 - **User data is kept:** signed-in users' data is in Supabase with a copy in the browser, and guests' data is in their browser. Every stored shape is versioned and migrated (see `src/storage/`).
 
@@ -98,7 +99,7 @@ Every pushed branch and pull request gets its own Vercel **preview deployment** 
 ## Smoke test after each deployment
 
 1. Open the site signed out: you land on the sign-in page, with no errors in the browser console. "Continue as a guest" opens Learning mode.
-2. Open `<your-url>/practice` and `<your-url>/settings` directly in a new tab, then refresh. Both must load (this checks the route fallback).
+2. Open `<your-url>/clf-c02/practice` and `<your-url>/settings` directly in a new tab, then refresh. Both must load (this checks the route fallback). Open `<your-url>/practice`: it moves to `/clf-c02/practice` (old addresses, D-066).
 3. Open `<your-url>/does-not-exist`. You should see CloudPrep's "Page not found" page, not a Vercel 404.
 4. As a guest, start a short practice session and check an answer. Reload: progress is kept, and the Review due card in Learning mode shows when the question comes back.
 5. Sign in with Google: you return to the page you came from and your account shows in the navigation. If you have guest data, you're asked once whether to add it.

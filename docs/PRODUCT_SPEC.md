@@ -1,13 +1,15 @@
 # CloudPrep — Product Specification
 
-> Status: **Describes the app as built** (version 3.5.0) · Last updated: 2026-11-04
+> Status: **Describes the app as built** (version 4.0.0) · Last updated: 2026-11-05
 > CloudPrep is an unofficial practice tool. It is not affiliated with, endorsed by, or sponsored by Amazon Web Services.
 >
 > This replaces the first draft of 2026-10-21. What changed from that plan is in IMPLEMENTATION_PLAN.md ("Changes from the original plan") and the reasons are in DECISIONS.md.
 
 ## 1. Purpose
 
-CloudPrep is a browser-based practice simulator for the **AWS Certified Cloud Practitioner (CLF-C02)** exam. It started as one person's preparation tool and is now a free, public product with its own landing page (non-commercial).
+CloudPrep is a browser-based practice simulator for AWS certification exams: **AWS Certified Cloud Practitioner (CLF-C02)**, and, from version 4.0.0, **AWS Certified Solutions Architect – Associate (SAA-C03)** and **AWS Certified Developer – Associate (DVA-C03)** (D-066). It started as one person's preparation tool and is now a free, public product with its own landing page (non-commercial).
+
+Every exam gets the same features: its own question bank, Learning mode with Review due, timed and proctored mock exams, results, answer review, history, progress and readiness, bookmarks and sync. SAA-C03 and DVA-C03 appear on the live site once their question banks are written and checked (D-066); until then they are available in development only.
 
 ### 1.1 Goals
 
@@ -24,11 +26,21 @@ CloudPrep is a browser-based practice simulator for the **AWS Certified Cloud Pr
 - Reproducing AWS's scaled-scoring algorithm, which is proprietary.
 - Using real, leaked or "dump" exam questions (D-042).
 - AI-generated questions or explanations at runtime.
-- Other AWS certifications for now. The database is ready for them (`exam_id` on every table, D-044), but the app is CLF-C02 only.
+- Other AWS certifications beyond these three for now. Adding one is mostly content: an exam guide object in `src/domain/exam-guide/` and a question bank (D-066).
 
 ## 2. Verified exam facts (source of truth)
 
-Source: the official CLF-C02 exam guide, <https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/>, checked on 2026-10-21.
+The facts live in code, one guide object per exam (`src/domain/exam-guide/`), and are tested (`examGuide.test.ts`).
+
+| Exam | Questions | Time | Passing score | Domain weights | Guide checked |
+|---|---|---|---|---|---|
+| CLF-C02 Cloud Practitioner | 65 (50 scored) | 90 minutes | 700 | 24 / 30 / 34 / 12% | 2026-10-21 |
+| SAA-C03 Solutions Architect – Associate | 65 (50 scored) | 130 minutes | 720 | 30 / 26 / 24 / 20% | 2026-11-05 (guide revision of 29 October 2026) |
+| DVA-C03 Developer – Associate | 65 (50 scored) | 130 minutes | 720 | 30 / 26 / 22 / 22% | 2026-11-05 (replaces DVA-C02, whose last exam day is 30 November 2026) |
+
+SAA-C03 domains: 1 Design Secure Architectures (tasks 1.1–1.3) · 2 Design Resilient Architectures (2.1–2.2) · 3 Design High-Performing Architectures (3.1–3.5) · 4 Design Cost-Optimized Architectures (4.1–4.4). DVA-C03 domains: 1 Development with AWS Services (1.1–1.3) · 2 Security (2.1–2.3, including AI services) · 3 Testing and Deployment (3.1–3.3) · 4 Troubleshooting and Optimization (4.1–4.3). Sources: <https://docs.aws.amazon.com/aws-certification/latest/solutions-architect-associate-03/solutions-architect-associate-03.html> and <https://docs.aws.amazon.com/aws-certification/latest/developer-associate-03/developer-associate-03.html>; exam times from the certification pages.
+
+The rest of this section gives the CLF-C02 facts in detail. Source: the official CLF-C02 exam guide, <https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/>, checked on 2026-10-21. The other two exams share the format rows (question types, unanswered, compensatory scoring).
 
 | Fact | Value | How CloudPrep uses it |
 |---|---|---|
@@ -73,23 +85,25 @@ Assumption: a current version of Chrome, Edge, Firefox or Safari on desktop, tab
 | Dashboard, mock exams, results, exam history, progress | Sign-in required | Yes |
 | Where data lives | `localStorage` in this browser | Supabase, with a copy in this browser that works offline (D-047) |
 
-`/` is the landing page for guests ("Sit the exam before you sit the exam.", an example question with explained answers, the two ways to study, what's covered, "Start practising" into Learning mode, and "Sign in"); signed-in users go straight to the dashboard (D-057). Pages that need an account send guests to the sign-in page, which offers "Continue as a guest". After signing in on a browser with guest data, the user is asked once whether to add it to the account; Settings offers it again later. Guest data is never changed by this. Signing out asks for confirmation and says whether everything is saved yet.
+Pages that belong to an exam have its id in the address: `/clf-c02/practice`, `/saa-c03/exam`, `/dva-c03/results/:id` (D-066). An **Exam** picker at the top of the navigation (shown when more than one exam is offered) opens the same section of another exam, and the app remembers the exam used last; pages without an exam in the address (settings, privacy) and old addresses from before 4.0.0 (`/practice`, `/exam`, …) use it. Each exam has its own landing page (`/saa-c03`). Data is kept per exam: each exam's dashboard, Learning mode, Review due, bookmarks, history, results and progress show only that exam's questions and attempts. Settings are shared. Only one exam can be in progress at a time, across all exams.
+
+`/` is the landing page for guests ("Sit the exam before you sit the exam.", an example question with explained answers, what's covered, the two ways to study, "Start practising" into Learning mode, and "Sign in"); signed-in users go straight to the dashboard (D-057). Pages that need an account send guests to the sign-in page, which offers "Continue as a guest". After signing in on a browser with guest data, the user is asked once whether to add it to the account; Settings offers it again later. Guest data is never changed by this. Signing out asks for confirmation and says whether everything is saved yet.
 
 ### 4.2 Pages
 
 | Page | What it does |
 |---|---|
-| Landing (`/`, guests only) | "Sit the exam before you sit the exam.", an example question with explained answers, the two ways to study (Learning mode and mock exam), what's covered (domain weights), links into Learning mode and sign-in; signed-in users are sent to the dashboard (D-057) |
-| Dashboard (`/dashboard`) | Latest mock exam, recent attempts, practice by domain and quick actions, with empty states for new users |
-| Learning mode (`/practice`) | Practice by domain, topic (task statement) and difficulty, 5 / 10 / 20 / all questions, optionally unanswered only; "Review due", "Practise mistakes" and "Practise bookmarks" |
-| Mock exam (`/exam`) | Rules, scoring explanation, integrity mode, start / resume / abandon; full exam (65 questions, 90 minutes) |
-| Check-in (`/exam/check-in`) | AI-proctored exams only: rules, camera and microphone, room check, calibration (§9) |
-| Exam session and review (`/exam/session`, `/exam/review`) | The exam itself and the final review before submitting |
-| Results (`/results/:id`) | Practice score, benchmark outcome, domain performance, weak areas, recommended next steps, integrity log |
-| Answer review (`/results/:id/review`) | Every question with your answer, the correct answer, explanations and sources; filters: all, correct, incorrect, unanswered |
-| Exam history (`/history`) | All submitted attempts, including shorter and proctor-ended ones |
-| Progress (`/progress`) | Practice readiness (D-033), recent exam scores, domain strengths and weaknesses, frequently missed topics, questions you keep missing, practice coverage |
-| Bookmarks (`/bookmarks`) | Bookmarked questions, with practice from the list |
+| Landing (`/`, and each exam's own page such as `/saa-c03`; guests only) | "Sit the exam before you sit the exam.", an example question with explained answers, "Choose your exam" (when more than one is offered; choosing one keeps the scroll position), what's covered (domain weights), the two ways to study (Learning mode and mock exam), links into Learning mode and sign-in; signed-in users are sent to the dashboard (D-057). `/` shows the exam used last (CLF-C02 for new visitors); each exam's page shows its own facts, example question and fee (D-066) |
+| Dashboard (`/:exam/dashboard`) | Latest mock exam, recent attempts, practice by domain and quick actions, with empty states for new users |
+| Learning mode (`/:exam/practice`) | Practice by domain, topic (task statement) and difficulty, 5 / 10 / 20 / all questions, optionally unanswered only; "Review due", "Practise mistakes" and "Practise bookmarks" |
+| Mock exam (`/:exam/exam`) | Rules, scoring explanation (with the exam's own passing score), integrity mode, start / resume / abandon; full exam (65 questions; 90 minutes for CLF-C02, 130 for SAA-C03 and DVA-C03). An exam in progress in another exam is offered for resuming instead |
+| Check-in (`/:exam/exam/check-in`) | AI-proctored exams only: rules, camera and microphone, room check, calibration (§9) |
+| Exam session and review (`/:exam/exam/session`, `/:exam/exam/review`) | The exam itself and the final review before submitting; the top bar shows the exam's code |
+| Results (`/:exam/results/:id`) | Practice score, benchmark outcome, domain performance, weak areas, recommended next steps, integrity log |
+| Answer review (`/:exam/results/:id/review`) | Every question with your answer, the correct answer, explanations and sources; filters: all, correct, incorrect, unanswered |
+| Exam history (`/:exam/history`) | All submitted attempts of the exam, including shorter and proctor-ended ones |
+| Progress (`/:exam/progress`) | Practice readiness (D-033), recent exam scores, domain strengths and weaknesses, frequently missed topics, questions you keep missing, practice coverage |
+| Bookmarks (`/:exam/bookmarks`) | Bookmarked questions of the exam, with practice from the list |
 | Settings (`/settings`) | Preferences, account, data management (§8) |
 | Privacy (`/privacy`) | What is stored, what is monitored, analytics and page-speed measurement (D-065), how to delete records, who runs CloudPrep (D-056; a Shubham Works project, D-062) and a link to Frontend Interview Prep (D-059), the licences and how the questions were made (D-061) |
 | Sign-in (`/sign-in`, `/auth/callback`) | Google sign-in (and email links when enabled), return to the requested page |
@@ -101,7 +115,9 @@ Assumption: a current version of Chrome, Edge, Firefox or Safari on desktop, tab
 - Comparing two attempts side by side.
 - Exam time accommodation (+30 minutes), keyboard shortcuts, custom-length quizzes.
 - Installable offline app (PWA): icons and "Add to Home Screen" exist, but there's no service worker.
-- An in-app question editor, other certifications, other languages.
+- An in-app question editor, other languages, and certifications other than CLF-C02, SAA-C03 and DVA-C03.
+- The SAA-C03 and DVA-C03 question banks: the app supports both exams (D-066), but their questions are still being written and checked, so the live site doesn't offer them yet.
+- Two exams in progress at once (one at a time, like a test centre), and settings per exam (they are shared).
 - Server-side scoring (Phase 8 step 5: answers are still downloaded with the questions).
 - Deleting your own account from inside the app ("Reset everything" deletes its data).
 
@@ -109,14 +125,14 @@ Assumption: a current version of Chrome, Edge, Firefox or Safari on desktop, tab
 
 ### 5.1 Rules
 
-- 65 questions and 90:00, using questions with status `unverified`, `checked` or `approved` (D-041).
+- 65 questions, timed by the exam's guide (90:00 for CLF-C02, 130:00 for SAA-C03 and DVA-C03), using questions with status `unverified`, `checked` or `approved` (D-041).
 - No pause (D-013). The timer keeps running while the tab is closed.
 - Answers save instantly, in the browser and to the account. The learner can change answers until submission.
 - No feedback, correctness hints or explanations until the exam is submitted. Exam pages receive question views without correct answers or explanations.
 - Unanswered questions count as incorrect.
 - Multiple-response questions are all-or-nothing (D-012). The question says how many to select ("Select two"), more than that can't be selected, and a partly answered question is shown as such (D-027).
 - Flag questions, move with previous/next or the question grid, and review all, answered, unanswered, partly answered or flagged questions before submitting. The finish dialog shows how many are unanswered.
-- Only one exam at a time. Starting a new one while one is in progress offers to resume it or abandon it (with confirmation).
+- Only one exam at a time, across all exams (D-066). Starting a new one while one is in progress offers to resume it or abandon it (with confirmation); another exam's Mock exam page names the exam in progress and links to it.
 - If the bank can't supply a full exam, a shorter timed exam at the real pace is offered instead (D-025). With the current bank this doesn't happen.
 
 ### 5.2 Timer
@@ -139,6 +155,8 @@ The domain weights apply to the **50 scored** questions on the real exam. CloudP
 | D4 Billing, Pricing & Support | 12% | 7.8 | **8** |
 | **Total** | 100% | 65 | **65** |
 
+Other exams use their own weights the same way: SAA-C03 30 / 26 / 24 / 20% gives **19 / 17 / 16 / 13**, DVA-C03 30 / 26 / 22 / 22% gives **20 / 17 / 14 / 14** (`blueprint.test.ts`).
+
 Within each domain, questions not used in earlier exams come first, spread across task statements by round-robin. Question order and option order (if that setting is on) are shuffled with a seeded generator, and the seed is stored with the session (D-026).
 
 ## 6. Scoring (unofficial)
@@ -146,7 +164,7 @@ Within each domain, questions not used in earlier exams come first, spread acros
 - **Practice score** = correct ÷ total questions, shown as a percentage.
 - **Practice benchmark** = a pass threshold, 70% by default, 50–90% in steps of 5 in Settings. The benchmark in effect at submission is stored with the attempt.
 - **Per-domain results** are information only; pass/fail ignores them, like the compensatory model.
-- The exam and results pages explain that AWS reports a scaled score from 100 to 1,000 (700 to pass) with an unpublished method, and that CloudPrep's score is simple percent-correct. CloudPrep never shows a number out of 1,000 (D-008).
+- The exam and results pages explain that AWS reports a scaled score from 100 to 1,000 (700 to pass CLF-C02, 720 for SAA-C03 and DVA-C03) with an unpublished method, and that CloudPrep's score is simple percent-correct. CloudPrep never shows a number out of 1,000 (D-008).
 - Attempts ended by the AI proctor are void: they never meet the benchmark and are left out of readiness, but keep their score for review (D-043).
 - **Readiness** (Progress page) uses explicit criteria over the last three exams and never says "ready" (D-033).
 

@@ -1,4 +1,4 @@
-import type { DomainId, TaskStatementId } from '@/domain/exam-guide/clf-c02';
+import type { DomainId, TaskStatementId } from '@/domain/exam-guide/types';
 import { PRACTICE_VISIBLE_STATUSES, type Difficulty, type Question } from './types';
 
 export interface QuestionFilter {

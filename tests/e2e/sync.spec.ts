@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }) => {
 
 /** Bookmarks the first question of a Learning mode session. */
 async function bookmarkFirstQuestion(page: Page) {
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await page.getByRole('button', { name: 'Start practice' }).click();
   await page.getByRole('button', { name: 'Bookmark' }).click();
 }
@@ -38,7 +38,7 @@ test('AC-B.18 progress is saved to the account and appears on another device', a
   ).toBeVisible();
 
   await forgetThisBrowser(page);
-  await page.goto('/bookmarks');
+  await page.goto('/clf-c02/bookmarks');
   await expect(page.getByRole('button', { name: /^Remove bookmark:/ })).toHaveCount(1);
 });
 
@@ -77,7 +77,7 @@ test.describe('as a guest first', () => {
     );
     expect(accountKeys).toEqual([]);
     // The guest's own bookmark is still here, and signing in again doesn't ask twice.
-    await page.goto('/bookmarks');
+    await page.goto('/clf-c02/bookmarks');
     await expect(page.getByRole('button', { name: /^Remove bookmark:/ })).toHaveCount(1);
   });
 });

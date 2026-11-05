@@ -13,18 +13,20 @@ import {
   countedAttempts,
   MIN_ATTEMPTS_FOR_GUIDANCE,
 } from '@/domain/analytics/readiness';
-import { FULL_EXAM } from '@/domain/exam/config';
-import { DOMAINS, EXAM_GUIDE_URL } from '@/domain/exam-guide/clf-c02';
+import { useExamPath } from '@/app/paths';
+import { fullExamConfig } from '@/domain/exam/config';
+import type { ExamGuide } from '@/domain/exam-guide';
 import { practiceStats, weakestDomain } from '@/domain/practice/progress';
 import { reviewOverview } from '@/domain/practice/review';
 import { questionCount, reviewSessionSetup } from '@/features/practice/reviewSession';
-import { SESSION_PATH, sessionState } from '@/features/practice/sessionSetup';
+import { SESSION_PAGE, sessionState } from '@/features/practice/sessionSetup';
 import { useNow } from '@/hooks/useNow';
 import { cn } from '@/lib/cn';
 import { formatDateTime, formatMinutes, formatPercent } from '@/lib/format';
 import type { ExamConfig } from '@/domain/exam/config';
 import { ReviewDueInfo } from '@/features/practice/ReviewDueInfo';
 import {
+  useCurrentExam,
   useExamAttempts,
   useExamQuestions,
   usePracticeQuestions,
@@ -47,39 +49,53 @@ interface QuickAction {
 
 const MINUTE = 60_000;
 
+type Path = (page?: string) => string;
+
 /** The timed exam on offer: the full exam, or the shorter one while the bank is too small. */
-function examAction(fullAvailable: boolean, shortConfig: ExamConfig | null): QuickAction {
+function examAction(
+  exam: ExamGuide,
+  path: Path,
+  fullAvailable: boolean,
+  shortConfig: ExamConfig | null,
+): QuickAction {
+  const full = fullExamConfig(exam);
   return fullAvailable || !shortConfig
     ? {
-        to: '/exam',
+        to: path('exam'),
         title: 'Timed mock exam',
-        description: `${FULL_EXAM.questionCount} questions · ${FULL_EXAM.durationMs / MINUTE} minutes`,
+        description: `${full.questionCount} questions · ${full.durationMs / MINUTE} minutes`,
       }
     : {
-        to: '/exam',
+        to: path('exam'),
         title: 'Timed mock exam (shorter)',
         description: `${shortConfig.questionCount} questions · ${shortConfig.durationMs / MINUTE} minutes`,
       };
 }
 
-const OTHER_ACTIONS: readonly QuickAction[] = [
-  {
-    to: '/practice',
-    title: 'Learning mode',
-    description: 'Untimed, with instant feedback and explanations',
-  },
-  {
-    to: '/bookmarks',
-    title: 'Bookmarked questions',
-    description: 'Questions you saved for later',
-  },
-];
+function otherActions(path: Path): QuickAction[] {
+  return [
+    {
+      to: path('practice'),
+      title: 'Learning mode',
+      description: 'Untimed, with instant feedback and explanations',
+    },
+    {
+      to: path('bookmarks'),
+      title: 'Bookmarked questions',
+      description: 'Questions you saved for later',
+    },
+  ];
+}
 
 /** "Review due" (D-052): starts the review session, or opens Learning mode when nothing is due. */
-function reviewAction(due: number, setup: ReturnType<typeof reviewSessionSetup>): QuickAction {
+function reviewAction(
+  path: Path,
+  due: number,
+  setup: ReturnType<typeof reviewSessionSetup>,
+): QuickAction {
   return setup
     ? {
-        to: SESSION_PATH,
+        to: path(SESSION_PAGE),
         title: 'Review due',
         description: `${questionCount(due)} due for review today`,
         emphasis: true,
@@ -88,7 +104,7 @@ function reviewAction(due: number, setup: ReturnType<typeof reviewSessionSetup>)
         info: <ReviewDueInfo align="end" />,
       }
     : {
-        to: '/practice',
+        to: path('practice'),
         title: 'Review due',
         description: 'Nothing due for review today',
         info: <ReviewDueInfo align="end" />,
@@ -99,6 +115,8 @@ function reviewAction(due: number, setup: ReturnType<typeof reviewSessionSetup>)
 const REVIEW_REFRESH_MS = 60_000;
 
 export function DashboardPage() {
+  const exam = useCurrentExam();
+  const path = useExamPath();
   const { progress, preferences } = useUserData();
   const { questions, ids } = usePracticeQuestions();
   const { fullAvailable, shortConfig } = useExamQuestions();
@@ -106,14 +124,23 @@ export function DashboardPage() {
   const quickActions = useMemo(() => {
     const due = reviewOverview(progress, ids, now).due;
     const setup = reviewSessionSetup(progress, ids, now, preferences.practiceSessionLength);
-    const [learning, ...rest] = OTHER_ACTIONS;
+    const [learning, ...rest] = otherActions(path);
     return [
-      examAction(fullAvailable, shortConfig),
+      examAction(exam, path, fullAvailable, shortConfig),
       ...(learning ? [learning] : []),
-      reviewAction(due, setup),
+      reviewAction(path, due, setup),
       ...rest,
     ];
-  }, [fullAvailable, shortConfig, progress, ids, now, preferences.practiceSessionLength]);
+  }, [
+    exam,
+    path,
+    fullAvailable,
+    shortConfig,
+    progress,
+    ids,
+    now,
+    preferences.practiceSessionLength,
+  ]);
   const stats = useMemo(() => practiceStats(progress, questions), [progress, questions]);
   const attempts = useExamAttempts();
   const latest = attempts[0];
@@ -129,7 +156,7 @@ export function DashboardPage() {
     <>
       <PageHeader
         title="Dashboard"
-        description="Your AWS Certified Cloud Practitioner (CLF-C02) preparation at a glance."
+        description={`Your ${exam.name} (${exam.code}) preparation at a glance.`}
       />
 
       <div className="grid gap-5 lg:grid-cols-5">
@@ -166,16 +193,16 @@ export function DashboardPage() {
                 Unofficial practice score. Official AWS result not predicted or guaranteed.
               </p>
               <div className="mt-5 flex flex-wrap gap-2">
-                <Link to="/exam" className={buttonClasses()}>
+                <Link to={path('exam')} className={buttonClasses()}>
                   Start a new mock exam
                 </Link>
                 <Link
-                  to={`/results/${latest.id}`}
+                  to={path(`results/${latest.id}`)}
                   className={buttonClasses({ variant: 'secondary' })}
                 >
                   View results
                 </Link>
-                <Link to="/progress" className={buttonClasses({ variant: 'ghost' })}>
+                <Link to={path('progress')} className={buttonClasses({ variant: 'ghost' })}>
                   See progress
                 </Link>
               </div>
@@ -187,7 +214,7 @@ export function DashboardPage() {
               title="No mock exams yet"
               description="Take a timed mock exam to see your practice score and how each domain is going."
               action={
-                <Link to="/exam" className={buttonClasses()}>
+                <Link to={path('exam')} className={buttonClasses()}>
                   Go to mock exam
                 </Link>
               }
@@ -249,7 +276,7 @@ export function DashboardPage() {
           />
           <CardBody>
             <ul className="grid gap-3.5 md:grid-cols-2">
-              {DOMAINS.map((domain) => {
+              {exam.domains.map((domain) => {
                 const domainStats = stats.byDomain[domain.id];
                 const isWeakest = weakest === domain.id;
                 return (
@@ -296,7 +323,7 @@ export function DashboardPage() {
               })}
             </ul>
             <p className="mt-5 text-sm text-fg-muted">
-              Source: <ExternalLink href={EXAM_GUIDE_URL}>CLF-C02 exam guide</ExternalLink>
+              Source: <ExternalLink href={exam.guideUrl}>{exam.code} exam guide</ExternalLink>
             </p>
           </CardBody>
         </Card>
@@ -306,7 +333,10 @@ export function DashboardPage() {
             title="Recent attempts"
             action={
               attempts.length > 0 && (
-                <Link to="/history" className={buttonClasses({ variant: 'ghost', size: 'sm' })}>
+                <Link
+                  to={path('history')}
+                  className={buttonClasses({ variant: 'ghost', size: 'sm' })}
+                >
                   All exam history
                 </Link>
               )
@@ -324,7 +354,7 @@ export function DashboardPage() {
               {attempts.slice(0, 4).map((attempt) => (
                 <li key={attempt.id} className="border-t border-border first:border-t-0">
                   <Link
-                    to={`/results/${attempt.id}`}
+                    to={path(`results/${attempt.id}`)}
                     className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-sm py-3"
                   >
                     <span className="font-semibold text-accent-fg">

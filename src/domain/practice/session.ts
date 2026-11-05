@@ -1,4 +1,4 @@
-import type { DomainId } from '@/domain/exam-guide/clf-c02';
+import type { DomainId } from '@/domain/exam-guide/types';
 import { evaluateAnswer, requiredSelectionCount } from '@/domain/questions/evaluate';
 import type { Question } from '@/domain/questions/types';
 import { createRandom, shuffle } from '@/domain/lib/random';
@@ -11,6 +11,8 @@ export interface PracticeAnswerState {
 
 export interface PracticeSession {
   readonly id: string;
+  /** The exam being practised (D-066). */
+  readonly examId: string;
   /** Human-readable description of what is being practised, e.g. "Security and Compliance". */
   readonly label: string;
   readonly seed: number;
@@ -26,6 +28,7 @@ export interface PracticeSession {
 
 export interface CreatePracticeSessionInput {
   id: string;
+  examId: string;
   label: string;
   seed: number;
   startedAt: number;
@@ -47,6 +50,7 @@ export function createPracticeSession(input: CreatePracticeSessionInput): Practi
   }
   return {
     id: input.id,
+    examId: input.examId,
     label: input.label,
     seed: input.seed,
     startedAt: input.startedAt,
@@ -138,6 +142,8 @@ export interface DomainTally {
 
 export interface PracticeSessionSummary {
   readonly id: string;
+  /** The exam it belongs to (D-066); saved summaries without one are CLF-C02. */
+  readonly examId: string;
   readonly label: string;
   readonly startedAt: number;
   readonly finishedAt: number;
@@ -176,6 +182,7 @@ export function summarizeSession(
   }
   return {
     id: session.id,
+    examId: session.examId,
     label: session.label,
     startedAt: session.startedAt,
     finishedAt: session.finishedAt ?? finishedAt,

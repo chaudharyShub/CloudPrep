@@ -3,14 +3,16 @@ import { DEVELOPER, FRONTEND_PREP, MAKER_BRAND } from '@/app/developer';
 import { LogoTile } from '@/components/brand/LogoMark';
 import { MakerMark } from '@/components/brand/MakerMark';
 import { ExternalLink } from '@/components/ui/ExternalLink';
+import { useCurrentExam } from '@/state/hooks';
 
 export function Brand({ onNavigate }: { onNavigate?: () => void }) {
+  const exam = useCurrentExam();
   return (
     <Link to="/" onClick={onNavigate} className="flex items-center gap-2.5 rounded-sm">
       <LogoTile size={32} />
       <span className="flex flex-col leading-tight">
         <span className="font-serif text-[1.375rem] font-semibold text-fg">CloudPrep</span>
-        <span className="text-xs text-fg-subtle">CLF-C02 practice</span>
+        <span className="text-xs text-fg-subtle">{exam.code} practice</span>
       </span>
     </Link>
   );

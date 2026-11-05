@@ -1,5 +1,5 @@
 import { Suspense, useCallback, useMemo, useState } from 'react';
-import { Navigate, Outlet, useOutletContext } from 'react-router';
+import { Navigate, Outlet, useLocation, useOutletContext } from 'react-router';
 import { Flag as FinishIcon } from 'lucide-react';
 import { LogoTile } from '@/components/brand/LogoMark';
 import { Badge } from '@/components/ui/Badge';
@@ -19,7 +19,8 @@ import { ProctorWarningDialog } from '@/features/exam/proctor/ProctorWarningDial
 import { useProctor } from '@/features/exam/proctor/useProctor';
 import { StorageNotices } from '@/features/shared/StorageNotices';
 import { useAppStore } from '@/state/StoreProvider';
-import { useActiveExam, useExamAttempts } from '@/state/hooks';
+import { useActiveExam, useCurrentExam, useExamAttempts } from '@/state/hooks';
+import { examPath } from '../paths';
 
 /** Proctor warnings logged before this time were shown on an earlier page load. */
 const PAGE_LOADED_AT = Date.now();
@@ -41,6 +42,8 @@ export function useExamOutlet(): ExamOutletContext {
 export function ExamLayout() {
   const exam = useActiveExam();
   const attempts = useExamAttempts();
+  const current = useCurrentExam();
+  const { pathname } = useLocation();
   const store = useAppStore();
   const { submit } = useExamActions();
   // The exam this layout was opened for; used to find its results once it has been submitted.
@@ -68,7 +71,13 @@ export function ExamLayout() {
     const finishedId =
       examId !== null && attempts.some((attempt) => attempt.id === examId) ? examId : null;
     if (exam?.status === 'submitted') return <ExamSkeleton />; // being finalised
-    return <Navigate to={finishedId ? `/results/${finishedId}` : '/exam'} replace />;
+    return (
+      <Navigate to={examPath(current.id, finishedId ? `results/${finishedId}` : 'exam')} replace />
+    );
+  }
+  // The exam in progress belongs to another exam than the address: open it under its own.
+  if (exam.examId !== current.id) {
+    return <Navigate to={pathname.replace(`/${current.id}/`, `/${exam.examId}/`)} replace />;
   }
 
   const counts = examCounts(exam);
@@ -106,7 +115,7 @@ export function ExamLayout() {
               )}
             </p>
             <p className="text-xs text-fg-muted tabular-nums">
-              {counts.answered} of {counts.total} answered
+              {current.code} · {counts.answered} of {counts.total} answered
             </p>
           </div>
           <ExamTimer endsAt={exam.endsAt} />

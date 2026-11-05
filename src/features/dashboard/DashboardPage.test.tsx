@@ -6,7 +6,7 @@ import { createTestStore, renderApp } from '@/test/renderApp';
 
 describe('DashboardPage', () => {
   it('AC-I.4 explains Review due from the "i" beside its quick action', async () => {
-    const { user } = renderApp('/dashboard');
+    const { user } = renderApp('/clf-c02/dashboard');
     await screen.findByRole('heading', { level: 1, name: 'Dashboard' });
     await user.click(screen.getByRole('button', { name: 'About Review due' }));
     expect(screen.getByText(/after 1, 3, 7, 21 and then 60 days/)).toBeVisible();
@@ -19,7 +19,7 @@ describe('DashboardPage', () => {
     for (const questionId of ['clf-d1-0001', 'clf-d2-0001']) {
       store.recordAnswer({ questionId, isCorrect: false, at: 1, sessionId: 's1' });
     }
-    const { user, router } = renderApp('/dashboard', { store });
+    const { user, router } = renderApp('/clf-c02/dashboard', { store });
     await screen.findByRole('heading', { level: 1, name: 'Dashboard' });
 
     await user.click(
@@ -27,15 +27,15 @@ describe('DashboardPage', () => {
     );
     expect(await screen.findByRole('heading', { level: 1, name: 'Review due' })).toBeVisible();
     expect(screen.getByText('Question 1 of 2')).toBeVisible();
-    expect(router.state.location.pathname).toBe('/practice/session');
+    expect(router.state.location.pathname).toBe('/clf-c02/practice/session');
   });
 
   it('AC-R.6 links to Learning mode when nothing is due', async () => {
-    renderApp('/dashboard');
+    renderApp('/clf-c02/dashboard');
     await screen.findByRole('heading', { level: 1, name: 'Dashboard' });
     expect(
       screen.getByRole('link', { name: /^Review due.*Nothing due for review today/ }),
-    ).toHaveAttribute('href', '/practice');
+    ).toHaveAttribute('href', '/clf-c02/practice');
   });
 
   it('AC-V.5 tags the weakest domain once two domains have enough answers', async () => {
@@ -50,7 +50,7 @@ describe('DashboardPage', () => {
     ids('D2').forEach((questionId, i) => {
       store.recordAnswer({ questionId, isCorrect: i < 5, at: 1, sessionId: 's1' });
     });
-    renderApp('/dashboard', { store });
+    renderApp('/clf-c02/dashboard', { store });
     await screen.findByRole('heading', { level: 1, name: 'Dashboard' });
     const weakest = screen.getByText('weakest');
     expect(weakest.closest('li')).toHaveTextContent('Security and Compliance');
@@ -62,7 +62,7 @@ describe('DashboardPage', () => {
     const exam = makeExam();
     const attempt = makeAttempt(exam, exam.startedAt + 3 * 60_000 + 1);
     store.completeExam(attempt, EXAM_QUESTIONS);
-    renderApp('/dashboard', { store });
+    renderApp('/clf-c02/dashboard', { store });
     const heading = await screen.findByRole('heading', { name: 'Recent attempts' });
     const card = heading.closest('div.rounded-lg') as HTMLElement;
     expect(attempt.timeUsedMs).toBe(3 * 60_000 + 1);

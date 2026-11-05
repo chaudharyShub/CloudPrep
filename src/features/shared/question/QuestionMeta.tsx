@@ -1,12 +1,13 @@
 import { Badge } from '@/components/ui/Badge';
-import { DOMAINS } from '@/domain/exam-guide/clf-c02';
+import { DEFAULT_EXAM, examForQuestionId } from '@/domain/exam-guide';
 import type { Question } from '@/domain/questions/types';
 
 const DIFFICULTY_LABEL = { easy: 'Easy', medium: 'Medium', hard: 'Hard' } as const;
 
 /** Domain, task statement, type and difficulty badges for a question. */
 export function QuestionMeta({ question }: { question: Question }) {
-  const domain = DOMAINS.find((d) => d.id === question.domain);
+  const { domains } = examForQuestionId(question.id) ?? DEFAULT_EXAM;
+  const domain = domains.find((d) => d.id === question.domain);
   const task = domain?.taskStatements.find((t) => t.id === question.taskStatement);
   return (
     <div className="flex flex-wrap items-center gap-2">

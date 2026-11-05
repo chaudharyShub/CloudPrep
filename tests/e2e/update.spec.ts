@@ -67,7 +67,7 @@ test('AC-U.5 a page file missing after a deploy reloads once and opens the page'
   page,
   isMobile,
 }) => {
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await expect(page.getByRole('heading', { level: 1, name: 'Learning mode' })).toBeVisible();
 
   const requests = await deployNewVersion(page, { newFileWorks: true });
@@ -85,7 +85,7 @@ test('AC-U.5 a file that keeps failing shows the error after one reload, not a l
   page,
   isMobile,
 }) => {
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await expect(page.getByRole('heading', { level: 1, name: 'Learning mode' })).toBeVisible();
 
   const requests = await deployNewVersion(page, { newFileWorks: false });

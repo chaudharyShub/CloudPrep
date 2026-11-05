@@ -36,7 +36,7 @@ test.describe('Admin page', () => {
   });
 
   test('AC-A.5 only admins get the Admin link in the navigation', async ({ page, isMobile }) => {
-    await page.goto('/dashboard');
+    await page.goto('/clf-c02/dashboard');
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Admin' })).toHaveCount(0);
 

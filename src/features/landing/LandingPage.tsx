@@ -3,57 +3,54 @@ import { MadeBy, UnofficialNote } from '@/components/layout/Brand';
 import { LogoTile } from '@/components/brand/LogoMark';
 import { buttonClasses } from '@/components/ui/buttonStyles';
 import { ExternalLink } from '@/components/ui/ExternalLink';
-import { FULL_EXAM } from '@/domain/exam/config';
+import { examPath } from '@/app/paths';
 import { formatClock } from '@/domain/exam/timer';
-import { DOMAINS, EXAM_GUIDE_URL } from '@/domain/exam-guide/clf-c02';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { cn } from '@/lib/cn';
 import { useAuth } from '@/state/AuthProvider';
+import { AVAILABLE_EXAMS } from '@/state/CurrentExam';
+import { useCurrentExam } from '@/state/hooks';
+import { landingContent } from './landingContent';
 import { revealClasses, useExamDemo, useReveal } from './motion';
 
-const QUESTIONS = FULL_EXAM.questionCount;
-const MINUTES = FULL_EXAM.durationMs / 60_000;
-
-/** Shown in the metrics strip. Update it when the published bank grows (README has the count). */
-const BANK_SIZE = '2,000';
-
-/** The dummy question on the hero card: an original question, not from a real exam. */
-const EXAMPLE_OPTIONS = [
-  { letter: 'A', text: 'Amazon EC2 Reserved Instances' },
-  { letter: 'B', text: 'AWS Lambda' },
-  { letter: 'C', text: 'Amazon Lightsail' },
-  { letter: 'D', text: 'AWS Outposts' },
-] as const;
-
-const METRICS = [
-  { value: BANK_SIZE, label: 'original questions, each one checked against the AWS docs' },
-  {
-    value: `${String(QUESTIONS)} / ${String(MINUTES)}`,
-    label: 'questions and minutes, like the real exam',
-  },
-  {
-    value: String(DOMAINS.length),
-    label: 'exam domains, weighted the way the exam guide weights them',
-  },
-  { value: 'Free', label: 'no ads, no paywall, no upsell' },
-] as const;
-
-const WAYS = [
-  {
-    label: '01 — Learning mode',
-    title: 'Answer, check, understand.',
-    text: 'Pick a domain or a topic and go at your own pace. Check each answer straight away and read why every option is right or wrong, with a link to the AWS page it comes from. Questions you miss come back when they’re due.',
-  },
-  {
-    label: '02 — Mock exam',
-    title: 'The real thing, minus the fee.',
-    text: `A timed ${String(QUESTIONS)}-question paper balanced across the four domains. Flag questions, review them, hand it in. You get a score, a domain breakdown and every explanation. Turn on the optional proctor if you want the pressure.`,
-  },
-] as const;
-
-/** The public front page for guests (D-057). Signed-in users go straight to the dashboard. */
+/**
+ * The public front page for guests (D-057): `/`, and each exam's own page (`/saa-c03`,
+ * D-066) with that exam's facts. Signed-in users go straight to the dashboard.
+ */
 export function LandingPage() {
-  useDocumentTitle('Practice for the AWS Cloud Practitioner exam');
+  const exam = useCurrentExam();
+  const { bankSize, example } = landingContent(exam.id);
+  const QUESTIONS = exam.questionCount;
+  const MINUTES = exam.durationMinutes;
+  const practicePath = examPath(exam.id, 'practice');
+  const metrics = [
+    ...(bankSize
+      ? [{ value: bankSize, label: 'original questions, each one checked against the AWS docs' }]
+      : []),
+    {
+      value: `${String(QUESTIONS)} / ${String(MINUTES)}`,
+      label: 'questions and minutes, like the real exam',
+    },
+    {
+      value: String(exam.domains.length),
+      label: 'exam domains, weighted the way the exam guide weights them',
+    },
+    { value: 'Free', label: 'no ads, no paywall, no upsell' },
+  ];
+  const ways = [
+    {
+      label: '01 — Learning mode',
+      title: 'Answer, check, understand.',
+      text: 'Pick a domain or a topic and go at your own pace. Check each answer straight away and read why every option is right or wrong, with a link to the AWS page it comes from. Questions you miss come back when they’re due.',
+    },
+    {
+      label: '02 — Mock exam',
+      title: 'The real thing, minus the fee.',
+      text: `A timed ${String(QUESTIONS)}-question paper balanced across the four domains. Flag questions, review them, hand it in. You get a score, a domain breakdown and every explanation. Turn on the optional proctor if you want the pressure.`,
+    },
+  ];
+  // On an exam's own page the title also gets its code ("… · SAA-C03 · CloudPrep").
+  useDocumentTitle(`Practice for the AWS ${exam.shortName} exam`);
   const { client } = useAuth();
   const demo = useExamDemo();
   const [metricsRef, metricsShown] = useReveal<HTMLDListElement>();
@@ -76,16 +73,21 @@ export function LandingPage() {
             <LogoTile size={32} />
             <span className="font-serif text-2xl font-semibold">CloudPrep</span>
             <span className="rounded-full border border-border px-2 py-0.5 text-xs font-semibold text-fg-muted">
-              CLF-C02
+              {exam.code}
             </span>
           </Link>
           <nav aria-label="Main" className="flex flex-wrap items-center gap-x-6 gap-y-2">
-            <a href="#how" className="text-fg-muted hover:text-fg">
-              How it works
-            </a>
             <a href="#covered" className="text-fg-muted hover:text-fg">
               What’s covered
             </a>
+            <a href="#how" className="text-fg-muted hover:text-fg">
+              How it works
+            </a>
+            {AVAILABLE_EXAMS.length > 1 && (
+              <a href="#exams" className="text-fg-muted hover:text-fg">
+                Exams
+              </a>
+            )}
             <Link to="/privacy" className="text-fg-muted hover:text-fg">
               Privacy
             </Link>
@@ -103,7 +105,7 @@ export function LandingPage() {
         <section className="mx-auto grid max-w-6xl items-start gap-12 px-4 pt-14 pb-16 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:pt-20">
           <div>
             <p className="animate-rise text-sm font-semibold tracking-wider text-accent-fg uppercase">
-              AWS Certified Cloud Practitioner · practice
+              {exam.name} · practice
             </p>
             <h1
               style={rise(80)}
@@ -126,7 +128,7 @@ export function LandingPage() {
             </p>
             <div style={rise(260)} className="mt-9 flex animate-rise flex-wrap gap-3">
               <Link
-                to="/practice"
+                to={practicePath}
                 className={buttonClasses({ className: 'h-12 hover-lift px-6 text-base' })}
               >
                 Start practising — free
@@ -157,13 +159,10 @@ export function LandingPage() {
               <span className="text-accent-fg">{formatClock(demo.remainingMs)} left</span>
             </div>
             <div className="p-5 sm:p-6">
-              <p className="font-serif text-xl leading-snug font-medium">
-                A startup wants to run code only when an image is uploaded, without managing
-                servers, and pay only for the time the code runs. Which service fits best?
-              </p>
+              <p className="font-serif text-xl leading-snug font-medium">{example.stem}</p>
               <ul className="mt-5 flex flex-col gap-2.5">
-                {EXAMPLE_OPTIONS.map((option) => {
-                  const chosen = demo.picked && option.letter === 'B';
+                {example.options.map((option) => {
+                  const chosen = demo.picked && option.letter === example.picked;
                   return (
                     <li
                       key={option.letter}
@@ -192,7 +191,7 @@ export function LandingPage() {
               </ul>
             </div>
             <figcaption className="sr-only">
-              An example question from a mock exam, with answer B chosen.
+              An example question from a mock exam, with answer {example.picked} chosen.
             </figcaption>
           </figure>
         </section>
@@ -203,7 +202,7 @@ export function LandingPage() {
             ref={metricsRef}
             className="mx-auto grid max-w-6xl px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-4"
           >
-            {METRICS.map((metric, index) => (
+            {metrics.map((metric, index) => (
               <div
                 key={metric.value}
                 style={{ transitionDelay: `${String(index * 90)}ms` }}
@@ -221,53 +220,27 @@ export function LandingPage() {
           </dl>
         </section>
 
-        {/* Two ways to study */}
-        <section
-          id="how"
-          aria-labelledby="how-heading"
-          className="mx-auto max-w-6xl px-4 pt-20 pb-8 sm:px-6"
-        >
-          <h2 id="how-heading" className="font-serif text-4xl font-medium sm:text-[2.625rem]">
-            Two ways to study
-          </h2>
-          <div ref={waysRef} className="mt-10 grid gap-6 md:grid-cols-2">
-            {WAYS.map((way, index) => (
-              <div
-                key={way.label}
-                style={{ transitionDelay: `${String(index * 120)}ms` }}
-                className={cn('rounded-lg', revealClasses(waysShown))}
-              >
-                <div className="h-full hover-lift rounded-lg border border-border bg-surface p-6 sm:p-7">
-                  <p className="text-sm font-semibold tracking-wider text-accent-fg uppercase">
-                    {way.label}
-                  </p>
-                  <h3 className="mt-2 font-serif text-2xl font-medium">{way.title}</h3>
-                  <p className="mt-3 text-lg leading-relaxed text-fg-muted">{way.text}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        {AVAILABLE_EXAMS.length > 1 && <ExamChooser currentId={exam.id} />}
 
         {/* What's covered */}
         <section
           id="covered"
           aria-labelledby="covered-heading"
-          className="mx-auto max-w-6xl px-4 py-20 sm:px-6"
+          className="mx-auto max-w-6xl px-4 pt-20 pb-8 sm:px-6"
         >
           <h2 id="covered-heading" className="font-serif text-4xl font-medium sm:text-[2.625rem]">
             What’s covered
           </h2>
           <p className="mt-3 max-w-2xl text-lg text-fg-muted">
             Every question maps to a domain and topic in the{' '}
-            <ExternalLink href={EXAM_GUIDE_URL}>CLF-C02 exam guide</ExternalLink>. Mock exams follow
-            the same weights.
+            <ExternalLink href={exam.guideUrl}>{exam.code} exam guide</ExternalLink>. Mock exams
+            follow the same weights.
           </p>
           <ul
             ref={domainsRef}
             className="mt-8 rounded-lg border border-border bg-surface px-5 sm:px-6"
           >
-            {DOMAINS.map((domain, index) => (
+            {exam.domains.map((domain, index) => (
               <li
                 key={domain.id}
                 className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-border py-5 last:border-b-0"
@@ -292,14 +265,42 @@ export function LandingPage() {
           </ul>
         </section>
 
+        {/* Two ways to study */}
+        <section
+          id="how"
+          aria-labelledby="how-heading"
+          className="mx-auto max-w-6xl px-4 py-20 sm:px-6"
+        >
+          <h2 id="how-heading" className="font-serif text-4xl font-medium sm:text-[2.625rem]">
+            Two ways to study
+          </h2>
+          <div ref={waysRef} className="mt-10 grid gap-6 md:grid-cols-2">
+            {ways.map((way, index) => (
+              <div
+                key={way.label}
+                style={{ transitionDelay: `${String(index * 120)}ms` }}
+                className={cn('rounded-lg', revealClasses(waysShown))}
+              >
+                <div className="h-full hover-lift rounded-lg border border-border bg-surface p-6 sm:p-7">
+                  <p className="text-sm font-semibold tracking-wider text-accent-fg uppercase">
+                    {way.label}
+                  </p>
+                  <h3 className="mt-2 font-serif text-2xl font-medium">{way.title}</h3>
+                  <p className="mt-3 text-lg leading-relaxed text-fg-muted">{way.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Call to action */}
         <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-6 rounded-[1.5rem] bg-primary px-8 py-12 text-on-primary sm:px-10">
             <h2 className="max-w-2xl font-serif text-4xl leading-tight font-medium">
-              Find out where you’d lose marks — before it costs you $100.
+              Find out where you’d lose marks — before it costs you ${exam.feeUsd}.
             </h2>
             <Link
-              to="/practice"
+              to={practicePath}
               className="inline-flex h-12 hover-lift items-center rounded-full bg-surface px-6 font-bold text-accent-fg hover:bg-surface-2"
             >
               Start practising
@@ -315,5 +316,42 @@ export function LandingPage() {
         <MadeBy />
       </footer>
     </div>
+  );
+}
+
+/** Links to every exam's own landing page (D-066). */
+function ExamChooser({ currentId }: { currentId: string }) {
+  return (
+    <section
+      id="exams"
+      aria-labelledby="exams-heading"
+      className="mx-auto max-w-6xl px-4 pt-20 sm:px-6"
+    >
+      <h2 id="exams-heading" className="font-serif text-4xl font-medium sm:text-[2.625rem]">
+        Choose your exam
+      </h2>
+      <ul className="mt-8 grid gap-4 md:grid-cols-3">
+        {AVAILABLE_EXAMS.map((option) => (
+          <li key={option.id}>
+            <Link
+              to={examPath(option.id)}
+              // Keep the reader at the chooser instead of jumping back to the top.
+              preventScrollReset
+              aria-current={option.id === currentId ? 'page' : undefined}
+              className={cn(
+                'flex h-full hover-lift flex-col gap-1 rounded-lg border bg-surface p-5',
+                option.id === currentId ? 'border-accent' : 'border-border',
+              )}
+            >
+              <span className="font-mono text-sm text-accent-fg">{option.code}</span>
+              <span className="font-serif text-xl font-medium">{option.shortName}</span>
+              <span className="text-fg-muted">
+                {option.level} · {option.questionCount} questions · {option.durationMinutes} minutes
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

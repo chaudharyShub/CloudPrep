@@ -9,12 +9,12 @@ const guest = () => createFakeAuthClient();
 describe('sign-in', () => {
   it('AC-B.6 sends guests from signed-in-only pages to sign-in', async () => {
     for (const path of [
-      '/dashboard',
-      '/exam',
-      '/exam/session',
-      '/history',
-      '/progress',
-      '/results/x',
+      '/clf-c02/dashboard',
+      '/clf-c02/exam',
+      '/clf-c02/exam/session',
+      '/clf-c02/history',
+      '/clf-c02/progress',
+      '/clf-c02/results/x',
     ]) {
       const { router, unmount } = renderApp(path, { auth: guest() });
       expect(await screen.findByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
@@ -25,8 +25,8 @@ describe('sign-in', () => {
 
   it('AC-B.6 lets guests use Learning mode, bookmarks and settings', async () => {
     for (const [path, heading] of [
-      ['/practice', 'Learning mode'],
-      ['/bookmarks', 'Bookmarks'],
+      ['/clf-c02/practice', 'Learning mode'],
+      ['/clf-c02/bookmarks', 'Bookmarks'],
       ['/settings', 'Settings'],
     ] as const) {
       const { unmount } = renderApp(path, { auth: guest() });
@@ -37,12 +37,14 @@ describe('sign-in', () => {
 
   it('AC-B.6 AC-B.8 returns to the requested page after signing in with Google', async () => {
     const auth = guest();
-    const { router, user } = renderApp('/history', { auth });
+    const { router, user } = renderApp('/clf-c02/history', { auth });
     expect(await screen.findByText('Sign in to continue')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Continue with Google' }));
-    expect(auth.calls.google).toEqual([`${window.location.origin}/auth/callback?next=%2Fhistory`]);
+    expect(auth.calls.google).toEqual([
+      `${window.location.origin}/auth/callback?next=%2Fclf-c02%2Fhistory`,
+    ]);
     expect(await screen.findByRole('heading', { level: 1, name: 'Exam history' })).toBeVisible();
-    expect(router.state.location.pathname).toBe('/history');
+    expect(router.state.location.pathname).toBe('/clf-c02/history');
   });
 
   it('AC-B.8 shows a Google sign-in failure', async () => {
@@ -101,13 +103,13 @@ describe('sign-in', () => {
   it('AC-B.9 the callback opens the requested page once signed in', async () => {
     const { router } = renderApp('/auth/callback?next=%2Fprogress');
     expect(await screen.findByRole('heading', { level: 1, name: 'Progress' })).toBeVisible();
-    expect(router.state.location.pathname).toBe('/progress');
+    expect(router.state.location.pathname).toBe('/clf-c02/progress');
   });
 
   it('AC-B.9 the callback never leaves the site', async () => {
     const { router } = renderApp('/auth/callback?next=%2F%2Fevil.example');
     await screen.findByRole('heading', { level: 1, name: 'Dashboard' });
-    expect(router.state.location.pathname).toBe('/dashboard');
+    expect(router.state.location.pathname).toBe('/clf-c02/dashboard');
   });
 
   it('AC-B.9 explains a failed or expired link and offers to try again', async () => {
@@ -151,7 +153,7 @@ describe('sign-in', () => {
 
   it('AC-B.10 signing out on a signed-in-only page leads to sign-in', async () => {
     const auth = createFakeAuthClient({ user: FAKE_USER });
-    const { router, user } = renderApp('/history', { auth });
+    const { router, user } = renderApp('/clf-c02/history', { auth });
     await screen.findByRole('heading', { level: 1, name: 'Exam history' });
     const nav = screen.getAllByRole('button', { name: 'Sign out' })[0];
     expect(nav).toBeDefined();
@@ -170,7 +172,7 @@ describe('sign-in', () => {
 
   it('AC-B.25 asks before signing out, and Cancel keeps you signed in', async () => {
     const auth = createFakeAuthClient({ user: FAKE_USER });
-    const { user } = renderApp('/history', { auth });
+    const { user } = renderApp('/clf-c02/history', { auth });
     await screen.findByRole('heading', { level: 1, name: 'Exam history' });
     await user.click(screen.getAllByRole('button', { name: 'Sign out' })[0] as HTMLElement);
     const dialog = await screen.findByRole('dialog', { name: 'Sign out of CloudPrep?' });
@@ -184,16 +186,16 @@ describe('sign-in', () => {
   it('AC-B.10 a signed-in visitor to the sign-in page goes to the dashboard', async () => {
     const { router } = renderApp('/sign-in');
     await screen.findByRole('heading', { level: 1, name: 'Dashboard' });
-    expect(router.state.location.pathname).toBe('/dashboard');
+    expect(router.state.location.pathname).toBe('/clf-c02/dashboard');
   });
 
   it('AC-B.11 explains when sign-in is not set up, and Learning mode still works', async () => {
-    const { unmount } = renderApp('/dashboard', { auth: unavailableAuthClient });
+    const { unmount } = renderApp('/clf-c02/dashboard', { auth: unavailableAuthClient });
     expect(await screen.findByText("Sign-in isn't available")).toBeVisible();
     expect(screen.queryByLabelText('Email address')).toBeNull();
     expect(screen.queryByRole('link', { name: 'Sign in' })).toBeNull();
     unmount();
-    renderApp('/practice', { auth: unavailableAuthClient });
+    renderApp('/clf-c02/practice', { auth: unavailableAuthClient });
     expect(await screen.findByRole('heading', { level: 1, name: 'Learning mode' })).toBeVisible();
   });
 });

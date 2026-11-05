@@ -53,3 +53,29 @@ test('AC-V.9 with reduced motion everything shows at once, with the answer alrea
   await expect(bar).toHaveAttribute('style', /width: 24%/);
   await expect(page.getByText('no ads, no paywall, no upsell')).toHaveCSS('opacity', '1');
 });
+
+test('AC-M.3 each exam has its own landing page, which passes axe', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/saa-c03');
+  await expect(
+    page.getByText('AWS Certified Solutions Architect – Associate · practice'),
+  ).toBeVisible();
+  await expect(page).toHaveTitle(
+    'Practice for the AWS Solutions Architect exam · SAA-C03 · CloudPrep',
+  );
+  await expect(page.locator('figure li').filter({ hasText: 'Auto Scaling group' })).toHaveClass(
+    /bg-highlight/,
+  );
+  const chooser = page.getByRole('region', { name: 'Choose your exam' });
+  await expect(chooser.getByRole('link')).toHaveCount(3);
+  await expect(page.getByRole('link', { name: 'Start practising — free' })).toHaveAttribute(
+    'href',
+    '/saa-c03/practice',
+  );
+  const results = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
+  expect(
+    results.violations
+      .filter((v) => v.impact === 'serious' || v.impact === 'critical')
+      .map((v) => v.id),
+  ).toEqual([]);
+});

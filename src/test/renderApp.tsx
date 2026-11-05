@@ -11,6 +11,7 @@ import { ToastProvider } from '@/components/ui/Toast';
 import { AdminProvider } from '@/state/AdminProvider';
 import { AuthProvider } from '@/state/AuthProvider';
 import { QuestionBankProvider } from '@/state/QuestionBankProvider';
+import type { QuestionBank } from '@/state/questionBank';
 import type { QuestionLoader } from '@/state/questionLoader';
 import type { AccountManager } from '@/state/accounts';
 import { UserDataProvider } from '@/state/UserDataProvider';
@@ -38,16 +39,18 @@ export function singleStoreAccounts(store: AppStore): AccountManager {
 
 /**
  * Renders the real route table at `path` using an in-memory router and store. Signed in
- * by default; pass `auth` (e.g. `createFakeAuthClient()`) to test as a guest. The question
- * bank is ready at once; pass `questions` (a loader) to test loading.
+ * by default; pass `auth` (e.g. `createFakeAuthClient()`) to test as a guest. The CLF-C02
+ * question bank is ready at once (pass `banks` for other exams); pass `questions` (a loader
+ * used for every exam) to test loading.
  */
 export function renderApp(
-  path = '/dashboard',
+  path = '/clf-c02/dashboard',
   {
     store = createTestStore(),
     state,
     auth = createFakeAuthClient({ user: FAKE_USER }),
     questions,
+    banks = [TEST_BANK],
     accounts = singleStoreAccounts(store),
     admin = createFakeAdminClient(),
   }: {
@@ -55,6 +58,8 @@ export function renderApp(
     state?: unknown;
     auth?: AuthClient;
     questions?: QuestionLoader | null;
+    /** Banks that are ready at once (when `questions` isn't given). */
+    banks?: readonly QuestionBank[];
     /** Signed-in users' data; defaults to `store` too. */
     accounts?: AccountManager;
     /** The admin overview; defaults to a non-admin. */
@@ -69,8 +74,8 @@ export function renderApp(
     <AuthProvider client={auth}>
       <UserDataProvider guestStore={store} accounts={accounts}>
         <QuestionBankProvider
-          loader={questions ?? null}
-          {...(questions === undefined ? { initialBank: TEST_BANK } : {})}
+          loaderFor={() => questions ?? null}
+          {...(questions === undefined ? { initialBanks: banks } : {})}
         >
           <AdminProvider client={admin}>
             <ToastProvider>

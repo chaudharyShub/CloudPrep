@@ -1,4 +1,3 @@
-import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
 import type { UserDataRemote } from '@/storage/sync';
 import { getSupabase, readSupabaseConfig } from './supabaseClient';
 import { createUserDataRemote, supabaseUserTables, type UserTables } from './userDataRemote';
@@ -43,15 +42,12 @@ function e2eUserTables(): UserTables {
  */
 export function createAccountRemote(userId: string): UserDataRemote | null {
   if (import.meta.env.MODE === 'e2e') {
-    return window.__cloudprepE2ESync
-      ? createUserDataRemote(e2eUserTables(), userId, EXAM_ID)
-      : null;
+    return window.__cloudprepE2ESync ? createUserDataRemote(e2eUserTables(), userId) : null;
   }
   const config = readSupabaseConfig(import.meta.env);
   if (!config) return null;
   return createUserDataRemote(
     supabaseUserTables(() => getSupabase(config)),
     userId,
-    EXAM_ID,
   );
 }

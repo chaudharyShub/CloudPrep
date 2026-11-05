@@ -4,7 +4,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Notice } from '@/components/ui/Notice';
 import { BrandLoading } from '@/components/brand/BrandLoading';
-import { useQuestionBankState } from '@/state/QuestionBankProvider';
+import { useQuestionBankState } from '@/state/hooks';
 
 /** Route guard for pages that use questions: waits for the bank, or explains why it failed. */
 export function RequireQuestions() {

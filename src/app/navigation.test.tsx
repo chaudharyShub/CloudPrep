@@ -1,14 +1,29 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { SAA_TEST_BANK, TEST_BANK } from '@/test/bank';
 import { renderApp } from '@/test/renderApp';
 import { PRIMARY_NAV, SECONDARY_NAV } from './navigation';
 
 const PAGES = [
-  { path: '/dashboard', heading: 'Dashboard', title: 'Dashboard · CloudPrep' },
-  { path: '/practice', heading: 'Learning mode', title: 'Learning mode · CloudPrep' },
-  { path: '/exam', heading: 'Mock exam', title: 'Mock exam · CloudPrep' },
-  { path: '/history', heading: 'Exam history', title: 'Exam history · CloudPrep' },
-  { path: '/bookmarks', heading: 'Bookmarks', title: 'Bookmarks · CloudPrep' },
+  // AC-M.10: pages of an exam name it in the tab title.
+  { path: '/clf-c02/dashboard', heading: 'Dashboard', title: 'Dashboard · CLF-C02 · CloudPrep' },
+  {
+    path: '/clf-c02/practice',
+    heading: 'Learning mode',
+    title: 'Learning mode · CLF-C02 · CloudPrep',
+  },
+  {
+    path: '/saa-c03/practice',
+    heading: 'Learning mode',
+    title: 'Learning mode · SAA-C03 · CloudPrep',
+  },
+  { path: '/clf-c02/exam', heading: 'Mock exam', title: 'Mock exam · CLF-C02 · CloudPrep' },
+  {
+    path: '/clf-c02/history',
+    heading: 'Exam history',
+    title: 'Exam history · CLF-C02 · CloudPrep',
+  },
+  { path: '/clf-c02/bookmarks', heading: 'Bookmarks', title: 'Bookmarks · CLF-C02 · CloudPrep' },
   { path: '/settings', heading: 'Settings', title: 'Settings · CloudPrep' },
 ] as const;
 
@@ -23,11 +38,11 @@ describe('routing', () => {
   it('redirects / to the dashboard', async () => {
     const { router } = renderApp('/');
     expect(await screen.findByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
-    expect(router.state.location.pathname).toBe('/dashboard');
+    expect(router.state.location.pathname).toBe('/clf-c02/dashboard');
   });
 
   it.each(PAGES)('renders $path with one h1 and a meaningful tab title', async (page) => {
-    renderApp(page.path);
+    renderApp(page.path, { banks: [TEST_BANK, SAA_TEST_BANK] });
     expect(await screen.findByRole('heading', { level: 1, name: page.heading })).toBeVisible();
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     await waitFor(() => {
@@ -40,7 +55,7 @@ describe('routing', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Page not found' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'Go to dashboard' })).toHaveAttribute(
       'href',
-      '/dashboard',
+      '/clf-c02/dashboard',
     );
   });
 });
@@ -51,7 +66,10 @@ describe('sidebar navigation', () => {
     await screen.findByRole('heading', { level: 1, name: 'Dashboard' });
     const nav = sidebarNav();
     for (const item of [...PRIMARY_NAV, ...SECONDARY_NAV]) {
-      expect(within(nav).getByRole('link', { name: item.label })).toHaveAttribute('href', item.to);
+      expect(within(nav).getByRole('link', { name: item.label })).toHaveAttribute(
+        'href',
+        'to' in item ? item.to : `/clf-c02/${item.page}`,
+      );
     }
   });
 

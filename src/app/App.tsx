@@ -5,7 +5,6 @@ import { createAdminClient } from '@/backend/createAdminClient';
 import { createAuthClient } from '@/backend/createAuthClient';
 import { createQuestionSource } from '@/backend/createQuestionSource';
 import { createAccountRemote } from '@/backend/createUserDataRemote';
-import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
 import { ToastProvider } from '@/components/ui/Toast';
 import { AdminProvider } from '@/state/AdminProvider';
 import { AuthProvider } from '@/state/AuthProvider';
@@ -30,10 +29,13 @@ export function App() {
   const [router] = useState(() => createBrowserRouter(routes));
   const [auth] = useState(createAuthClient);
   const [admin] = useState(createAdminClient);
-  const [questions] = useState<QuestionLoader | null>(() => {
-    const source = createQuestionSource();
+  const [loaderFor] = useState(() => {
     const cache = createIndexedDbQuestionCache() ?? createMemoryQuestionCache();
-    return source ? createQuestionLoader(source, cache, EXAM_ID) : null;
+    // One loader per exam, made when a page first needs that exam's questions (D-066).
+    return (examId: string): QuestionLoader | null => {
+      const source = createQuestionSource(examId);
+      return source ? createQuestionLoader(source, cache, examId) : null;
+    };
   });
   const [{ guestStore, accounts }] = useState(() => {
     const local = createLocalStorageDriver();
@@ -53,7 +55,7 @@ export function App() {
   return (
     <AuthProvider client={auth}>
       <UserDataProvider guestStore={guestStore} accounts={accounts}>
-        <QuestionBankProvider loader={questions}>
+        <QuestionBankProvider loaderFor={loaderFor}>
           <AdminProvider client={admin}>
             <ToastProvider>
               <RouterProvider router={router} />

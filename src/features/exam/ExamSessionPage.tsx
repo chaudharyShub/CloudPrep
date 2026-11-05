@@ -1,3 +1,4 @@
+import { examPath } from '@/app/paths';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ArrowLeft, ArrowRight, Flag, LayoutGrid, ListChecks } from 'lucide-react';
@@ -129,7 +130,10 @@ export function ExamSessionPage() {
           >
             Previous
           </Button>
-          <Link to="/exam/review" className={buttonClasses({ variant: 'ghost' })}>
+          <Link
+            to={examPath(exam.examId, 'exam/review')}
+            className={buttonClasses({ variant: 'ghost' })}
+          >
             <ListChecks size={18} strokeWidth={1.75} aria-hidden="true" />
             Review all
           </Link>
@@ -157,7 +161,7 @@ export function ExamSessionPage() {
           </p>
           <QuestionNavigator exam={exam} onSelect={goTo} />
           <Link
-            to="/exam/review"
+            to={examPath(exam.examId, 'exam/review')}
             className="mt-4 flex min-h-11 items-center justify-center border border-ink font-semibold text-fg transition-colors hover:bg-surface-2"
           >
             Review all answers
@@ -230,7 +234,10 @@ export function ExamSessionPage() {
         title="Questions"
         description={`${counts.answered} answered · ${counts.flagged} flagged`}
         footer={
-          <Link to="/exam/review" className={buttonClasses({ variant: 'secondary' })}>
+          <Link
+            to={examPath(exam.examId, 'exam/review')}
+            className={buttonClasses({ variant: 'secondary' })}
+          >
             Review all
           </Link>
         }

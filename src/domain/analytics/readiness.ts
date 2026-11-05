@@ -1,4 +1,4 @@
-import { DOMAINS, type DomainId, type TaskStatementId } from '@/domain/exam-guide/clf-c02';
+import { DOMAIN_IDS, type DomainId, type TaskStatementId } from '@/domain/exam-guide/types';
 import type { ExamAttempt } from '@/domain/exam/attempt';
 import type { ProgressMap } from '@/domain/practice/progress';
 import type { Question } from '@/domain/questions/types';
@@ -92,11 +92,11 @@ export function domainEvidence(
   window = RECENT_WINDOW,
 ): DomainEvidence[] {
   const recent = countedAttempts(attempts).slice(0, window);
-  return DOMAINS.map((domain) => {
+  return DOMAIN_IDS.map((domain) => {
     let correct = 0;
     let total = 0;
     for (const attempt of recent) {
-      const result = attempt.summary.byDomain[domain.id];
+      const result = attempt.summary.byDomain[domain];
       correct += result.correct;
       total += result.total;
     }
@@ -108,7 +108,7 @@ export function domainEvidence(
       else if (ratio * 100 >= benchmarkPercent + 10) status = 'strength';
       else status = 'neutral';
     }
-    return { domain: domain.id, correct, total, ratio, enoughData, status };
+    return { domain, correct, total, ratio, enoughData, status };
   });
 }
 

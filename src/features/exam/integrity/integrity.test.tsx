@@ -123,7 +123,7 @@ describe('strict practice in the app', () => {
     const request = vi.fn(() => Promise.reject(new Error('no')));
     document.documentElement.requestFullscreen = request;
     const store = createTestStore();
-    const { user } = renderApp('/exam', { store });
+    const { user } = renderApp('/clf-c02/exam', { store });
     await user.click(await screen.findByRole('radio', { name: /^Strict practice(?! with)/ }));
     await user.click(screen.getByRole('button', { name: 'Start full exam' }));
     expect(screen.getByRole('dialog')).toHaveAccessibleDescription(/logs when the tab is hidden/);
@@ -143,7 +143,7 @@ describe('strict practice in the app', () => {
   it('shows a fullscreen-exit warning with a way back, and lets the learner stop monitoring', async () => {
     const store = createTestStore();
     store.startExam(strictExam());
-    const { user } = renderApp('/exam/session', { store });
+    const { user } = renderApp('/clf-c02/exam/session', { store });
     await screen.findByRole('heading', { level: 1, name: /^Question 1 of/ });
     // Monitoring starts in an effect, which can run just after the heading appears; it logs
     // `monitoring-started` as it attaches its listeners.
@@ -170,7 +170,7 @@ describe('strict practice in the app', () => {
   it('logs nothing and shows no monitoring bar in standard mode', async () => {
     const store = createTestStore();
     store.startExam(makeExam());
-    renderApp('/exam/session', { store });
+    renderApp('/clf-c02/exam/session', { store });
     await screen.findByRole('heading', { level: 1, name: /^Question 1 of/ });
     window.dispatchEvent(new Event('blur'));
     expect(screen.queryByText(/monitoring/)).not.toBeInTheDocument();
@@ -184,7 +184,7 @@ describe('strict practice in the app', () => {
       event: { type: 'tab-hidden', at: Date.now() },
     });
     store.completeExam(makeAttempt(exam), EXAM_QUESTIONS);
-    const { user } = renderApp('/results/r1', { store });
+    const { user } = renderApp('/clf-c02/results/r1', { store });
     const table = await screen.findByRole('table', { name: 'Integrity events in time order' });
     expect(within(table).getByText('Exam tab hidden')).toBeVisible();
     expect(within(table).getByText(/None required/)).toBeVisible();

@@ -2,14 +2,14 @@
 import { PGlite } from '@electric-sql/pglite';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { QUESTION_BANK } from '@/content/questions';
-import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
+import { CLF_C02 } from '@/domain/exam-guide';
 import type { Question } from '@/domain/questions/types';
 import { createMemoryDriver } from '@/storage/driver';
 import { createAppStore } from '@/storage/store';
 import { createSyncEngine, parseRemote } from '@/storage/sync';
 import { EXAM_QUESTIONS } from '@/test/bank';
 import { examQuestion, makeAttempt, makeExam } from '@/test/exam';
-import { clfExamRows, isPublishable, questionToRows } from './contentRows';
+import { examRows, isPublishable, questionToRows } from './contentRows';
 import { createUserDataRemote, type SelectQuery, type UserTables } from './userDataRemote';
 
 /**
@@ -86,12 +86,12 @@ function insertRow(table: string, row: Record<string, unknown>) {
 }
 
 async function publish(questions: readonly Question[]): Promise<void> {
-  const { exam, domains, topics } = clfExamRows();
+  const { exam, domains, topics } = examRows(CLF_C02, true);
   await insertRow('exams', { ...exam });
   for (const domain of domains) await insertRow('exam_domains', { ...domain });
   for (const topic of topics) await insertRow('exam_topics', { ...topic });
   for (const question of questions) {
-    const rows = questionToRows(question, EXAM_ID);
+    const rows = questionToRows(question, CLF_C02.id);
     await insertRow('questions', { ...rows.question });
     await insertRow('question_keys', { ...rows.key });
     await insertRow('question_revisions', { ...rows.revision });
@@ -185,7 +185,7 @@ describe('database schema', () => {
     await asAdmin();
     expect(await count('public.questions')).toBe(4);
     expect(await count('public.question_keys')).toBe(4);
-    expect(await count('public.exam_topics')).toBe(clfExamRows().topics.length);
+    expect(await count('public.exam_topics')).toBe(examRows(CLF_C02, true).topics.length);
   });
 
   it('AC-B.5 signing up creates a profile', async () => {
@@ -242,18 +242,18 @@ describe('database schema', () => {
       `insert into public.question_progress (exam_id, question_id, attempts, correct, last_result,
          first_answered_at, last_answered_at, last_incorrect_at, last_session_id)
        values ($1, 'clf-d1-0001', 2, 1, 'correct', now(), now(), now(), 's1')`,
-      [EXAM_ID],
+      [CLF_C02.id],
     );
     await db.query(
       `insert into public.bookmarks (exam_id, question_id) values ($1, 'clf-d1-0001')`,
-      [EXAM_ID],
+      [CLF_C02.id],
     );
     await db.query(
       `insert into public.user_preferences (preferences) values ('{"theme": "light"}')`,
     );
     await db.query(
       `insert into public.active_exams (exam_id, session) values ($1, '{"id": "e1"}')`,
-      [EXAM_ID],
+      [CLF_C02.id],
     );
     expect(await count('public.question_progress')).toBe(1);
 
@@ -266,7 +266,7 @@ describe('database schema', () => {
     await expect(
       db.query(
         `insert into public.bookmarks (user_id, exam_id, question_id) values ($1, $2, 'x')`,
-        [ALICE, EXAM_ID],
+        [ALICE, CLF_C02.id],
       ),
     ).rejects.toThrow(/row-level security/);
     const updated = await db.query(`update public.user_preferences set preferences = '{}'`);
@@ -287,7 +287,7 @@ describe('database schema', () => {
          summary)
        values ('a1', $1, 'short', 'v1', now() - interval '10 min', now(), 600000, now(), 'manual',
          600000, 70, true, '{"total": 1}')`,
-      [EXAM_ID],
+      [CLF_C02.id],
     );
     await db.query(
       `insert into public.exam_attempt_questions (attempt_id, position, question_id, revision,
@@ -319,7 +319,7 @@ describe('database schema', () => {
         `insert into public.question_progress (exam_id, question_id, attempts, correct,
            last_result, first_answered_at, last_answered_at, last_incorrect_at, last_session_id)
          values ($1, 'bad', $2, $3, $4, now(), now(), ${lastIncorrect}, 's')`,
-        [EXAM_ID, attempts, correct, result],
+        [CLF_C02.id, attempts, correct, result],
       );
     await expect(insert(1, 2, 'correct', 'null')).rejects.toThrow(/check constraint/);
     await expect(insert(1, 0, 'correct', 'null')).rejects.toThrow(/check constraint/);
@@ -332,7 +332,7 @@ describe('database schema', () => {
     await db.query(`insert into auth.users (id) values ($1)`, [CAROL]);
     await asUser(CAROL);
     const tables = pgUserTables();
-    const remote = createUserDataRemote(tables, CAROL, EXAM_ID);
+    const remote = createUserDataRemote(tables, CAROL);
     const T0 = Date.UTC(2026, 9, 1, 9, 0, 0, 123);
 
     const laptop = createAppStore({ driver: createMemoryDriver(), persistent: true });
@@ -342,6 +342,7 @@ describe('database schema', () => {
     laptop.toggleBookmark('q-1', T0 + 2);
     laptop.addSessionSummary({
       id: 's-1',
+      examId: 'clf-c02',
       label: 'Domain 1',
       startedAt: T0,
       finishedAt: T0 + 3,
@@ -409,7 +410,7 @@ describe('database schema', () => {
            last_result, first_answered_at, last_answered_at, last_incorrect_at, last_session_id,
            review_level)
          values ($1, $2, 3, $3, $4, now(), now(), now(), 's', ${level})`,
-        [EXAM_ID, id, correct, result],
+        [CLF_C02.id, id, correct, result],
       );
     await expect(insert('high', 'correct', 2, '5')).rejects.toThrow(/check constraint/);
     await expect(insert('negative', 'correct', 2, '-1')).rejects.toThrow(/check constraint/);
@@ -418,7 +419,7 @@ describe('database schema', () => {
     await insert('noLevel', 'correct', 2, 'null');
     await insert('staleLevel', 'incorrect', 2, '2');
 
-    const pulled = await createUserDataRemote(pgUserTables(), DAVE, EXAM_ID).pull();
+    const pulled = await createUserDataRemote(pgUserTables(), DAVE).pull();
     const levels = Object.fromEntries(
       Object.entries(parseRemote(pulled).progress ?? {}).map(([id, e]) => [id, e.reviewLevel]),
     );
@@ -447,13 +448,13 @@ describe('database schema', () => {
         `insert into public.question_progress (exam_id, question_id, attempts, correct,
            last_result, first_answered_at, last_answered_at, last_session_id)
          values ($1, $2, 1, 1, 'correct', now(), now(), 's1')`,
-        [EXAM_ID, id],
+        [CLF_C02.id, id],
       );
     }
     await db.query(
       `insert into public.practice_sessions (id, exam_id, label, started_at, finished_at, total,
          answered, correct) values ('p1', $1, 'Mixed', now(), now(), 2, 2, 2)`,
-      [EXAM_ID],
+      [CLF_C02.id],
     );
     for (const [id, reason, percent] of [
       ['x1', 'manual', 72.5],
@@ -465,7 +466,7 @@ describe('database schema', () => {
            benchmark_met, summary)
          values ($1, $2, 'short', 'v1', now() - interval '10 min', now(), 600000, now(), $3,
            600000, 70, true, $4)`,
-        [id, EXAM_ID, reason, JSON.stringify({ percent })],
+        [id, CLF_C02.id, reason, JSON.stringify({ percent })],
       );
     }
 

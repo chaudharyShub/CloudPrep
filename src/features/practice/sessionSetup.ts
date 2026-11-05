@@ -8,7 +8,8 @@ export interface SessionSetup {
   limit: number | null;
 }
 
-export const SESSION_PATH = '/practice/session';
+/** The Learning mode session page, under the exam's address (`examPath`). */
+export const SESSION_PAGE = 'practice/session';
 
 /** Router state is untrusted (it survives reloads in history); validate before use. */
 export function parseSessionSetup(state: unknown): SessionSetup | null {

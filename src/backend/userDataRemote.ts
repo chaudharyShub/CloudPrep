@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { EXAMS } from '@/domain/exam-guide';
 import { MAX_SESSION_SUMMARIES } from '@/storage/areas';
 import { MAX_EXAM_ATTEMPTS } from '@/storage/attemptsArea';
 import type { RemoteUserData, SyncChanges, UserDataRemote } from '@/storage/sync';
@@ -11,6 +12,7 @@ import {
   rowsToAttempt,
   rowsToBookmarks,
   rowsToProgress,
+  rowToActiveExam,
   rowToSession,
   sessionToRow,
   type AttemptQuestionRow,
@@ -56,39 +58,39 @@ function chunks<T>(items: readonly T[], size: number): T[][] {
   return result;
 }
 
-/** Sync's server side for one user and exam, on top of `UserTables` (D-047). */
-export function createUserDataRemote(
-  tables: UserTables,
-  userId: string,
-  examId: string,
-): UserDataRemote {
-  const byExam = { exam_id: examId };
-
+/**
+ * Sync's server side for one user, on top of `UserTables` (D-047). It covers every exam:
+ * each row is written with its item's exam and reads include all exams (D-066).
+ */
+export function createUserDataRemote(tables: UserTables, userId: string): UserDataRemote {
   async function upsert(table: UserTable, rows: readonly Row[], onConflict: string) {
     for (const part of chunks(rows, UPSERT_CHUNK)) await tables.upsert(table, part, onConflict);
   }
   async function deleteKeys(table: UserTable, column: string, keys: readonly string[]) {
     for (const part of chunks(keys, IN_CHUNK)) {
-      await tables.delete(table, { eq: byExam, in: { column, values: part } });
+      await tables.delete(table, { in: { column, values: part } });
     }
   }
 
   return {
     async pull(): Promise<RemoteUserData> {
+      // Session and attempt limits apply per exam, like the local store's.
+      const perExam = (table: UserTable, column: string, limit: number) =>
+        Promise.all(
+          EXAMS.map((exam) =>
+            tables.select(table, {
+              eq: { exam_id: exam.id },
+              order: { column, ascending: false },
+              limit,
+            }),
+          ),
+        ).then((lists) => lists.flat());
       const [progress, bookmarks, sessions, attempts, active, preferences] = await Promise.all([
-        tables.select('question_progress', { eq: byExam }),
-        tables.select('bookmarks', { eq: byExam }),
-        tables.select('practice_sessions', {
-          eq: byExam,
-          order: { column: 'finished_at', ascending: false },
-          limit: MAX_SESSION_SUMMARIES,
-        }),
-        tables.select('exam_attempts', {
-          eq: byExam,
-          order: { column: 'submitted_at', ascending: false },
-          limit: MAX_EXAM_ATTEMPTS,
-        }),
-        tables.select('active_exams', { eq: byExam }),
+        tables.select('question_progress', {}),
+        tables.select('bookmarks', {}),
+        perExam('practice_sessions', 'finished_at', MAX_SESSION_SUMMARIES),
+        perExam('exam_attempts', 'submitted_at', MAX_EXAM_ATTEMPTS),
+        tables.select('active_exams', {}),
         tables.select('user_preferences', {}),
       ]);
       const attemptIds = attempts.map((row) => String(row['id']));
@@ -115,7 +117,8 @@ export function createUserDataRemote(
             (questionsByAttempt.get(String(row['id'])) ?? []) as Partial<AttemptQuestionRow>[],
           ),
         ),
-        activeExam: active[0]?.['session'] ?? null,
+        // One exam at a time (D-066); if more rows exist, the newest wins.
+        activeExam: newestActive(active),
         preferences: preferences[0]?.['preferences'] ?? {},
       };
     },
@@ -132,42 +135,40 @@ export function createUserDataRemote(
       }
 
       if (progress) {
-        if (progress.clear) await tables.delete('question_progress', { eq: byExam });
+        if (progress.clear) await tables.delete('question_progress', {});
         await deleteKeys('question_progress', 'question_id', progress.delete);
         await upsert(
           'question_progress',
-          progress.upsert.map((item) => progressToRow(userId, examId, item.questionId, item.entry)),
+          progress.upsert.map((item) => progressToRow(userId, item.questionId, item.entry)),
           'user_id,question_id',
         );
       }
 
       if (bookmarks) {
-        if (bookmarks.clear) await tables.delete('bookmarks', { eq: byExam });
+        if (bookmarks.clear) await tables.delete('bookmarks', {});
         await deleteKeys('bookmarks', 'question_id', bookmarks.delete);
         await upsert(
           'bookmarks',
-          bookmarks.upsert.map((item) =>
-            bookmarkToRow(userId, examId, item.questionId, item.addedAt),
-          ),
+          bookmarks.upsert.map((item) => bookmarkToRow(userId, item.questionId, item.addedAt)),
           'user_id,question_id',
         );
       }
 
       if (sessions) {
-        if (sessions.clear) await tables.delete('practice_sessions', { eq: byExam });
+        if (sessions.clear) await tables.delete('practice_sessions', {});
         await deleteKeys('practice_sessions', 'id', sessions.delete);
         await upsert(
           'practice_sessions',
-          sessions.upsert.map((session) => sessionToRow(userId, examId, session)),
+          sessions.upsert.map((session) => sessionToRow(userId, session)),
           'user_id,id',
         );
       }
 
       if (attempts) {
         // Deleting an attempt deletes its questions too (foreign key cascade).
-        if (attempts.clear) await tables.delete('exam_attempts', { eq: byExam });
+        if (attempts.clear) await tables.delete('exam_attempts', {});
         await deleteKeys('exam_attempts', 'id', attempts.delete);
-        const rows = attempts.upsert.map((attempt) => attemptToRows(userId, examId, attempt));
+        const rows = attempts.upsert.map((attempt) => attemptToRows(userId, attempt));
         await upsert(
           'exam_attempts',
           rows.map((row) => row.attempt),
@@ -181,20 +182,39 @@ export function createUserDataRemote(
       }
 
       if (activeExam) {
-        if (activeExam.clear || activeExam.delete.length > 0) {
-          await tables.delete('active_exams', { eq: byExam });
-        }
         const session = activeExam.upsert.at(-1);
-        if (session) {
-          await upsert(
+        // Only one exam is in progress at a time (D-066): when a session ends or is replaced,
+        // remove the old row, which may belong to another exam.
+        if (activeExam.clear || activeExam.delete.length > 0) {
+          await tables.delete(
             'active_exams',
-            [activeExamToRow(userId, examId, session)],
-            'user_id,exam_id',
+            session ? { in: { column: 'exam_id', values: otherExams(session.examId) } } : {},
           );
+        }
+        if (session) {
+          await upsert('active_exams', [activeExamToRow(userId, session)], 'user_id,exam_id');
         }
       }
     },
   };
+}
+
+function otherExams(examId: string): string[] {
+  return EXAMS.map((exam) => exam.id).filter((id) => id !== examId);
+}
+
+function startedAt(row: Row): number {
+  const session = row['session'];
+  const value =
+    typeof session === 'object' && session !== null
+      ? (session as Record<string, unknown>)['startedAt']
+      : undefined;
+  return typeof value === 'number' ? value : 0;
+}
+
+function newestActive(rows: readonly Row[]): unknown {
+  const newest = [...rows].sort((a, b) => startedAt(b) - startedAt(a))[0];
+  return newest ? rowToActiveExam(newest) : null;
 }
 
 /** Rows per request when reading; Supabase returns at most 1,000 by default. */

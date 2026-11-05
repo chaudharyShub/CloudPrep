@@ -1,4 +1,4 @@
-import { DOMAINS, type DomainId, type TaskStatementId } from '@/domain/exam-guide/clf-c02';
+import type { DomainId, ExamDomain, TaskStatementId } from '@/domain/exam-guide/types';
 import type { ExamAttempt } from '@/domain/exam/attempt';
 import type { DomainResult } from '@/domain/exam/scoring';
 
@@ -24,15 +24,18 @@ export interface WeakTopic {
 export function weakAreas(
   attempt: Pick<ExamAttempt, 'summary' | 'questions'>,
   benchmarkPercent: number,
+  examDomains: readonly ExamDomain[],
 ): { domains: WeakDomain[]; topics: WeakTopic[] } {
-  const domains = DOMAINS.flatMap((domain) => {
-    const result = attempt.summary.byDomain[domain.id];
-    if (result.total === 0 || result.score === null) return [];
-    if (result.score * 100 >= benchmarkPercent) return [];
-    return [
-      { domain: domain.id, result, impact: (domain.weightPercent / 100) * (1 - result.score) },
-    ];
-  }).sort((a, b) => b.impact - a.impact);
+  const domains = examDomains
+    .flatMap((domain) => {
+      const result = attempt.summary.byDomain[domain.id];
+      if (result.total === 0 || result.score === null) return [];
+      if (result.score * 100 >= benchmarkPercent) return [];
+      return [
+        { domain: domain.id, result, impact: (domain.weightPercent / 100) * (1 - result.score) },
+      ];
+    })
+    .sort((a, b) => b.impact - a.impact);
 
   const byTask = new Map<TaskStatementId, WeakTopic>();
   for (const question of attempt.questions) {
@@ -61,13 +64,16 @@ export type NextStep =
   | { kind: 'confirm-consistency' };
 
 /** Rule-based suggestions; every rule is explained to the learner where it's shown. */
-export function nextSteps(attempt: ExamAttempt): NextStep[] {
+export function nextSteps(attempt: ExamAttempt, examDomains: readonly ExamDomain[]): NextStep[] {
   const steps: NextStep[] = [];
   const missed = attempt.questions.filter((q) => q.outcome !== 'correct').map((q) => q.questionId);
   if (attempt.summary.unanswered > 0) {
     steps.push({ kind: 'pacing', unanswered: attempt.summary.unanswered });
   }
-  for (const weak of weakAreas(attempt, attempt.benchmarkPercent).domains.slice(0, 2)) {
+  for (const weak of weakAreas(attempt, attempt.benchmarkPercent, examDomains).domains.slice(
+    0,
+    2,
+  )) {
     steps.push({ kind: 'practise-domain', domain: weak.domain });
   }
   if (missed.length > 0) steps.push({ kind: 'practise-missed', questionIds: missed });

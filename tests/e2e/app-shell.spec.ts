@@ -2,13 +2,22 @@ import AxeBuilder from '@axe-core/playwright';
 import type { Page } from '@playwright/test';
 import { expect, test } from './support/fixtures';
 
+// Pages of an exam name it in the tab title (AC-M.10).
 const PAGES = [
-  { path: '/dashboard', heading: 'Dashboard' },
-  { path: '/practice', heading: 'Learning mode' },
-  { path: '/exam', heading: 'Mock exam' },
-  { path: '/history', heading: 'Exam history' },
-  { path: '/bookmarks', heading: 'Bookmarks' },
-  { path: '/settings', heading: 'Settings' },
+  { path: '/clf-c02/dashboard', heading: 'Dashboard', title: 'Dashboard · CLF-C02 · CloudPrep' },
+  {
+    path: '/clf-c02/practice',
+    heading: 'Learning mode',
+    title: 'Learning mode · CLF-C02 · CloudPrep',
+  },
+  { path: '/clf-c02/exam', heading: 'Mock exam', title: 'Mock exam · CLF-C02 · CloudPrep' },
+  {
+    path: '/clf-c02/history',
+    heading: 'Exam history',
+    title: 'Exam history · CLF-C02 · CloudPrep',
+  },
+  { path: '/clf-c02/bookmarks', heading: 'Bookmarks', title: 'Bookmarks · CLF-C02 · CloudPrep' },
+  { path: '/settings', heading: 'Settings', title: 'Settings · CloudPrep' },
 ] as const;
 
 const VIEWPORTS = [
@@ -37,14 +46,20 @@ async function expectNoHorizontalOverflow(page: Page) {
 }
 
 test.describe('pages', () => {
-  for (const { path, heading } of PAGES) {
+  for (const { path, heading, title } of PAGES) {
     test(`${path} loads directly, has a title and passes axe`, async ({ page }) => {
       await page.goto(path);
       await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
-      await expect(page).toHaveTitle(`${heading} · CloudPrep`);
+      await expect(page).toHaveTitle(title);
       await expectNoSeriousA11yViolations(page);
     });
   }
+
+  test('AC-M.2 an old address opens the CLF-C02 page', async ({ page }) => {
+    await page.goto('/practice');
+    await expect(page.getByRole('heading', { level: 1, name: 'Learning mode' })).toBeVisible();
+    await expect(page).toHaveURL(/\/clf-c02\/practice$/);
+  });
 
   test('light theme passes axe', async ({ page }) => {
     await page.goto('/settings');
@@ -59,7 +74,7 @@ test.describe('pages', () => {
     await page.getByRole('radio', { name: 'Dark' }).check();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await expectNoSeriousA11yViolations(page);
-    await page.goto('/dashboard');
+    await page.goto('/clf-c02/dashboard');
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     await expectNoSeriousA11yViolations(page);
   });
@@ -84,14 +99,14 @@ test.describe('layout', () => {
 
   test('desktop shows the sidebar and hides the menu button', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto('/dashboard');
+    await page.goto('/clf-c02/dashboard');
     await expect(page.getByRole('navigation', { name: 'Main' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Open navigation' })).toBeHidden();
   });
 
   test('small screens navigate through the menu drawer', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto('/dashboard');
+    await page.goto('/clf-c02/dashboard');
     await expect(page.getByRole('navigation', { name: 'Main' })).toBeHidden();
 
     await page.getByRole('button', { name: 'Open navigation' }).click();
@@ -114,7 +129,7 @@ test.describe('keyboard', () => {
     // WebKit only tabs to links when "Press Tab to highlight each item" is enabled.
     test.skip(browserName === 'webkit', 'WebKit skips links on Tab by default');
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto('/dashboard');
+    await page.goto('/clf-c02/dashboard');
     await page.keyboard.press('Tab');
     const skip = page.getByRole('link', { name: 'Skip to main content' });
     await expect(skip).toBeFocused();
@@ -126,7 +141,7 @@ test.describe('keyboard', () => {
   test('sidebar links are reachable and show the active page', async ({ page, browserName }) => {
     test.skip(browserName === 'webkit', 'WebKit skips links on Tab by default');
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto('/dashboard');
+    await page.goto('/clf-c02/dashboard');
     const nav = page.getByRole('navigation', { name: 'Main' });
     const examLink = nav.getByRole('link', { name: 'Mock exam' });
     await examLink.focus();

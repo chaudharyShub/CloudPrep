@@ -1,3 +1,4 @@
+import { CLF_C02 } from '@/domain/exam-guide';
 import { buildAttempt } from '@/domain/exam/attempt';
 import { shortExamConfig } from '@/domain/exam/config';
 import {
@@ -25,7 +26,7 @@ export function makeExam({
 } = {}): ExamSession {
   const session = createExamSession({
     id,
-    config: shortExamConfig(count),
+    config: shortExamConfig(CLF_C02, count),
     bankVersion: 'test',
     seed: 1,
     startedAt,

@@ -21,19 +21,21 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Notice } from '@/components/ui/Notice';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { nextSteps, weakAreas, type NextStep } from '@/domain/analytics/attemptInsights';
-import { DOMAINS } from '@/domain/exam-guide/clf-c02';
+import { useExamPath } from '@/app/paths';
+import type { ExamGuide } from '@/domain/exam-guide';
 import type { ExamAttempt } from '@/domain/exam/attempt';
 import { EVENT_DESCRIPTIONS } from '@/domain/exam/integrity';
 import { proctorStatus } from '@/domain/exam/proctor';
 import { formatDateTime, formatPercent } from '@/lib/format';
-import { useExamAttempts, useExamQuestions, usePreferences } from '@/state/hooks';
-import { SESSION_PATH, sessionState } from '@/features/practice/sessionSetup';
+import { useCurrentExam, useExamAttempts, useExamQuestions, usePreferences } from '@/state/hooks';
+import { SESSION_PAGE, sessionState } from '@/features/practice/sessionSetup';
 import { formatDuration } from './format';
 import { IntegrityReport } from './IntegrityReport';
 
-const domainName = (id: string) => DOMAINS.find((d) => d.id === id)?.name ?? id;
-const taskTitle = (id: string) =>
-  DOMAINS.flatMap((d) => d.taskStatements).find((t) => t.id === id)?.title ?? id;
+const domainName = (exam: ExamGuide, id: string) =>
+  exam.domains.find((d) => d.id === id)?.name ?? id;
+const taskTitle = (exam: ExamGuide, id: string) =>
+  exam.domains.flatMap((d) => d.taskStatements).find((t) => t.id === id)?.title ?? id;
 
 export function ResultsPage() {
   const { attemptId } = useParams();
@@ -43,6 +45,7 @@ export function ResultsPage() {
 }
 
 export function ResultsNotFound() {
+  const path = useExamPath();
   return (
     <>
       <PageHeader title="Exam results" />
@@ -52,7 +55,7 @@ export function ResultsNotFound() {
           title="Results not found"
           description="This exam isn't in this browser's history. It may have been deleted, or taken in another browser."
           action={
-            <Link to="/history" className={buttonClasses({ variant: 'secondary' })}>
+            <Link to={path('history')} className={buttonClasses({ variant: 'secondary' })}>
               Go to exam history
             </Link>
           }
@@ -76,9 +79,11 @@ function Stat({ icon: Icon, label, value }: { icon: LucideIcon; label: string; v
 
 function Results({ attempt }: { attempt: ExamAttempt }) {
   const { summary } = attempt;
-  const weak = weakAreas(attempt, attempt.benchmarkPercent);
-  const steps = nextSteps(attempt);
-  const reviewPath = `/results/${attempt.id}/review`;
+  const exam = useCurrentExam();
+  const path = useExamPath();
+  const weak = weakAreas(attempt, attempt.benchmarkPercent, exam.domains);
+  const steps = nextSteps(attempt, exam.domains);
+  const reviewPath = path(`results/${attempt.id}/review`);
 
   return (
     <>
@@ -134,19 +139,20 @@ function Results({ attempt }: { attempt: ExamAttempt }) {
               </strong>{' '}
               This is an unofficial practice score: the percentage of questions answered correctly,
               with unanswered questions counted as incorrect. AWS reports a scaled score (100–1,000,
-              700 to pass) using a method it doesn&apos;t publish, so a practice result can&apos;t
-              guarantee success in the real exam.
+              {` ${String(exam.passingScore)} `}to pass for {exam.code}) using a method it
+              doesn&apos;t publish, so a practice result can&apos;t guarantee success in the real
+              exam.
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <Link to={reviewPath} className={buttonClasses()}>
                 <ListChecks size={18} strokeWidth={1.75} aria-hidden="true" />
                 Review all answers
               </Link>
-              <Link to="/exam" className={buttonClasses({ variant: 'secondary' })}>
+              <Link to={path('exam')} className={buttonClasses({ variant: 'secondary' })}>
                 <RotateCcw size={18} strokeWidth={1.75} aria-hidden="true" />
                 Take another exam
               </Link>
-              <Link to="/dashboard" className={buttonClasses({ variant: 'ghost' })}>
+              <Link to={path('dashboard')} className={buttonClasses({ variant: 'ghost' })}>
                 <LayoutDashboard size={18} strokeWidth={1.75} aria-hidden="true" />
                 Dashboard
               </Link>
@@ -179,7 +185,7 @@ function Results({ attempt }: { attempt: ExamAttempt }) {
                 </tr>
               </thead>
               <tbody>
-                {DOMAINS.map((d) => {
+                {exam.domains.map((d) => {
                   const result = summary.byDomain[d.id];
                   if (result.total === 0) return null;
                   return (
@@ -245,7 +251,7 @@ function Results({ attempt }: { attempt: ExamAttempt }) {
                   <li key={domain} className="flex gap-3">
                     <Target size={18} className="mt-0.5 shrink-0 text-warning" aria-hidden="true" />
                     <span>
-                      <span className="font-medium text-fg">{domainName(domain)}</span>
+                      <span className="font-medium text-fg">{domainName(exam, domain)}</span>
                       <span className="block text-fg-muted">
                         {result.correct} of {result.total} correct ({formatPercent(result.score)})
                         {result.smallSample && ' · small sample'}
@@ -258,7 +264,7 @@ function Results({ attempt }: { attempt: ExamAttempt }) {
                     <CircleX size={18} className="mt-0.5 shrink-0 text-danger" aria-hidden="true" />
                     <span>
                       <span className="font-medium text-fg">
-                        {topic.taskStatement} {taskTitle(topic.taskStatement)}
+                        {topic.taskStatement} {taskTitle(exam, topic.taskStatement)}
                       </span>
                       <span className="block text-fg-muted">
                         Missed {topic.missed} of {topic.total}
@@ -308,12 +314,16 @@ function stepKey(step: NextStep): string {
 
 function NextStepItem({ step }: { step: NextStep }) {
   const navigate = useNavigate();
+  const exam = useCurrentExam();
+  const path = useExamPath();
   const { practiceSessionLength } = usePreferences();
   const { questions: examQuestions } = useExamQuestions();
   const limit = practiceSessionLength === 'all' ? null : Number(practiceSessionLength);
 
   const startPractice = (label: string, questionIds: string[], max: number | null) => {
-    void navigate(SESSION_PATH, { state: sessionState({ label, questionIds, limit: max }) });
+    void navigate(path(SESSION_PAGE), {
+      state: sessionState({ label, questionIds, limit: max }),
+    });
   };
 
   switch (step.kind) {
@@ -324,12 +334,13 @@ function NextStepItem({ step }: { step: NextStep }) {
           <p className="mt-1 text-fg-muted">
             You left {step.unanswered} question{step.unanswered === 1 ? '' : 's'} unanswered.
             Unanswered questions always score as incorrect, so give every question a best guess and
-            flag it to revisit. The real exam allows about 83 seconds per question.
+            flag it to revisit. The real exam allows about{' '}
+            {Math.round((exam.durationMinutes * 60) / exam.questionCount)} seconds per question.
           </p>
         </li>
       );
     case 'practise-domain': {
-      const name = domainName(step.domain);
+      const name = domainName(exam, step.domain);
       return (
         <li className="text-sm">
           <p className="font-medium text-fg">Practise {name}</p>
@@ -393,7 +404,7 @@ function NextStepItem({ step }: { step: NextStep }) {
           <p className="mt-1 text-fg-muted">
             One exam is limited evidence. Take more exams to check your score holds up. The{' '}
             <Link
-              to="/progress"
+              to={path('progress')}
               className="font-medium text-accent-fg underline-offset-4 hover:underline"
             >
               Progress

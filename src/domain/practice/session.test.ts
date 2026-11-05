@@ -17,6 +17,7 @@ const QUESTIONS = [single, multi];
 function newSession(overrides: Partial<Parameters<typeof createPracticeSession>[0]> = {}) {
   return createPracticeSession({
     id: 's1',
+    examId: 'clf-c02',
     label: 'Test',
     seed: 123,
     startedAt: 1000,

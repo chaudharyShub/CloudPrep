@@ -38,6 +38,7 @@ An unofficial practice simulator for the **AWS Certified Cloud Practitioner (CLF
 - **Learning mode:** untimed practice by domain or topic, with instant feedback, an explanation for every option, and links to the AWS documentation each question is based on. You can bookmark questions, and **Review due** brings questions back on a schedule (1, 3, 7, 21, then 60 days) so missed ones come up again before you forget them. The "i" next to Review due explains how it works.
 - **Timed mock exam:** a 65-question / 90-minute exam that follows the CLF-C02 domain weightings, with flagging, a question grid, final review and automatic submission when time runs out.
 - **Results:** a practice score, per-domain breakdown, answer review with explanations, exam history, and progress guidance across attempts.
+- **More exams (coming):** CloudPrep 4.0 is built for three exams: Cloud Practitioner (CLF-C02), Solutions Architect – Associate (SAA-C03) and Developer – Associate (DVA-C03). Each exam has its own address (`/clf-c02`, `/saa-c03`, `/dva-c03`), question bank, progress and history, with an exam picker in the navigation. The SAA-C03 and DVA-C03 banks have 600 checked questions each so far (target 2,000 each); those exams go live once their banks are published and launched.
 
 | Learning mode: instant feedback and an answer sheet                                       | Mock exam in the true-black dark theme                                                                |
 | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -128,9 +129,9 @@ CloudPrep is a static site on Vercel, deployed automatically from `master`. `ver
 
 ## Updating the question bank
 
-Questions live in `src/content/questions/`: one file per domain (`d<n>-*.ts`) and the larger set in `batches/`, written as compact specs (`author.ts`) with references from `refs.ts`. Each question needs:
+Each exam has its own folder, listed in `src/content/banks.ts`: `src/content/questions/` for CLF-C02 (one file per domain, `d<n>-*.ts`, and the larger set in `batches/`), `src/content/saa-c03/` and `src/content/dva-c03/` (batches only). Questions are written as compact specs (`author.ts`) with references from the exam's `refs.ts`. Each question needs:
 
-- A stable ID such as `clf-d3-0012`. IDs are never reused.
+- A stable ID with the exam's prefix, such as `clf-d3-0012`, `saa-d1-0001` or `dva-d4-0040`. IDs are never reused.
 - Four options for single answer, or five or more with at least two correct for multiple response. No "all/none of the above".
 - An explanation for every option, correct ones included, and an overall explanation.
 - At least one https AWS reference.
@@ -138,10 +139,10 @@ Questions live in `src/content/questions/`: one file per domain (`d<n>-*.ts`) an
 
 After editing:
 
-1. Bump `BANK_VERSION` in `src/content/questions/index.ts`.
+1. Bump `BANK_VERSION` in that exam's `index.ts`.
 2. Run `npm run validate:questions` and `node scripts/check-duplicates.mjs 0.3`, and fix what they report.
 3. Run `npm run check`.
-4. Publish: `npm run publish:questions`, then `npm run check:published`. **The live app only sees published questions**; visitors get the new set on their next visit.
+4. Publish: `npm run publish:questions`, then `npm run check:published` (both cover every exam). **The live app only sees published questions**; visitors get the new set on their next visit.
 
 Saved attempts keep the exact wording you answered (question archive), so editing a question never rewrites history. If a question changes in substance, increase its `revision`. Full rules are in `CLAUDE.md`, and the review checklist is in `docs/CONTENT_REVIEW.md`.
 

@@ -1,4 +1,4 @@
-import { DOMAINS, type DomainId } from '@/domain/exam-guide/clf-c02';
+import { EXAMS, examForQuestionId, type DomainId } from '@/domain/exam-guide';
 import { DIFFICULTIES, QUESTION_TYPES, REVIEW_STATUSES } from './types';
 
 export type ValidationCode =
@@ -43,7 +43,9 @@ export interface ValidationIssue {
 export const SINGLE_OPTION_COUNT = 4;
 export const MULTIPLE_MIN_OPTIONS = 5;
 
-const ID_PATTERN = /^clf-d([1-4])-\d{4}$/;
+/** `<exam prefix>-d<domain>-<4 digits>`, e.g. `clf-d2-0007` or `saa-d1-0001` (D-066). */
+const ID_PATTERN = /^([a-z]+)-d([1-4])-\d{4}$/;
+const ID_PREFIXES = EXAMS.map((exam) => exam.questionPrefix).join(', ');
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const ALLOWED_REFERENCE_HOSTS = [
   'docs.aws.amazon.com',
@@ -51,6 +53,8 @@ const ALLOWED_REFERENCE_HOSTS = [
   'repost.aws',
   'calculator.aws',
   'skillbuilder.aws',
+  // Kiro is in scope for DVA-C03; AWS's documentation overview links to its docs on kiro.dev.
+  'kiro.dev',
 ];
 const ALL_OR_NONE = /\b(all|none) of the above\b/i;
 
@@ -96,7 +100,13 @@ export function validateQuestion(input: unknown, index = 0): ValidationIssue[] {
 
   // Identity
   const idMatch = typeof input['id'] === 'string' ? ID_PATTERN.exec(input['id']) : null;
-  if (!idMatch) add('INVALID_ID', 'ID must match clf-d<1-4>-<4 digits>, e.g. clf-d2-0007.');
+  const exam = idMatch ? examForQuestionId(input['id'] as string) : undefined;
+  if (!idMatch || !exam) {
+    add(
+      'INVALID_ID',
+      `ID must match <exam>-d<1-4>-<4 digits> with an exam prefix (${ID_PREFIXES}), e.g. clf-d2-0007.`,
+    );
+  }
   if (!Number.isInteger(input['revision']) || (input['revision'] as number) < 1) {
     add('INVALID_REVISION', 'Revision must be a positive integer.');
   }
@@ -187,13 +197,15 @@ export function validateQuestion(input: unknown, index = 0): ValidationIssue[] {
   }
 
   // Classification
-  const domain = DOMAINS.find((d) => d.id === input['domain']);
+  // The exam comes from the ID prefix; an unknown prefix is already reported above.
+  const domains = (exam ?? EXAMS[0])?.domains ?? [];
+  const domain = domains.find((d) => d.id === input['domain']);
   if (!domain)
-    add('INVALID_DOMAIN', `Domain must be one of: ${DOMAINS.map((d) => d.id).join(', ')}.`);
-  if (domain && !domain.taskStatements.some((task) => task.id === input['taskStatement'])) {
-    add('INVALID_TASK_STATEMENT', `Task statement must belong to ${domain.id}.`);
+    add('INVALID_DOMAIN', `Domain must be one of: ${domains.map((d) => d.id).join(', ')}.`);
+  if (domain && exam && !domain.taskStatements.some((task) => task.id === input['taskStatement'])) {
+    add('INVALID_TASK_STATEMENT', `Task statement must belong to ${exam.code} ${domain.id}.`);
   }
-  if (idMatch && domain && `D${idMatch[1] ?? ''}` !== (domain.id satisfies DomainId)) {
+  if (idMatch && domain && `D${idMatch[2] ?? ''}` !== (domain.id satisfies DomainId)) {
     add('ID_DOMAIN_MISMATCH', `ID prefix does not match domain ${domain.id}.`);
   }
   if (!(DIFFICULTIES as readonly unknown[]).includes(input['difficulty'])) {

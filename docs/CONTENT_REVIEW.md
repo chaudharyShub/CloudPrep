@@ -1,8 +1,10 @@
 # Question bank: review checklist
 
-> Bank version `2026-10-25.2` · 2,000 questions · 1,995 `checked`, 5 `unverified`, none `approved` yet.
+> **CLF-C02:** bank version `2026-10-25.2` · 2,000 questions · 1,995 `checked`, 5 `unverified`, none `approved` yet.
+> **SAA-C03:** bank version `2026-11-05.1` · **600 questions**, all `checked` (160 / 160 / 160 / 120 across the domains; D-066).
+> **DVA-C03:** bank version `2026-11-05.1` · **600 questions**, all `checked` (160 / 160 / 160 / 120 across the domains; D-066).
 >
-> Unverified questions live in `src/content/questions/batches/` and are written with `defineQuestions` (`author.ts`) using reference keys from `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`.
+> Unverified questions live in each exam's `batches/` folder (`src/content/questions/batches/` for CLF-C02, `src/content/saa-c03/batches/`, `src/content/dva-c03/batches/`) and are written with the exam's `defineQuestions` (`author.ts`) using reference keys from its `refs.ts`. To promote one, check it against its cited pages and set its status to `checked`. The sections below are the CLF-C02 review; SAA-C03 and DVA-C03 have their own sections at the end.
 
 ## Reviewing the unverified batches
 
@@ -99,3 +101,55 @@ All 19 exam-guide task statements have at least one question. Run `npm run valid
 | D4 Billing, Pricing, and Support | 7 | 5 / 2 |
 
 Gaps to cover in the next batch: more **hard** questions (only 2 so far); task statements with a single question (3.1, 3.7, 3.8, 4.3); and topics from the exam guide not yet covered, including AWS Organizations SCPs, IAM Identity Center, AWS Secrets Manager, Amazon Inspector, AWS Security Hub, AWS Backup, Amazon EFS/FSx, AWS Storage Gateway, AWS DMS and SCT, Direct Connect and VPN, ECS/EKS/Fargate, EC2 instance types, SageMaker AI and Lex, Kinesis and Glue, SNS and EventBridge, Amazon Connect and SES, AWS Pricing Calculator, cost allocation tags and Cost and Usage Report, data transfer costs, AWS Marketplace and Partners, re:Post and Knowledge Center, the AWS Health Dashboard, and AWS Trust & Safety.
+
+## SAA-C03 and DVA-C03 (D-066)
+
+Both banks follow the same rules as CLF-C02 (original questions from public AWS pages and the exam guide, every option explained, `unverified` until checked) and the same process: batches of about 40 questions, each written for one task statement or a mix within one domain, then checked against the cited pages and logged in a table like the one above.
+
+**Target: 2,000 questions per exam**, spread by domain weight and across every task statement:
+
+| Exam | D1 | D2 | D3 | D4 | Source |
+|---|---|---|---|---|---|
+| SAA-C03 | ~600 (30%, tasks 1.1–1.3) | ~520 (26%, 2.1–2.2) | ~480 (24%, 3.1–3.5) | ~400 (20%, 4.1–4.4) | [Exam guide](https://docs.aws.amazon.com/aws-certification/latest/solutions-architect-associate-03/solutions-architect-associate-03.html), revision of 29 October 2026, with its in-scope service list |
+| DVA-C03 | ~600 (30%, 1.1–1.3) | ~520 (26%, 2.1–2.3) | ~440 (22%, 3.1–3.3) | ~440 (22%, 4.1–4.3) | [Exam guide](https://docs.aws.amazon.com/aws-certification/latest/developer-associate-03/developer-associate-03.html), including the new AI-assisted development skills (1.1.9, 1.1.10, 2.3, 3.2.5, 3.3.9, 4.1.5, 4.3.6) |
+
+Associate questions are mostly scenarios: a requirement, constraints (cost, least operational effort, availability) and four or five plausible designs. Distractors must be real AWS options that fail one stated constraint, and each option's explanation says which.
+
+| Batch | Written | Checked | Result |
+|---|---|---|---|
+| SAA `d1-01` (1.1 secure access, n1–40) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d1-02` (1.2 secure workloads, n41–80) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d1-03` (1.3 data security controls, n81–120) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d1-04` (Domain 1 mixed, n121–160) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d2-01` (2.1 scalable, loosely coupled, n1–40) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d2-02` (2.2 high availability and DR, n41–80) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d2-03` (2.1/2.2 resilience scenarios, n81–120) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d2-04` (Domain 2 mixed, n121–160) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d3-01` (3.1/3.2 storage and compute, n1–40) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d3-02` (3.3 databases, n41–80) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d3-03` (3.4/3.5 networks and data ingestion, n81–120) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d3-04` (Domain 3 mixed, n121–160) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d4-01` (4.1 storage cost, n1–40) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d4-02` (4.2 compute cost, n41–80) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| SAA `d4-03` (4.3/4.4 database and network cost, n81–120) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d1-01` (1.1 code for AWS-hosted apps, n1–40) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d1-02` (1.2 Lambda, n41–80) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d1-03` (1.3 data stores, n81–120) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d1-04` (Domain 1 mixed, n121–160) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d2-01` (2.1 authentication and authorization, n1–40) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d2-02` (2.2 encryption, n41–80) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d2-03` (2.3 AI security risks, n81–120) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d2-04` (Domain 2 mixed, n121–160) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d3-01` (3.1 artifacts and configuration, n1–40) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d3-02` (3.2 testing, n41–80) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d3-03` (3.3 CI/CD, n81–120) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d3-04` (Domain 3 mixed, n121–160) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d4-01` (4.1 root cause analysis, n1–40) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d4-02` (4.2 observability, n41–80) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+| DVA `d4-03` (4.3 optimization, n81–120) | 2026-11-05 | 2026-11-05 | All 40 checked against the cited pages; 0 pairs at or above 0.3 in `check-duplicates` |
+
+Fixes made while checking (examples): S3 Replication Time Control is 99.9% of objects within 15 minutes; Multi-AZ DB clusters are described by lower write latency, not faster failover; accelerated Site-to-Site VPN needs a transit gateway; Direct Connect with VPN means IPsec over a public VIF; the SQS maximum message size is 1 MiB; DynamoDB on-demand is the default and recommended capacity mode; API Gateway returns 502 for Lambda function errors or a malformed proxy response and 500 when the invocation is rejected; Amazon Timestream for LiveAnalytics was avoided (its page points new users to Timestream for InfluxDB); X-Ray SDKs and daemon are in maintenance mode since 25 February 2026, so tracing questions point to OpenTelemetry (ADOT). Duplicate pairs found by `check-duplicates` were replaced with new questions (SAA `d3-03` q85 and q103, `d3-04` q134, `d2-04` q144, `d4-03` q97 and q101; DVA `d3-01` q36, `d4-03` q83).
+
+**Reference host added:** `kiro.dev` (Kiro is in scope for DVA-C03, and AWS's documentation overview links to Kiro's docs there). The validator's allowed hosts and its test were updated (D-066).
+
+**Still to write:** about 1,400 more questions per exam to reach the 2,000 target (SAA-C03: D4 n121+ and every domain past n160; DVA-C03: D3 and D4 past n160/n120, and every domain beyond).

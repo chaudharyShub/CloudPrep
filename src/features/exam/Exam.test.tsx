@@ -28,14 +28,14 @@ function navigatorButton(name: RegExp) {
 describe('exam start page', () => {
   // The "full exam not available yet" state is tested with a small bank in ExamUnavailable.test.tsx.
   it('offers the full exam when the bank has enough questions in every domain', async () => {
-    renderApp('/exam');
+    renderApp('/clf-c02/exam');
     expect(await screen.findByRole('button', { name: 'Start full exam' })).toBeEnabled();
     expect(screen.queryByText("The full exam isn't available yet")).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Start shorter exam' })).not.toBeInTheDocument();
   });
 
   it('starts the timer only after confirmation', async () => {
-    const { user, store, router } = renderApp('/exam');
+    const { user, store, router } = renderApp('/clf-c02/exam');
     await user.click(await screen.findByRole('button', { name: 'Start full exam' }));
     const dialog = screen.getByRole('dialog', { name: 'Start the full exam?' });
     expect(dialog).toHaveAccessibleDescription(/65 questions, 90 minutes/);
@@ -50,7 +50,7 @@ describe('exam start page', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Question 1 of 65' }),
     ).toBeVisible();
-    expect(router.state.location.pathname).toBe('/exam/session');
+    expect(router.state.location.pathname).toBe('/clf-c02/exam/session');
     const exam = store.getSnapshot().data.activeExam;
     expect(exam?.questionIds).toHaveLength(65);
     expect(new Set(exam?.questionIds).size).toBe(65);
@@ -61,7 +61,7 @@ describe('exam start page', () => {
 
   it('offers to resume or discard an exam in progress', async () => {
     const store = storeWithExam();
-    const { user } = renderApp('/exam', { store });
+    const { user } = renderApp('/clf-c02/exam', { store });
     expect(await screen.findByText('You have an exam in progress')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Start full exam' })).toBeDisabled();
 
@@ -78,13 +78,13 @@ describe('exam start page', () => {
 
 describe('exam session', () => {
   it('redirects to the start page when there is no exam', async () => {
-    const { router } = renderApp('/exam/session');
+    const { router } = renderApp('/clf-c02/exam/session');
     await screen.findByRole('heading', { level: 1, name: 'Mock exam' });
-    expect(router.state.location.pathname).toBe('/exam');
+    expect(router.state.location.pathname).toBe('/clf-c02/exam');
   });
 
   it('never puts correct answers or explanations in the page before submission', async () => {
-    const { container } = renderApp('/exam/session', { store: storeWithExam() });
+    const { container } = renderApp('/clf-c02/exam/session', { store: storeWithExam() });
     await screen.findByRole('heading', { level: 1, name: 'Question 1 of 5' });
     const html = container.ownerDocument.body.innerHTML;
     const question = examQuestion(0);
@@ -96,7 +96,7 @@ describe('exam session', () => {
 
   it('saves single answers immediately and shows question status in the navigator', async () => {
     const store = storeWithExam();
-    const { user } = renderApp('/exam/session', { store });
+    const { user } = renderApp('/clf-c02/exam/session', { store });
     await screen.findByRole('heading', { level: 1, name: 'Question 1 of 5' });
     const q0 = examQuestion(0);
 
@@ -104,12 +104,12 @@ describe('exam session', () => {
     await user.click(screen.getByRole('radio', { name: /Go global in minutes/ }));
     expect(store.getSnapshot().data.activeExam?.answers[q0.id]).toEqual(['a']);
     expect(navigatorButton(/^Question 1: answered$/)).toHaveAttribute('aria-current', 'step');
-    expect(screen.getByText('1 of 5 answered')).toBeVisible();
+    expect(screen.getByText('CLF-C02 · 1 of 5 answered')).toBeVisible();
   });
 
   it('handles multiple-response questions: count shown, partial state, cap enforced', async () => {
     const store = storeWithExam();
-    const { user } = renderApp('/exam/session', { store });
+    const { user } = renderApp('/clf-c02/exam/session', { store });
     await screen.findByRole('heading', { level: 1, name: 'Question 1 of 5' });
 
     await user.click(navigatorButton(/^Question 3:/));
@@ -129,7 +129,7 @@ describe('exam session', () => {
 
   it('flags questions and moves with Previous and Next', async () => {
     const store = storeWithExam();
-    const { user } = renderApp('/exam/session', { store });
+    const { user } = renderApp('/clf-c02/exam/session', { store });
     await screen.findByRole('heading', { level: 1, name: 'Question 1 of 5' });
 
     expect(screen.getByRole('button', { name: 'Previous' })).toBeDisabled();
@@ -146,7 +146,7 @@ describe('exam session', () => {
   });
 
   it('opens the question list in a dialog on small screens', async () => {
-    const { user } = renderApp('/exam/session', { store: storeWithExam() });
+    const { user } = renderApp('/clf-c02/exam/session', { store: storeWithExam() });
     await screen.findByRole('heading', { level: 1, name: 'Question 1 of 5' });
     await user.click(screen.getByRole('button', { name: '1 / 5: open question list' }));
     const dialog = screen.getByRole('dialog', { name: 'Questions' });
@@ -157,7 +157,7 @@ describe('exam session', () => {
 
   it('shows an accessible warning when time is low', async () => {
     const exam = makeExam({ startedAt: Date.now() - 7 * MIN + 4 * MIN }); // ~4 minutes left
-    renderApp('/exam/session', { store: storeWithExam(exam) });
+    renderApp('/clf-c02/exam/session', { store: storeWithExam(exam) });
     await screen.findByRole('heading', { level: 1, name: 'Question 1 of 5' });
     expect(screen.getByText('Less than 5 minutes remaining.')).toBeInTheDocument();
     expect(screen.getByText('Low time')).toBeInTheDocument();
@@ -175,7 +175,7 @@ describe('review and submission', () => {
         ],
       }),
     );
-    const { user } = renderApp('/exam/review', { store });
+    const { user } = renderApp('/clf-c02/exam/review', { store });
     await screen.findByRole('heading', { level: 1, name: 'Review your answers' });
     expect(screen.getAllByRole('listitem').filter((li) => li.querySelector('button'))).toHaveLength(
       5,
@@ -193,7 +193,7 @@ describe('review and submission', () => {
     const store = storeWithExam(
       makeExam({ actions: [{ type: 'toggleFlag', questionId: q0, at: Date.now() }] }),
     );
-    const { user } = renderApp('/exam/session', { store });
+    const { user } = renderApp('/clf-c02/exam/session', { store });
     await screen.findByRole('heading', { level: 1, name: 'Question 1 of 5' });
 
     await user.click(screen.getByRole('button', { name: 'Finish exam' }));
@@ -211,7 +211,7 @@ describe('review and submission', () => {
 
   it('submits once, stores the attempt and shows results with explanations', async () => {
     const store = storeWithExam();
-    const { user, router } = renderApp('/exam/session', { store });
+    const { user, router } = renderApp('/clf-c02/exam/session', { store });
     await screen.findByRole('heading', { level: 1, name: 'Question 1 of 5' });
     await user.click(screen.getByRole('radio', { name: /Go global in minutes/ }));
 
@@ -219,7 +219,7 @@ describe('review and submission', () => {
     await user.dblClick(screen.getByRole('button', { name: 'Submit exam' }));
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Exam results' })).toBeVisible();
-    expect(router.state.location.pathname).toBe('/results/exam-test');
+    expect(router.state.location.pathname).toBe('/clf-c02/results/exam-test');
     expect(store.getSnapshot().data.attempts).toHaveLength(1);
     expect(store.getSnapshot().data.activeExam).toBeNull();
     expect(screen.getByText('1 of 5 questions correct')).toBeVisible();
@@ -237,7 +237,7 @@ describe('interruption recovery', () => {
     const driver = createMemoryDriver();
     const first = createAppStore({ driver, persistent: true });
     first.startExam(makeExam());
-    const view = renderApp('/exam/session', { store: first });
+    const view = renderApp('/clf-c02/exam/session', { store: first });
     await screen.findByRole('heading', { level: 1, name: 'Question 1 of 5' });
     await view.user.click(screen.getByRole('radio', { name: /Go global in minutes/ }));
     await view.user.click(screen.getByRole('button', { name: 'Flag for review' }));
@@ -247,7 +247,7 @@ describe('interruption recovery', () => {
 
     // "Reload": a new store reading the same storage.
     const second = createAppStore({ driver, persistent: true });
-    const { user } = renderApp('/exam/session', { store: second });
+    const { user } = renderApp('/clf-c02/exam/session', { store: second });
     expect(await screen.findByRole('heading', { level: 1, name: 'Question 2 of 5' })).toBeVisible();
     expect(navigatorButton(/^Question 1: answered, flagged$/)).toBeVisible();
     await user.click(navigatorButton(/^Question 1:/));
@@ -257,16 +257,16 @@ describe('interruption recovery', () => {
   it('submits an exam that expired while the app was closed', async () => {
     const expired = makeExam({ startedAt: Date.now() - 3 * 60 * MIN });
     const store = storeWithExam(expired);
-    const { router } = renderApp('/exam/session', { store });
+    const { router } = renderApp('/clf-c02/exam/session', { store });
     expect(await screen.findByRole('heading', { level: 1, name: 'Exam results' })).toBeVisible();
     expect(screen.getByText(/ended while CloudPrep was closed/)).toBeVisible();
-    expect(router.state.location.pathname).toBe('/results/exam-test');
+    expect(router.state.location.pathname).toBe('/clf-c02/results/exam-test');
     expect(store.getSnapshot().data.attempts[0]?.submitReason).toBe('expired_while_away');
   });
 
   it('submits an expired exam found while on another page and says so', async () => {
     const store = storeWithExam(makeExam({ startedAt: Date.now() - 3 * 60 * MIN }));
-    renderApp('/dashboard', { store });
+    renderApp('/clf-c02/dashboard', { store });
     expect(await screen.findByText('Your exam time ran out')).toBeVisible();
     expect(store.getSnapshot().data.attempts).toHaveLength(1);
   });
@@ -275,7 +275,7 @@ describe('interruption recovery', () => {
     // Ends ~1.5 s from now; the 5-question exam lasts 7 minutes.
     const exam = makeExam({ startedAt: Date.now() - 7 * MIN + 1500 });
     const store = storeWithExam(exam);
-    renderApp('/exam/session', { store });
+    renderApp('/clf-c02/exam/session', { store });
     await screen.findByRole('heading', { level: 1, name: 'Question 1 of 5' });
     await waitFor(
       () => {

@@ -9,9 +9,17 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 - **Readiness guidance** is based on simple, published criteria (three or more recent exams at or above your benchmark, in every domain). It never says you are "ready".
 - **Question difficulty and style** are CloudPrep's own. Questions are original and written from public AWS documentation, so they may be easier or harder than the real exam.
 
+## Exams
+
+- CloudPrep supports three exams (D-066): CLF-C02, SAA-C03 and DVA-C03. CLF-C02 has 2,000 questions; **SAA-C03 and DVA-C03 have 600 checked questions each** (160 / 160 / 160 / 120 across the domains), toward a target of 2,000 each, so a 65-question exam can repeat questions across attempts sooner than on CLF-C02. Until their banks are published and the exams launched, they don't appear on the live site (they do in development).
+- Only one mock exam can be in progress at a time, whichever exam it belongs to. Finish or discard it before starting one in another exam.
+- Settings (theme, practice benchmark, shuffling, session length) are shared by all exams. The benchmark presets go in steps of 5, so the default 70% sits below the 72% that matches the associate exams' passing score of 720.
+- Addresses changed in 4.0.0: pages now have the exam in the address (`/clf-c02/practice`). Old links and bookmarks still work: they open the same page of the exam you used last, after a quick redirect in the browser (the server itself doesn't redirect).
+- "Clear learning progress", "Clear exam history", export and import cover every exam at once.
+
 ## Question bank
 
-- The bank has **2,000 questions** (400 / 600 / 753 / 247 across the four domains), so the full 65-question, 90-minute exam is available. The shorter exam only appears if the bank is ever too small.
+- The CLF-C02 bank has **2,000 questions** (400 / 600 / 753 / 247 across the four domains), so the full 65-question, 90-minute exam is available. The shorter exam only appears if the bank is ever too small.
 - **1,995 questions are `checked`** against the AWS pages they cite (reviewed on 2026-10-25), and **5 are still `unverified`** because no current AWS page confirms them (D-041). None is `approved` yet: the checks were done by the author, without a second human review. Learning mode notes with the feedback when a question is `unverified` or only `checked`. See `docs/CONTENT_REVIEW.md`.
 - Some questions overlap in topic. An automated check (`node scripts/check-duplicates.mjs 0.3`) flags about 15 pairs with similar wording; these were reviewed and test different points, but the bank was not deduplicated by hand.
 - AWS services and support plans change. Each question records the date it was checked. Questions note services that AWS has closed to new customers or is ending (for example Snowball and Business Support); AWS Support plan changes taking effect on 1 January 2027 will need another content review.
@@ -25,7 +33,7 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 - Progress from before you signed in stays in the browser as guest data. You're asked once whether to add it to your account; you can also do it later in Settings.
 - On a new device, a past exam taken with an older version of a question is reviewed with the current version (with a note), because the old wording is only kept in the browser where you took it.
 - There's no button to delete your account itself; "Reset everything" deletes all its data. Ask the person who shared CloudPrep to remove the account.
-- The landing page (`/`, D-057) is shown to guests only; signed-in users go straight to the dashboard and can't open it. Its "2,000 questions" figure is fixed text, updated by hand when the bank grows.
+- The landing page (`/`, D-057) is shown to guests only; signed-in users go straight to the dashboard and can't open it. Its "2,000 questions" figure is fixed text per exam (`src/features/landing/landingContent.ts`), updated by hand when a bank grows; exams without a figure leave it out.
 - The admin page (`/admin`, D-054) lists signed-in accounts only. Guests are counted only as anonymous totals in Vercel Analytics. Admins are added with `npm run admin:add` (from `ADMIN_EMAIL` in `.env.local`) or the Supabase SQL editor; there's no page for it, and the script never removes admins. After becoming an admin, reload the site to see the Admin link. The list loads all accounts at once, which is fine for a site shared with friends.
 - Mock exams, the dashboard, exam history and progress need an account; Learning mode, bookmarks and settings don't.
 
@@ -84,7 +92,7 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 
 ## Search engines
 
-- Search engines can read the landing page, Learning mode's start page and the Privacy page, but not the questions: they load inside the app after sign-in or a click (D-063).
+- Search engines can read the landing page, each launched exam's own page and Learning mode start page, and the Privacy page, but not the questions: they load inside the app after sign-in or a click (D-063, D-066).
 - An unknown address shows CloudPrep's "Page not found" screen, but the server answers it with status 200, so search engines may treat it as a normal page.
 
 ## Not built

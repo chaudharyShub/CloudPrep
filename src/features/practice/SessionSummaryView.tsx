@@ -6,11 +6,12 @@ import { buttonClasses } from '@/components/ui/buttonStyles';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { DOMAINS } from '@/domain/exam-guide/clf-c02';
+import { useExamPath } from '@/app/paths';
 import { summarizeSession, type PracticeSession } from '@/domain/practice/session';
 import type { Question } from '@/domain/questions/types';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { formatPercent } from '@/lib/format';
+import { useCurrentExam } from '@/state/hooks';
 
 export interface SessionSummaryViewProps {
   session: PracticeSession;
@@ -20,6 +21,8 @@ export interface SessionSummaryViewProps {
 
 export function SessionSummaryView({ session, questionsById, onRetry }: SessionSummaryViewProps) {
   useDocumentTitle('Session summary');
+  const { domains } = useCurrentExam();
+  const path = useExamPath();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const summary = summarizeSession(session, questionsById, session.finishedAt ?? session.startedAt);
 
@@ -35,7 +38,7 @@ export function SessionSummaryView({ session, questionsById, onRetry }: SessionS
           title="No questions to practise"
           description="None of the selected questions are available any more. Choose another set in Learning mode."
           action={
-            <Link to="/practice" className={buttonClasses({ variant: 'secondary' })}>
+            <Link to={path('practice')} className={buttonClasses({ variant: 'secondary' })}>
               Back to Learning mode
             </Link>
           }
@@ -97,7 +100,7 @@ export function SessionSummaryView({ session, questionsById, onRetry }: SessionS
               </Button>
             )}
             <Link
-              to="/practice"
+              to={path('practice')}
               className={buttonClasses({
                 variant: summary.incorrectQuestionIds.length > 0 ? 'secondary' : 'primary',
               })}
@@ -113,17 +116,19 @@ export function SessionSummaryView({ session, questionsById, onRetry }: SessionS
           <CardHeader title="By domain" />
           <CardBody>
             <ul className="flex flex-col gap-3 text-sm">
-              {DOMAINS.filter((domain) => summary.byDomain[domain.id]).map((domain) => {
-                const tally = summary.byDomain[domain.id] ?? { answered: 0, correct: 0 };
-                return (
-                  <li key={domain.id} className="flex items-center justify-between gap-4">
-                    <span className="text-fg">{domain.name}</span>
-                    <span className="text-fg-muted tabular-nums">
-                      {tally.correct}/{tally.answered} correct
-                    </span>
-                  </li>
-                );
-              })}
+              {domains
+                .filter((domain) => summary.byDomain[domain.id])
+                .map((domain) => {
+                  const tally = summary.byDomain[domain.id] ?? { answered: 0, correct: 0 };
+                  return (
+                    <li key={domain.id} className="flex items-center justify-between gap-4">
+                      <span className="text-fg">{domain.name}</span>
+                      <span className="text-fg-muted tabular-nums">
+                        {tally.correct}/{tally.answered} correct
+                      </span>
+                    </li>
+                  );
+                })}
             </ul>
           </CardBody>
         </Card>

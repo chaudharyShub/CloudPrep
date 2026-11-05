@@ -1,13 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import { makeQuestion } from '@/test/fixtures/questions';
 import { FULL_BANK, makeBank } from '@/test/fixtures/bank';
+import { CLF_C02, SAA_C03 } from '@/domain/exam-guide';
 import { countByDomain, examEligibleQuestions, selectExamQuestions } from './select';
 
+const D = CLF_C02.domains;
 const byId = new Map(FULL_BANK.map((q) => [q.id, q]));
 
 describe('selectExamQuestions', () => {
   it('returns 65 unique questions in the 16 / 19 / 22 / 8 split', () => {
-    const result = selectExamQuestions({ questions: FULL_BANK, questionCount: 65, seed: 1 });
+    const result = selectExamQuestions({
+      questions: FULL_BANK,
+      questionCount: 65,
+      domains: D,
+      seed: 1,
+    });
     if (!result.ok) throw new Error('expected success');
     expect(result.questionIds).toHaveLength(65);
     expect(new Set(result.questionIds).size).toBe(65);
@@ -16,15 +23,35 @@ describe('selectExamQuestions', () => {
   });
 
   it('is reproducible for a seed and varies across seeds', () => {
-    const a = selectExamQuestions({ questions: FULL_BANK, questionCount: 65, seed: 42 });
-    const b = selectExamQuestions({ questions: FULL_BANK, questionCount: 65, seed: 42 });
-    const c = selectExamQuestions({ questions: FULL_BANK, questionCount: 65, seed: 43 });
+    const a = selectExamQuestions({
+      questions: FULL_BANK,
+      questionCount: 65,
+      domains: D,
+      seed: 42,
+    });
+    const b = selectExamQuestions({
+      questions: FULL_BANK,
+      questionCount: 65,
+      domains: D,
+      seed: 42,
+    });
+    const c = selectExamQuestions({
+      questions: FULL_BANK,
+      questionCount: 65,
+      domains: D,
+      seed: 43,
+    });
     expect(a).toEqual(b);
     expect(a).not.toEqual(c);
   });
 
   it('randomises the order rather than grouping by domain', () => {
-    const result = selectExamQuestions({ questions: FULL_BANK, questionCount: 65, seed: 7 });
+    const result = selectExamQuestions({
+      questions: FULL_BANK,
+      questionCount: 65,
+      domains: D,
+      seed: 7,
+    });
     if (!result.ok) throw new Error('expected success');
     const domains = result.questionIds.map((id) => byId.get(id)?.domain);
     const grouped = [...domains].sort();
@@ -32,7 +59,12 @@ describe('selectExamQuestions', () => {
   });
 
   it('spreads each domain across its task statements', () => {
-    const result = selectExamQuestions({ questions: FULL_BANK, questionCount: 65, seed: 3 });
+    const result = selectExamQuestions({
+      questions: FULL_BANK,
+      questionCount: 65,
+      domains: D,
+      seed: 3,
+    });
     if (!result.ok) throw new Error('expected success');
     const d3Tasks = new Set(
       result.questionIds
@@ -50,6 +82,7 @@ describe('selectExamQuestions', () => {
     const result = selectExamQuestions({
       questions: bank,
       questionCount: 8,
+      domains: D,
       seed: 5,
       seenIds: seen,
     });
@@ -59,7 +92,7 @@ describe('selectExamQuestions', () => {
 
   it('reports shortfalls instead of duplicating questions or starting a partial exam', () => {
     const bank = makeBank({ D1: 10, D2: 12, D3: 15, D4: 7 });
-    const result = selectExamQuestions({ questions: bank, questionCount: 65, seed: 1 });
+    const result = selectExamQuestions({ questions: bank, questionCount: 65, domains: D, seed: 1 });
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.shortfalls).toEqual([
@@ -73,7 +106,12 @@ describe('selectExamQuestions', () => {
   it('treats duplicate entries in the input as one question', () => {
     const bank = makeBank({ D1: 3, D2: 3, D3: 3, D4: 2 });
     const doubled = [...bank, ...bank];
-    const result = selectExamQuestions({ questions: doubled, questionCount: 11, seed: 1 });
+    const result = selectExamQuestions({
+      questions: doubled,
+      questionCount: 11,
+      domains: D,
+      seed: 1,
+    });
     // 11 needs 3 / 3 / 4 / 1 and D3 has only 3 unique questions.
     expect(result.ok).toBe(false);
   });
@@ -102,5 +140,22 @@ describe('examEligibleQuestions', () => {
       'clf-d1-0005',
       'clf-d1-0004',
     ]);
+  });
+});
+
+describe('selectExamQuestions for other exams (D-066)', () => {
+  it('AC-M.4 builds a balanced SAA-C03 exam from an SAA-C03 bank', () => {
+    const bank = makeBank({ D1: 25, D2: 20, D3: 20, D4: 15 }, SAA_C03);
+    const saaById = new Map(bank.map((q) => [q.id, q]));
+    const result = selectExamQuestions({
+      questions: bank,
+      questionCount: 65,
+      domains: SAA_C03.domains,
+      seed: 9,
+    });
+    if (!result.ok) throw new Error('expected success');
+    expect(result.questionIds.every((id) => id.startsWith('saa-'))).toBe(true);
+    const chosen = result.questionIds.map((id) => saaById.get(id)).filter((q) => q !== undefined);
+    expect(countByDomain(chosen)).toEqual({ D1: 19, D2: 17, D3: 16, D4: 13 });
   });
 });

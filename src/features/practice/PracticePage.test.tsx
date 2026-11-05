@@ -12,7 +12,7 @@ const matches = (n: number) => (n === 1 ? '1 question matches.' : `${n} question
 
 describe('PracticePage', () => {
   it('shows how many questions match and narrows by domain, topic and difficulty', async () => {
-    const { user } = renderApp('/practice');
+    const { user } = renderApp('/clf-c02/practice');
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
     expect(
       screen.getByText(`${TOTAL} questions match; 10 will be picked at random.`),
@@ -40,7 +40,7 @@ describe('PracticePage', () => {
     for (const question of D4_TOPIC) {
       store.recordAnswer({ questionId: question.id, isCorrect: true, at: 1, sessionId: 's' });
     }
-    const { user } = renderApp('/practice', { store });
+    const { user } = renderApp('/clf-c02/practice', { store });
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
     await user.selectOptions(screen.getByRole('combobox', { name: 'Domain' }), 'D4');
     await user.selectOptions(screen.getByRole('combobox', { name: 'Topic' }), '4.3');
@@ -50,7 +50,7 @@ describe('PracticePage', () => {
   });
 
   it('starts a session from the setup form', async () => {
-    const { user, router } = renderApp('/practice');
+    const { user, router } = renderApp('/clf-c02/practice');
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
     await user.selectOptions(screen.getByRole('combobox', { name: 'Domain' }), 'D4');
     await user.click(screen.getByRole('radio', { name: '5' }));
@@ -60,11 +60,11 @@ describe('PracticePage', () => {
       await screen.findByRole('heading', { level: 1, name: 'Billing, Pricing, and Support' }),
     ).toBeVisible();
     expect(screen.getByText('Question 1 of 5')).toBeVisible();
-    expect(router.state.location.pathname).toBe('/practice/session');
+    expect(router.state.location.pathname).toBe('/clf-c02/practice/session');
   });
 
   it('starts a domain session from a domain card', async () => {
-    const { user } = renderApp('/practice');
+    const { user } = renderApp('/clf-c02/practice');
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
     await user.click(screen.getByRole('button', { name: 'Practise Security and Compliance' }));
     expect(
@@ -78,7 +78,7 @@ describe('PracticePage', () => {
     store.recordAnswer({ questionId: 'clf-d4-0001', isCorrect: false, at: 1, sessionId: 's1' });
     store.recordAnswer({ questionId: 'clf-d4-0001', isCorrect: true, at: 2, sessionId: 's2' });
     store.recordAnswer({ questionId: 'clf-d4-0002', isCorrect: false, at: 3, sessionId: 's2' });
-    renderApp('/practice', { store });
+    renderApp('/clf-c02/practice', { store });
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
 
     const card = screen.getByRole('heading', { level: 3, name: 'Billing, Pricing, and Support' })
@@ -92,7 +92,7 @@ describe('PracticePage', () => {
     store.recordAnswer({ questionId: 'clf-d1-0001', isCorrect: false, at: 1, sessionId: 's1' });
     store.toggleBookmark('clf-d3-0002', 1);
     store.toggleBookmark('clf-d3-0003', 2);
-    const { user } = renderApp('/practice', { store });
+    const { user } = renderApp('/clf-c02/practice', { store });
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
 
     expect(screen.getByRole('button', { name: 'Practise bookmarks (2)' })).toBeEnabled();
@@ -117,7 +117,7 @@ describe('PracticePage', () => {
     }
     const notDue = QUESTION_BANK[12]?.id ?? '';
     store.recordAnswer({ questionId: notDue, isCorrect: true, at: now, sessionId: 'today' });
-    const { user } = renderApp('/practice', { store });
+    const { user } = renderApp('/clf-c02/practice', { store });
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
 
     expect(screen.getByText('12 questions due today.')).toBeVisible();
@@ -135,14 +135,14 @@ describe('PracticePage', () => {
       at: Date.now(),
       sessionId: 's1',
     });
-    renderApp('/practice', { store });
+    renderApp('/clf-c02/practice', { store });
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
     expect(screen.getByText('Nothing due today. Next review tomorrow.')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Review due questions (0)' })).toBeDisabled();
   });
 
   it('disables review actions when there is nothing to review', async () => {
-    renderApp('/practice');
+    renderApp('/clf-c02/practice');
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
     expect(screen.getByRole('button', { name: 'Review due questions (0)' })).toBeDisabled();
     expect(
@@ -151,7 +151,7 @@ describe('PracticePage', () => {
   });
 
   it('AC-I.4 explains Review due from the "i" beside its heading', async () => {
-    const { user } = renderApp('/practice');
+    const { user } = renderApp('/clf-c02/practice');
     await screen.findByRole('heading', { level: 1, name: 'Learning mode' });
     // The button sits beside the heading, so the heading's name stays "Review due".
     expect(screen.getByRole('heading', { level: 3, name: 'Review due' })).toBeVisible();

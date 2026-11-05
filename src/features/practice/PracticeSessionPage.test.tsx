@@ -1,7 +1,9 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { renderApp, createTestStore } from '@/test/renderApp';
-import { SESSION_PATH, type SessionSetup } from './sessionSetup';
+import type { SessionSetup } from './sessionSetup';
+
+const SESSION_PATH = '/clf-c02/practice/session';
 
 // Real bank questions with known answers.
 const SINGLE_ID = 'clf-d1-0001'; // correct: "Go global in minutes"
@@ -18,7 +20,7 @@ describe('PracticeSessionPage', () => {
   it('redirects to Learning mode when opened without a valid setup', async () => {
     const { router } = renderApp(SESSION_PATH, { state: { setup: { label: 1 } } });
     expect(await screen.findByRole('heading', { level: 1, name: 'Learning mode' })).toBeVisible();
-    expect(router.state.location.pathname).toBe('/practice');
+    expect(router.state.location.pathname).toBe('/clf-c02/practice');
   });
 
   it('does not reveal the answer or explanations before checking', async () => {
@@ -175,7 +177,7 @@ describe('PracticeSessionPage', () => {
     await screen.findByRole('heading', { level: 1, name: 'Test session' });
     await user.click(screen.getByRole('button', { name: 'End session' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'Learning mode' })).toBeVisible();
-    expect(router.state.location.pathname).toBe('/practice');
+    expect(router.state.location.pathname).toBe('/clf-c02/practice');
   });
 
   it('shows an empty state when none of the requested questions exist', async () => {

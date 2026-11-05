@@ -9,13 +9,14 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { ExternalLink } from '@/components/ui/ExternalLink';
 import { Notice } from '@/components/ui/Notice';
-import { DOMAINS, EXAM_GUIDE_URL } from '@/domain/exam-guide/clf-c02';
-import { FULL_EXAM, type ExamConfig } from '@/domain/exam/config';
+import { examPath, useExamPath } from '@/app/paths';
+import { findExam } from '@/domain/exam-guide';
+import { fullExamConfig, type ExamConfig } from '@/domain/exam/config';
 import { examCounts } from '@/domain/exam/session';
 import { formatClock, remainingMs } from '@/domain/exam/timer';
 import { useNow } from '@/hooks/useNow';
 import { useAppStore } from '@/state/StoreProvider';
-import { useActiveExam, useExamQuestions } from '@/state/hooks';
+import { useActiveExam, useCurrentExam, useExamQuestions } from '@/state/hooks';
 import { useExamActions } from './useExamActions';
 import { IntegrityModePicker, MODE_SUMMARY } from './integrity/IntegrityModePicker';
 import type { IntegrityMode } from '@/domain/exam/integrity';
@@ -42,6 +43,10 @@ const RULES = [
 
 export function ExamEntryPage() {
   const navigate = useNavigate();
+  const exam = useCurrentExam();
+  const path = useExamPath();
+  const domains = exam.domains;
+  const fullExam = fullExamConfig(exam);
   const store = useAppStore();
   const activeExam = useActiveExam();
   const { availability, fullAllocation, fullAvailable, shortConfig } = useExamQuestions();
@@ -51,11 +56,13 @@ export function ExamEntryPage() {
   const [startError, setStartError] = useState<string | null>(null);
   const [integrityMode, setIntegrityMode] = useState<IntegrityMode>('standard');
   const inProgress = activeExam !== null && activeExam.status !== 'submitted';
+  // One exam at a time (D-066): the one in progress may belong to another exam.
+  const activeSessionPath = activeExam ? examPath(activeExam.examId, 'exam/session') : '';
 
   /** Proctored exams go through check-in first; the others ask for confirmation. */
   function choose(config: ExamConfig) {
     if (integrityMode === 'proctored') {
-      void navigate('/exam/check-in', { state: { kind: config.kind } satisfies CheckInState });
+      void navigate(path('exam/check-in'), { state: { kind: config.kind } satisfies CheckInState });
     } else {
       setPending(config);
     }
@@ -79,7 +86,7 @@ export function ExamEntryPage() {
       if (root.requestFullscreen) root.requestFullscreen().catch(logUnavailable);
       else logUnavailable();
     }
-    if (result.started) void navigate('/exam/session');
+    if (result.started) void navigate(path('exam/session'));
     else setStartError('The exam could not be started. Reload the page and try again.');
   }
 
@@ -87,13 +94,13 @@ export function ExamEntryPage() {
     <>
       <PageHeader
         title="Mock exam"
-        description="A full-length, timed practice exam in the format of the CLF-C02 exam."
+        description={`A full-length, timed practice exam in the format of the ${exam.code} exam.`}
       />
 
       {inProgress && (
         <ResumeCard
           onResume={() => {
-            void navigate('/exam/session');
+            void navigate(activeSessionPath);
           }}
           onAbandon={() => {
             setConfirmAbandon(true);
@@ -108,9 +115,9 @@ export function ExamEntryPage() {
             <CardBody>
               <dl className="grid grid-cols-3 gap-3">
                 {[
-                  { label: 'Questions', value: FULL_EXAM.questionCount },
-                  { label: 'Minutes', value: FULL_EXAM.durationMs / MINUTE },
-                  { label: 'Domains', value: DOMAINS.length },
+                  { label: 'Questions', value: fullExam.questionCount },
+                  { label: 'Minutes', value: fullExam.durationMs / MINUTE },
+                  { label: 'Domains', value: domains.length },
                 ].map((stat) => (
                   <div
                     key={stat.label}
@@ -125,7 +132,7 @@ export function ExamEntryPage() {
               </dl>
               <h3 className="mt-6 text-sm font-semibold text-fg">Questions per domain</h3>
               <ul className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
-                {DOMAINS.map((d) => (
+                {domains.map((d) => (
                   <li key={d.id} className="flex items-center justify-between gap-3">
                     <span className="text-fg-muted">
                       {d.number}. {d.name}
@@ -135,8 +142,9 @@ export function ExamEntryPage() {
                 ))}
               </ul>
               <p className="mt-3 text-xs text-fg-subtle">
-                The official weightings (24 / 30 / 34 / 12%) apply to the 50 scored questions of the
-                real exam. CloudPrep applies them to all 65 questions, rounding with the
+                The official weightings ({domains.map((d) => d.weightPercent).join(' / ')}%) apply
+                to the {exam.scoredQuestionCount} scored questions of the real exam. CloudPrep
+                applies them to all {exam.questionCount} questions, rounding with the
                 largest-remainder method, so the split is an approximation.
               </p>
               <h3 className="mt-6 text-sm font-semibold text-fg">Question types</h3>
@@ -200,7 +208,7 @@ export function ExamEntryPage() {
                   className="w-full"
                   disabled={inProgress}
                   onClick={() => {
-                    choose(FULL_EXAM);
+                    choose(fullExam);
                   }}
                 >
                   Start full exam
@@ -208,7 +216,7 @@ export function ExamEntryPage() {
               ) : (
                 <>
                   <Notice tone="warning" title="The full exam isn't available yet">
-                    A full exam needs {FULL_EXAM.questionCount} different questions in the right
+                    A full exam needs {fullExam.questionCount} different questions in the right
                     balance. The question bank doesn&apos;t have enough yet, and CloudPrep never
                     repeats a question within an exam.
                   </Notice>
@@ -228,7 +236,7 @@ export function ExamEntryPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {DOMAINS.map((d) => {
+                      {domains.map((d) => {
                         const short = availability[d.id] < fullAllocation[d.id];
                         return (
                           <tr key={d.id} className="border-t border-border">
@@ -269,7 +277,7 @@ export function ExamEntryPage() {
                     </div>
                   )}
                   <Link
-                    to="/practice"
+                    to={path('practice')}
                     className={buttonClasses({ variant: 'secondary', className: 'w-full' })}
                   >
                     <GraduationCap size={18} strokeWidth={1.75} aria-hidden="true" />
@@ -289,8 +297,10 @@ export function ExamEntryPage() {
             <CardHeader as="h2" title="About the score" />
             <CardBody className="flex flex-col gap-3 text-sm text-fg-muted">
               <p>
-                AWS reports a scaled score from 100 to 1,000, with 700 needed to pass. It is
-                calculated with a method AWS doesn&apos;t publish, from 50 scored questions.
+                AWS reports a scaled score from 100 to 1,000, with {exam.passingScore} needed to
+                pass
+                {exam.code}. It is calculated with a method AWS doesn&apos;t publish, from{' '}
+                {exam.scoredQuestionCount} scored questions.
               </p>
               <p>
                 CloudPrep shows an unofficial practice score: the percentage of questions you
@@ -298,7 +308,9 @@ export function ExamEntryPage() {
                 of your real result.
               </p>
               <p>
-                <ExternalLink href={EXAM_GUIDE_URL}>Read the official exam guide</ExternalLink>
+                <ExternalLink href={exam.guideUrl}>
+                  Read the official {exam.code} exam guide
+                </ExternalLink>
               </p>
             </CardBody>
           </Card>
@@ -340,13 +352,15 @@ export function ExamEntryPage() {
 
 function ResumeCard({ onResume, onAbandon }: { onResume: () => void; onAbandon: () => void }) {
   const exam = useActiveExam();
+  const current = useCurrentExam();
   const now = useNow(1000, exam !== null);
   if (!exam) return null;
   const counts = examCounts(exam);
+  const other = exam.examId !== current.id ? findExam(exam.examId) : undefined;
   return (
     <Notice
       tone="info"
-      title="You have an exam in progress"
+      title={other ? `You have a ${other.code} exam in progress` : 'You have an exam in progress'}
       className="mb-6"
       action={
         <div className="flex flex-col gap-2 sm:flex-row">
@@ -361,6 +375,7 @@ function ResumeCard({ onResume, onAbandon }: { onResume: () => void; onAbandon: 
     >
       {counts.answered} of {counts.total} answered · {formatClock(remainingMs(exam.endsAt, now))}{' '}
       left. The timer keeps running while you&apos;re away.
+      {other && ' Finish or discard it before starting another exam: one exam can run at a time.'}
     </Notice>
   );
 }

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createFakeAuthClient, FAKE_USER } from '@/backend/fakeAuth';
 import { createFakeUserTables, type FakeUserTables } from '@/backend/fakeUserTables';
 import { createUserDataRemote } from '@/backend/userDataRemote';
-import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
+import { CLF_C02 } from '@/domain/exam-guide';
 import { ACCOUNT_PREFIX, accountOwner, openAccountDriver } from '@/storage/account';
 import { createMemoryDriver, type StorageDriver } from '@/storage/driver';
 import { createAppStore } from '@/storage/store';
@@ -21,7 +21,7 @@ function browser(tables: FakeUserTables, base: StorageDriver = createMemoryDrive
   const accounts = createAccountManager({
     base,
     persistent: true,
-    createRemote: (userId) => createUserDataRemote(tables, userId, EXAM_ID),
+    createRemote: (userId) => createUserDataRemote(tables, userId),
   });
   return { base, guest, accounts };
 }
@@ -33,7 +33,7 @@ async function serverBookmark(tables: FakeUserTables, questionId: string) {
     [
       {
         user_id: FAKE_USER.id,
-        exam_id: EXAM_ID,
+        exam_id: CLF_C02.id,
         question_id: questionId,
         added_at: new Date(T0).toISOString(),
       },
@@ -53,7 +53,7 @@ describe('guest data and the account copy', () => {
     guest.toggleBookmark(GUEST_QUESTION.id, T0);
     accounts.markAskedToImport(FAKE_USER.id);
 
-    const { user } = renderApp('/bookmarks', { store: guest, accounts });
+    const { user } = renderApp('/clf-c02/bookmarks', { store: guest, accounts });
     expect(await screen.findByText(ACCOUNT_QUESTION.stem)).toBeVisible();
     expect(screen.queryByText(GUEST_QUESTION.stem)).toBeNull();
     expect(accountOwner(base)).toBe(FAKE_USER.id);
@@ -85,7 +85,7 @@ describe('guest data and the account copy', () => {
     const { guest, accounts } = browser(tables, base);
     accounts.markAskedToImport(FAKE_USER.id);
 
-    renderApp('/bookmarks', { store: guest, accounts });
+    renderApp('/clf-c02/bookmarks', { store: guest, accounts });
     expect(await screen.findByText('No bookmarks yet')).toBeVisible();
     expect(screen.queryByText(GUEST_QUESTION.stem)).toBeNull();
     expect(accountOwner(base)).toBe(FAKE_USER.id);
@@ -120,7 +120,7 @@ describe('adding guest data to the account', () => {
     guest.toggleBookmark(GUEST_QUESTION.id, T0);
     guest.recordAnswer({ questionId: GUEST_QUESTION.id, isCorrect: true, at: T0, sessionId: 's' });
 
-    const { user, unmount } = renderApp('/bookmarks', { store: guest, accounts });
+    const { user, unmount } = renderApp('/clf-c02/bookmarks', { store: guest, accounts });
     const dialog = await screen.findByRole('dialog', {
       name: "Add this browser's progress to your account?",
     });
@@ -136,7 +136,7 @@ describe('adding guest data to the account', () => {
     // Guest data stays, and the question isn't asked again.
     expect(Object.keys(guest.getSnapshot().data.bookmarks)).toEqual([GUEST_QUESTION.id]);
     unmount();
-    renderApp('/bookmarks', { store: guest, accounts });
+    renderApp('/clf-c02/bookmarks', { store: guest, accounts });
     expect(await screen.findByText(GUEST_QUESTION.stem)).toBeVisible();
     expect(screen.queryByRole('dialog')).toBeNull();
   });

@@ -9,7 +9,7 @@ import { useToast } from '@/components/ui/Toast';
 import { useTheme } from '@/hooks/useTheme';
 import type { MotionPreference, ThemePreference } from '@/lib/theme';
 import { useAppStore } from '@/state/StoreProvider';
-import { usePreferences, useUserData } from '@/state/hooks';
+import { useAllUserData, usePreferences } from '@/state/hooks';
 import { PRACTICE_LENGTHS, type PracticeLength } from '@/storage/preferencesArea';
 import { AccountCard } from '@/features/auth/AccountCard';
 import { DataManagement } from './DataManagement';
@@ -40,7 +40,7 @@ export function SettingsPage() {
   const { showToast } = useToast();
   const store = useAppStore();
   const preferences = usePreferences();
-  const { preferenceOverrides } = useUserData();
+  const { preferenceOverrides } = useAllUserData();
   const benchmark = String(preferences.benchmarkPercent) as Benchmark;
   const hasCustomSettings = Object.keys(preferenceOverrides).length > 0;
 

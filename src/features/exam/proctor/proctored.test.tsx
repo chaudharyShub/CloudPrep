@@ -23,7 +23,7 @@ describe('proctored exam in the app', () => {
   it('AC-7.5 after a reload, hides the questions until the proctor is restarted, and counts it as a strike', async () => {
     const store = createTestStore();
     store.startExam(proctoredExam([['proctor-started', Date.now() - 60_000]]));
-    renderApp('/exam/session', { store });
+    renderApp('/clf-c02/exam/session', { store });
 
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Restart the AI proctor' }),
@@ -54,10 +54,10 @@ describe('proctored exam in the app', () => {
         ['phone-detected', now - 1000],
       ]),
     );
-    const { router } = renderApp('/exam/session', { store });
+    const { router } = renderApp('/clf-c02/exam/session', { store });
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Exam results' })).toBeVisible();
-    expect(router.state.location.pathname).toBe('/results/proctored-1');
+    expect(router.state.location.pathname).toBe('/clf-c02/results/proctored-1');
     expect(screen.getByText(/Reason: Phone detected/)).toBeVisible();
     const [attempt] = store.getSnapshot().data.attempts;
     expect(attempt?.submitReason).toBe('proctor_ended');
@@ -83,7 +83,7 @@ describe('proctored exam in the app', () => {
         ['mouth-moving', now - 30_000],
       ]),
     );
-    renderApp('/exam/session', { store });
+    renderApp('/clf-c02/exam/session', { store });
     expect(await screen.findByText(/Reason: Lips moving/)).toBeVisible();
   });
 
@@ -91,10 +91,10 @@ describe('proctored exam in the app', () => {
     const store = createTestStore();
     const now = Date.now();
     store.startExam(proctoredExam([['camera-lost', now - 1000]], 'h1'));
-    renderApp('/exam/session', { store });
+    renderApp('/clf-c02/exam/session', { store });
     await screen.findByText(/Reason: Camera lost/);
 
-    const history = renderApp('/history', { store });
+    const history = renderApp('/clf-c02/history', { store });
     expect(await history.findAllByText('Ended by proctor')).not.toHaveLength(0);
   });
 });

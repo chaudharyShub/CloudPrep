@@ -6,15 +6,17 @@ import { Button } from '@/components/ui/Button';
 import { buttonClasses } from '@/components/ui/buttonStyles';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { useExamPath } from '@/app/paths';
 import { useAppStore } from '@/state/StoreProvider';
 import { usePracticeQuestions, useUserData } from '@/state/hooks';
 import { formatDateTime } from '@/lib/format';
 import { QuestionMeta } from '@/features/shared/question/QuestionMeta';
-import { SESSION_PATH, sessionState } from '@/features/practice/sessionSetup';
+import { SESSION_PAGE, sessionState } from '@/features/practice/sessionSetup';
 
 export function BookmarksPage() {
   const store = useAppStore();
   const navigate = useNavigate();
+  const path = useExamPath();
   const { bookmarks } = useUserData();
   const { byId } = usePracticeQuestions();
 
@@ -40,7 +42,7 @@ export function BookmarksPage() {
             <Button
               icon={Play}
               onClick={() => {
-                void navigate(SESSION_PATH, {
+                void navigate(path(SESSION_PAGE), {
                   state: sessionState({
                     label: 'Bookmarks',
                     questionIds: items.map((item) => item.question.id),
@@ -61,7 +63,7 @@ export function BookmarksPage() {
             title="No bookmarks yet"
             description="Select Bookmark on any question during practice, and it will appear here."
             action={
-              <Link to="/practice" className={buttonClasses({ variant: 'secondary' })}>
+              <Link to={path('practice')} className={buttonClasses({ variant: 'secondary' })}>
                 Go to Learning mode
               </Link>
             }

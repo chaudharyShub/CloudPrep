@@ -1,3 +1,4 @@
+import { DEFAULT_EXAM, examForQuestionId } from '@/domain/exam-guide';
 import type { ExamAttempt } from '@/domain/exam/attempt';
 import type { ExamSession } from '@/domain/exam/session';
 import type { QuestionProgress } from '@/domain/practice/progress';
@@ -101,13 +102,12 @@ const json = (value: object): Record<string, unknown> =>
 
 export function progressToRow(
   userId: string,
-  examId: string,
   questionId: string,
   entry: QuestionProgress,
 ): ProgressRow {
   return {
     user_id: userId,
-    exam_id: examId,
+    exam_id: examIdOfQuestion(questionId),
     question_id: questionId,
     attempts: entry.attempts,
     correct: entry.correct,
@@ -155,13 +155,13 @@ export function rowsToProgress(rows: readonly Partial<ProgressRow>[]): Record<st
   return { ...map };
 }
 
-export function bookmarkToRow(
-  userId: string,
-  examId: string,
-  questionId: string,
-  addedAt: number,
-): BookmarkRow {
-  return { user_id: userId, exam_id: examId, question_id: questionId, added_at: iso(addedAt) };
+export function bookmarkToRow(userId: string, questionId: string, addedAt: number): BookmarkRow {
+  return {
+    user_id: userId,
+    exam_id: examIdOfQuestion(questionId),
+    question_id: questionId,
+    added_at: iso(addedAt),
+  };
 }
 
 export function rowsToBookmarks(rows: readonly Partial<BookmarkRow>[]): Record<string, unknown> {
@@ -173,15 +173,11 @@ export function rowsToBookmarks(rows: readonly Partial<BookmarkRow>[]): Record<s
   return { ...map };
 }
 
-export function sessionToRow(
-  userId: string,
-  examId: string,
-  session: PracticeSessionSummary,
-): PracticeSessionRow {
+export function sessionToRow(userId: string, session: PracticeSessionSummary): PracticeSessionRow {
   return {
     user_id: userId,
     id: session.id,
-    exam_id: examId,
+    exam_id: session.examId,
     label: session.label,
     started_at: iso(session.startedAt),
     finished_at: iso(session.finishedAt),
@@ -196,6 +192,7 @@ export function sessionToRow(
 export function rowToSession(row: Partial<PracticeSessionRow>): unknown {
   return {
     id: row.id,
+    examId: row.exam_id,
     label: row.label,
     startedAt: ms(row.started_at),
     finishedAt: ms(row.finished_at),
@@ -209,14 +206,13 @@ export function rowToSession(row: Partial<PracticeSessionRow>): unknown {
 
 export function attemptToRows(
   userId: string,
-  examId: string,
   attempt: ExamAttempt,
 ): { attempt: AttemptRow; questions: AttemptQuestionRow[] } {
   return {
     attempt: {
       user_id: userId,
       id: attempt.id,
-      exam_id: examId,
+      exam_id: attempt.examId,
       kind: attempt.kind,
       bank_version: attempt.bankVersion,
       started_at: iso(attempt.startedAt),
@@ -253,6 +249,7 @@ export function rowsToAttempt(
 ): unknown {
   return {
     id: row.id,
+    examId: row.exam_id,
     kind: row.kind,
     bankVersion: row.bank_version,
     startedAt: ms(row.started_at),
@@ -281,12 +278,20 @@ export function rowsToAttempt(
   };
 }
 
-export function activeExamToRow(
-  userId: string,
-  examId: string,
-  session: ExamSession,
-): ActiveExamRow {
-  return { user_id: userId, exam_id: examId, session: json(session) };
+export function activeExamToRow(userId: string, session: ExamSession): ActiveExamRow {
+  return { user_id: userId, exam_id: session.examId, session: json(session) };
+}
+
+/** An active exam row's session, with the row's exam (sessions saved before D-066 lack it). */
+export function rowToActiveExam(row: Readonly<Record<string, unknown>>): unknown {
+  const session = row['session'];
+  if (typeof session !== 'object' || session === null || Array.isArray(session)) return session;
+  return { ...session, examId: row['exam_id'] };
+}
+
+/** The exam a question id belongs to; ids without a known prefix count as CLF-C02. */
+export function examIdOfQuestion(questionId: string): string {
+  return (examForQuestionId(questionId) ?? DEFAULT_EXAM).id;
 }
 
 export function preferencesToRow(userId: string, overrides: PreferenceOverrides): PreferencesRow {

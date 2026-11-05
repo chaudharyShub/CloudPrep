@@ -1,4 +1,4 @@
-import { DOMAINS, type DomainId, type TaskStatementId } from '@/domain/exam-guide/clf-c02';
+import { EXAMS, type DomainId } from '@/domain/exam-guide';
 import {
   summarizeAttemptQuestions,
   timeUsed,
@@ -9,17 +9,30 @@ import { meetsBenchmark, type QuestionOutcome } from '@/domain/exam/scoring';
 import type { AreaDefinition, Parsed } from './envelope';
 import { parseIntegrityLog } from './integrityParse';
 import { includes, KINDS, REASONS } from './examAreas';
-import { isCount, isNonEmptyString, isRecord, isTimestamp, isUniqueStringArray } from './guards';
+import {
+  capPerExam,
+  isCount,
+  isNonEmptyString,
+  isRecord,
+  isTimestamp,
+  isUniqueStringArray,
+  parseExamId,
+} from './guards';
 
-/** Newest first; older attempts beyond this are dropped. */
+/** Newest first; older attempts beyond this (per exam) are dropped. */
 export const MAX_EXAM_ATTEMPTS = 100;
 
 const OUTCOMES: readonly QuestionOutcome[] = ['correct', 'incorrect', 'unanswered'];
-const TASKS_BY_DOMAIN = new Map<string, Set<string>>(
-  DOMAINS.map((d) => [d.id, new Set(d.taskStatements.map((t) => t.id))]),
-);
+/** Task statements per domain, per exam: `TASKS[examId].get(domain)`. */
+const TASKS: Readonly<Record<string, ReadonlyMap<string, ReadonlySet<string>>>> =
+  Object.fromEntries(
+    EXAMS.map((exam) => [
+      exam.id,
+      new Map(exam.domains.map((d) => [d.id, new Set(d.taskStatements.map((t) => t.id))])),
+    ]),
+  );
 
-function parseAttemptQuestion(value: unknown): AttemptQuestion | null {
+function parseAttemptQuestion(value: unknown, examId: string): AttemptQuestion | null {
   if (!isRecord(value)) return null;
   const {
     questionId,
@@ -37,7 +50,7 @@ function parseAttemptQuestion(value: unknown): AttemptQuestion | null {
     revision < 1 ||
     typeof domain !== 'string' ||
     typeof taskStatement !== 'string' ||
-    !TASKS_BY_DOMAIN.get(domain)?.has(taskStatement) ||
+    !TASKS[examId]?.get(domain)?.has(taskStatement) ||
     !isUniqueStringArray(selectedOptionIds) ||
     !isUniqueStringArray(optionOrder) ||
     !selectedOptionIds.every((id) => optionOrder.includes(id)) ||
@@ -52,7 +65,7 @@ function parseAttemptQuestion(value: unknown): AttemptQuestion | null {
     questionId,
     revision,
     domain: domain as DomainId,
-    taskStatement: taskStatement as TaskStatementId,
+    taskStatement,
     selectedOptionIds,
     optionOrder,
     flagged,
@@ -81,8 +94,10 @@ export function parseExamAttempt(
     questions,
     unavailableQuestionIds,
   } = value;
+  const examId = parseExamId(value['examId']);
   if (
     !isNonEmptyString(id) ||
+    examId === null ||
     !includes(KINDS, kind) ||
     typeof bankVersion !== 'string' ||
     !isTimestamp(startedAt) ||
@@ -103,7 +118,7 @@ export function parseExamAttempt(
   const parsedQuestions: AttemptQuestion[] = [];
   const seen = new Set<string>();
   for (const entry of questions) {
-    const parsed = parseAttemptQuestion(entry);
+    const parsed = parseAttemptQuestion(entry, examId);
     if (!parsed || seen.has(parsed.questionId)) return null;
     seen.add(parsed.questionId);
     parsedQuestions.push(parsed);
@@ -128,6 +143,7 @@ export function parseExamAttempt(
   return {
     attempt: {
       id,
+      examId,
       kind,
       bankVersion,
       startedAt,
@@ -206,6 +222,6 @@ export const EXAM_ATTEMPTS_AREA: AreaDefinition<readonly ExamAttempt[]> = {
         dropped++;
       }
     }
-    return { value: value.slice(0, MAX_EXAM_ATTEMPTS), dropped };
+    return { value: capPerExam(value, MAX_EXAM_ATTEMPTS), dropped };
   },
 };

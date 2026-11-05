@@ -5,7 +5,8 @@ import { isExpired } from '@/domain/exam/timer';
 import { useToast } from '@/components/ui/Toast';
 import { useNow } from '@/hooks/useNow';
 import { useAuth } from '@/state/AuthProvider';
-import { useQuestionBankState } from '@/state/QuestionBankProvider';
+import { examPath } from '@/app/paths';
+import { useExamBankState } from '@/state/QuestionBankProvider';
 import { useActiveExam } from '@/state/hooks';
 import { useAppStore } from '@/state/StoreProvider';
 import { useExamActions } from './useExamActions';
@@ -29,11 +30,11 @@ export function ExamWatcher() {
   // Wait until sign-in is known, so the exam pages (which need sign-in) are on screen first and
   // can show the results themselves.
   const authLoading = useAuth().state.status === 'loading';
-  // Scoring needs the questions.
-  const bankReady = useQuestionBankState().state.status === 'ready';
+  // Scoring needs the questions of the exam in progress, whichever page is open (D-066).
+  const bankReady = useExamBankState(exam?.examId ?? null).state.status === 'ready';
 
   useEffect(() => {
-    if (authLoading || !bankReady) return;
+    if (authLoading || (exam !== null && !bankReady)) return;
     const firstCheck = isFirstCheck.current;
     isFirstCheck.current = false;
     if (!exam) return;
@@ -61,9 +62,12 @@ export function ExamWatcher() {
             ? 'expired_while_away'
             : 'time_expired';
     const attempt = submit(reason);
-    if (attempt && (pathname === '/exam/session' || pathname === '/exam/review')) {
-      void navigate(`/results/${attempt.id}`, { replace: true });
-    } else if (attempt && !pathname.startsWith('/exam')) {
+    const onExamScreen =
+      pathname === examPath(exam.examId, 'exam/session') ||
+      pathname === examPath(exam.examId, 'exam/review');
+    if (attempt && onExamScreen) {
+      void navigate(examPath(exam.examId, `results/${attempt.id}`), { replace: true });
+    } else if (attempt && !pathname.startsWith(examPath(exam.examId, 'exam'))) {
       showToast({
         tone: 'warning',
         title:
