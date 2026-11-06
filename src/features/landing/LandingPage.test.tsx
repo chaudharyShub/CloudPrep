@@ -10,7 +10,7 @@ describe('Landing page', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByRole('link', { name: /Start practising — free/ })).toHaveAttribute(
       'href',
-      '/practice',
+      '/clf-c02/practice',
     );
     expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute('href', '/sign-in');
     expect(
@@ -24,7 +24,7 @@ describe('Landing page', () => {
   it('AC-V.7 signed-in users go straight to the dashboard', async () => {
     const { router } = renderApp('/');
     await waitFor(() => {
-      expect(router.state.location.pathname).toBe('/dashboard');
+      expect(router.state.location.pathname).toBe('/clf-c02/dashboard');
     });
   });
 });

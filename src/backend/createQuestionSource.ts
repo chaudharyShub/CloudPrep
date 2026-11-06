@@ -1,4 +1,3 @@
-import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
 import {
   staticQuestionSource,
   supabaseQuestionSource,
@@ -6,11 +5,15 @@ import {
 } from './questionSource';
 import { getSupabase, readSupabaseConfig } from './supabaseClient';
 
-/** A source that loads the questions bundled in the repo, as a separate chunk. */
-function bundledQuestionSource(): QuestionSource {
+/** A source that loads one exam's questions bundled in the repo, as a separate chunk. */
+function bundledQuestionSource(examId: string): QuestionSource {
   const load = async () => {
-    const { BANK_VERSION, QUESTION_BANK } = await import('@/content/questions');
-    return staticQuestionSource(QUESTION_BANK, BANK_VERSION);
+    const { BANKS } = await import('@/content/banks');
+    const bank = BANKS[examId];
+    if (!bank || bank.questions.length === 0) {
+      throw new Error('This exam has no published questions yet.');
+    }
+    return staticQuestionSource(bank.questions, bank.version);
   };
   return {
     fetchVersion: async () => (await load()).fetchVersion(),
@@ -19,18 +22,18 @@ function bundledQuestionSource(): QuestionSource {
 }
 
 /**
- * Where the app loads questions from (D-046):
+ * Where the app loads an exam's questions from (D-046, D-066):
  * - E2E builds, and development without Supabase settings or with
  *   `VITE_QUESTIONS_SOURCE=local`: the bundled bank (these branches are removed from
  *   production builds, so the bank isn't shipped there);
  * - otherwise Supabase; null if the site has no Supabase settings.
  */
-export function createQuestionSource(): QuestionSource | null {
+export function createQuestionSource(examId: string): QuestionSource | null {
   const config = readSupabaseConfig(import.meta.env);
-  if (import.meta.env.MODE === 'e2e') return bundledQuestionSource();
+  if (import.meta.env.MODE === 'e2e') return bundledQuestionSource(examId);
   if (import.meta.env.DEV && (!config || import.meta.env['VITE_QUESTIONS_SOURCE'] === 'local')) {
-    return bundledQuestionSource();
+    return bundledQuestionSource(examId);
   }
   if (!config) return null;
-  return supabaseQuestionSource(() => getSupabase(config), EXAM_ID);
+  return supabaseQuestionSource(() => getSupabase(config), examId);
 }

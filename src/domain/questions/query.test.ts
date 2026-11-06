@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { makeMultiQuestion, makeQuestion } from '@/test/fixtures/questions';
+import { CLF_C02 } from '@/domain/exam-guide';
 import { bankCoverage } from './coverage';
 import { filterQuestions, indexQuestions, practiceableQuestions } from './query';
 
@@ -91,7 +92,7 @@ describe('indexQuestions and bankCoverage', () => {
   });
 
   it('counts coverage and lists uncovered task statements', () => {
-    const coverage = bankCoverage(ALL);
+    const coverage = bankCoverage(ALL, CLF_C02);
     expect(coverage.total).toBe(3);
     expect(coverage.byDomain).toEqual({ D1: 2, D2: 1, D3: 0, D4: 0 });
     expect(coverage.byType).toEqual({ single: 2, multiple: 1 });

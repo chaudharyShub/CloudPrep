@@ -139,6 +139,7 @@ describe('area parsers', () => {
   it('drops malformed and duplicate session summaries and caps the list', () => {
     const summary = (id: string): PracticeSessionSummary => ({
       id,
+      examId: 'clf-c02',
       label: 'x',
       startedAt: 1,
       finishedAt: 2,
@@ -260,6 +261,7 @@ describe('createAppStore', () => {
     const store = createAppStore({ driver: createMemoryDriver(), persistent: true });
     const summary = (id: string): PracticeSessionSummary => ({
       id,
+      examId: 'clf-c02',
       label: id,
       startedAt: 1,
       finishedAt: 2,

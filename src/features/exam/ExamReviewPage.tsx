@@ -1,3 +1,4 @@
+import { examPath } from '@/app/paths';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { ArrowLeft, Check, CircleDashed, Flag, Send } from 'lucide-react';
@@ -38,7 +39,7 @@ export function ExamReviewPage() {
 
   function open(index: number) {
     store.dispatchExam({ type: 'goTo', index });
-    void navigate('/exam/session');
+    void navigate(examPath(exam.examId, 'exam/session'));
   }
 
   return (
@@ -54,7 +55,7 @@ export function ExamReviewPage() {
           variant="secondary"
           icon={ArrowLeft}
           onClick={() => {
-            void navigate('/exam/session');
+            void navigate(examPath(exam.examId, 'exam/session'));
           }}
         >
           Back to questions

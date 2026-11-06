@@ -1,4 +1,4 @@
-import type { DomainId, TaskStatementId } from '@/domain/exam-guide/clf-c02';
+import type { DomainId, TaskStatementId } from '@/domain/exam-guide/types';
 
 export const QUESTION_TYPES = ['single', 'multiple'] as const;
 /** `single` = multiple choice (one correct of four); `multiple` = multiple response (two or more correct of five or more). */
@@ -34,7 +34,7 @@ export interface SourceReference {
 }
 
 export interface Question {
-  /** Format `clf-d<domain>-<4 digits>`, e.g. `clf-d2-0007`. Never reused. */
+  /** Format `<exam prefix>-d<domain>-<4 digits>`, e.g. `clf-d2-0007`. Never reused. */
   readonly id: string;
   /** Bump when a change could alter the correct answer. */
   readonly revision: number;

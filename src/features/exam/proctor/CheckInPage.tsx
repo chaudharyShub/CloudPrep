@@ -5,9 +5,11 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Notice } from '@/components/ui/Notice';
-import { FULL_EXAM, type ExamConfig } from '@/domain/exam/config';
+import { useExamPath } from '@/app/paths';
+import type { ExamGuide } from '@/domain/exam-guide';
+import { fullExamConfig, type ExamConfig } from '@/domain/exam/config';
 import { checkInIssues, MAX_STRIKES, type CheckInIssue } from '@/domain/exam/proctor';
-import { useActiveExam, useExamQuestions } from '@/state/hooks';
+import { useActiveExam, useCurrentExam, useExamQuestions } from '@/state/hooks';
 import { useExamActions } from '../useExamActions';
 import {
   ERROR_TEXT,
@@ -38,12 +40,13 @@ export interface CheckInState {
 }
 
 function examConfig(
+  exam: ExamGuide,
   kind: CheckInState['kind'] | undefined,
   fullAvailable: boolean,
   shortConfig: ExamConfig | null,
 ): ExamConfig | null {
   if (kind === 'short') return shortConfig;
-  return fullAvailable ? FULL_EXAM : shortConfig;
+  return fullAvailable ? fullExamConfig(exam) : shortConfig;
 }
 
 function hasExtraDisplay(): boolean {
@@ -60,7 +63,10 @@ export function CheckInPage() {
   const activeExam = useActiveExam();
   const { start } = useExamActions();
   const { fullAvailable, shortConfig } = useExamQuestions();
+  const exam = useCurrentExam();
+  const path = useExamPath();
   const config = examConfig(
+    exam,
     (location.state as Partial<CheckInState> | null)?.kind,
     fullAvailable,
     shortConfig,
@@ -114,9 +120,9 @@ export function CheckInPage() {
   const roomPassed = roomClear && clearLongEnough;
 
   if (activeExam && activeExam.status !== 'submitted' && !examStarted) {
-    return <Navigate to="/exam" replace />;
+    return <Navigate to={path('exam')} replace />;
   }
-  if (!config) return <Navigate to="/exam" replace />;
+  if (!config) return <Navigate to={path('exam')} replace />;
 
   function begin() {
     const next = new ProctorEngine();
@@ -143,7 +149,7 @@ export function CheckInPage() {
     }
     // Inside this click: browsers only allow fullscreen from a user action.
     void document.documentElement.requestFullscreen().catch(() => undefined);
-    void navigate('/exam/session');
+    void navigate(path('exam/session'));
   }
 
   const allAgreed = agreed.every(Boolean);
@@ -281,7 +287,7 @@ export function CheckInPage() {
               The timer starts when you start, in fullscreen. Don&apos;t press Esc during the exam.
             </p>
             <Link
-              to="/exam"
+              to={path('exam')}
               className="text-sm font-medium text-accent-fg underline-offset-4 hover:underline sm:ml-auto"
             >
               Cancel

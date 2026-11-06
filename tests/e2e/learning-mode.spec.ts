@@ -37,7 +37,7 @@ async function answerCurrentQuestion(page: Page) {
 
 test.beforeEach(async ({ page }) => {
   // Each test starts with empty storage.
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await page.evaluate(() => {
     window.localStorage.clear();
   });
@@ -46,7 +46,7 @@ test.beforeEach(async ({ page }) => {
 test('practise a domain, check answers, bookmark, and keep progress after reload', async ({
   page,
 }) => {
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await expectNoSeriousA11yViolations(page);
 
   await page.getByRole('combobox', { name: 'Domain' }).selectOption('D1');
@@ -73,17 +73,17 @@ test('practise a domain, check answers, bookmark, and keep progress after reload
   );
 
   // Reload the Learning page: progress and bookmark were saved.
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   const domainCard = page.getByRole('listitem').filter({ hasText: 'Domain 1' }).first();
   await expect(domainCard.getByText(/^1 of \d+$/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Practise bookmarks (1)' })).toBeEnabled();
 
-  await page.goto('/bookmarks');
+  await page.goto('/clf-c02/bookmarks');
   await expect(page.getByRole('button', { name: /^Remove bookmark:/ })).toHaveCount(1);
 });
 
 test('finish a session and see the summary', async ({ page }) => {
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await page.getByRole('combobox', { name: 'Domain' }).selectOption('D4');
   await page.getByRole('combobox', { name: 'Topic' }).selectOption('4.3');
   await expect(page.getByText(/^\d+ questions? match/)).toBeVisible();
@@ -107,7 +107,7 @@ test('finish a session and see the summary', async ({ page }) => {
 
 test('answer options work with the keyboard only', async ({ page, browserName }) => {
   test.skip(browserName === 'webkit', 'WebKit skips some controls on Tab by default');
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await page.getByRole('combobox', { name: 'Domain' }).selectOption('D1');
   await page.getByRole('combobox', { name: 'Topic' }).selectOption('1.4');
   await page.getByRole('button', { name: 'Start practice' }).click();
@@ -133,7 +133,7 @@ test('answer options work with the keyboard only', async ({ page, browserName })
 
 test('practice pages fit a phone screen', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await expectNoHorizontalOverflow(page);
   await page.getByRole('button', { name: 'Start practice' }).click();
   await expect(page.getByText(/Question 1 of/)).toBeVisible();
@@ -145,7 +145,7 @@ test('practice pages fit a phone screen', async ({ page }) => {
 
 test('AC-I.5 the Review due explanation fits a phone screen and passes axe', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
-  for (const path of ['/practice', '/dashboard']) {
+  for (const path of ['/clf-c02/practice', '/clf-c02/dashboard']) {
     await page.goto(path);
     await page.getByRole('button', { name: 'About Review due' }).click();
     const tip = page.getByText(/after 1, 3, 7, 21 and then 60 days/);
@@ -162,14 +162,14 @@ test('AC-I.5 the Review due explanation fits a phone screen and passes axe', asy
 });
 
 test('recovers from corrupted saved progress without crashing', async ({ page }) => {
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   // Signed in, saved data is the account's copy in this browser (D-047). Wait until sign-in
   // has created it: data found without an owner is removed.
   await page.waitForFunction(() => window.localStorage.getItem('cloudprep-account:owner') !== null);
   await page.evaluate(() => {
     window.localStorage.setItem('cloudprep-account:cloudprep:progress', '{not valid json');
   });
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await expect(page.getByText(/Some saved practice progress couldn't be read/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Start practice' })).toBeEnabled();
   const backups = await page.evaluate(() =>
@@ -183,7 +183,7 @@ test('recovers from corrupted saved progress without crashing', async ({ page })
 test('AC-R.7 progress saved before review levels shows up as review due and can be practised', async ({
   page,
 }) => {
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await page.waitForFunction(() => window.localStorage.getItem('cloudprep-account:owner') !== null);
   // Version 1 progress (no review levels), answered three days ago: two wrong, one right.
   await page.evaluate(() => {
@@ -211,7 +211,7 @@ test('AC-R.7 progress saved before review levels shows up as review due and can 
       }),
     );
   });
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   // Wrong answers are due after a day; the right one after three.
   await expect(page.getByText('3 questions due today.')).toBeVisible();
   await expectNoSeriousA11yViolations(page);

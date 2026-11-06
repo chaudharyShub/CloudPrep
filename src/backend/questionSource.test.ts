@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { describe, expect, it } from 'vitest';
-import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
+import { CLF_C02 } from '@/domain/exam-guide';
 import { TEST_BANK } from '@/test/bank';
 import { questionToRows } from './contentRows';
 import { parseFetchedRow, supabaseQuestionSource } from './questionSource';
@@ -10,7 +10,7 @@ const sample = TEST_BANK.practice.questions;
 function fetchedRow(index: number, embedAsArray = false) {
   const question = sample[index];
   if (!question) throw new Error('not enough questions');
-  const rows = questionToRows(question, EXAM_ID);
+  const rows = questionToRows(question, CLF_C02.id);
   return { ...rows.question, question_keys: embedAsArray ? [rows.key] : rows.key };
 }
 
@@ -71,7 +71,7 @@ describe('question source', () => {
     const { supabase, ranges } = fakeSupabase({ version: 'v7', rows });
     const loaded = await supabaseQuestionSource(
       () => Promise.resolve(supabase),
-      EXAM_ID,
+      CLF_C02.id,
     ).fetchBank();
     expect(loaded.version).toBe('v7');
     expect(loaded.questions).toHaveLength(1199);
@@ -84,7 +84,7 @@ describe('question source', () => {
 
   it('reports an unpublished exam, a failed request and an empty bank', async () => {
     const source = (options: Parameters<typeof fakeSupabase>[0]) =>
-      supabaseQuestionSource(() => Promise.resolve(fakeSupabase(options).supabase), EXAM_ID);
+      supabaseQuestionSource(() => Promise.resolve(fakeSupabase(options).supabase), CLF_C02.id);
     await expect(source({}).fetchVersion()).rejects.toThrow(/no published questions/);
     await expect(source({ version: null }).fetchVersion()).rejects.toThrow(/no published/);
     await expect(source({ version: 'v1', failQuestions: 'timeout' }).fetchBank()).rejects.toThrow(

@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect, useRef, type ReactNode } from 'react';
 import { Outlet, useLocation } from 'react-router';
 import { MobileNav } from '@/components/layout/MobileNav';
 import { Sidebar } from '@/components/layout/Sidebar';
@@ -6,7 +6,8 @@ import { PageSkeleton } from '@/components/ui/Skeleton';
 import { AccountNav } from '@/features/auth/AccountNav';
 import { StorageNotices } from '@/features/shared/StorageNotices';
 
-export function AppLayout() {
+/** The app chrome around a page: the route's page, or `children` (e.g. a not-found page). */
+export function AppLayout({ children }: { children?: ReactNode }) {
   const { pathname } = useLocation();
   const mainRef = useRef<HTMLElement>(null);
   const isFirstRender = useRef(true);
@@ -37,9 +38,7 @@ export function AppLayout() {
       <main id="main" ref={mainRef} tabIndex={-1}>
         <div className="mx-auto w-full max-w-content px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-10">
           <StorageNotices />
-          <Suspense fallback={<PageSkeleton />}>
-            <Outlet />
-          </Suspense>
+          <Suspense fallback={<PageSkeleton />}>{children ?? <Outlet />}</Suspense>
         </div>
       </main>
     </div>

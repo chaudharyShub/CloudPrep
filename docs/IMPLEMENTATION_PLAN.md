@@ -1,6 +1,6 @@
 # CloudPrep — Implementation Plan
 
-> Status: **In progress** · Last updated: 2026-11-04
+> Status: **In progress** · Last updated: 2026-11-05
 >
 > The phase sections below (P0–P10, C1–C3) are the original plan from 2026-10-21, kept for history; the Progress table and "Changes from the original plan" say what was actually built. For how the app works today, see PRODUCT_SPEC.md and ARCHITECTURE.md.
 
@@ -32,6 +32,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Review due "i" explanation (D-058) | An "i" button beside Review due that explains the schedule; version 3.1.0 | Done, merged and live (PR #19) |
 | Search engine basics (D-063) | `robots.txt` and `sitemap.xml` written by the production build (`src/app/seo.ts`); one address per page (no trailing slash); a page title that names the exam; Google Search Console steps in DEPLOYMENT.md; version 3.4.1; acceptance criteria below | Done, merged and live (PR #24); Search Console verification file is live, verify and submit the sitemap there |
 | New live address (D-064) | https://aws-cloud-prepare.vercel.app (the old address 308-redirects to it) in `SITE_ORIGIN` for link previews, `robots.txt` and `sitemap.xml`; README links; address-change steps in DEPLOYMENT.md; a PNG icon link and `favicon.ico` for the icon in search results; version 3.4.2; acceptance criteria below | Done, pushed to `master` (user's choice, approved 2026-11-02); Supabase URLs and Search Console by hand |
+| More exams (D-066) | SAA-C03 and DVA-C03 with everything CLF-C02 has. Step 1: multi-exam app (exam guides as data, exam in the address, data tagged by exam, sync, publish), version 4.0.0. Step 2: SAA-C03 bank (2,000 questions, checked). Step 3: DVA-C03 bank (2,000 questions, checked). Acceptance criteria below | Step 1 implemented on `feature/multi-exam` (not merged); after merging, run `npm run publish:questions` once (catalogue rows and questions). Steps 2–3 in progress: 600 checked questions each for SAA-C03 and DVA-C03 (not published; exams not launched) |
 | Speed Insights (D-065) | Vercel Speed Insights (Core Web Vitals) beside Web Analytics, production builds only; the Privacy page says what it measures; version 3.5.0; acceptance criteria below | Done, merged and live (PR #25) |
 | Shubham Works footer (D-062) | The credit becomes a shared footer for all the developer's sites: the orange "Dial" maker mark (`maker` token; SVGs in `docs/brand/`), "A Shubham Works project", "Made by Shubham Chaudhary", and "Also: Frontend Interview Prep" (replaces "Also by me"); a less crowded sidebar bottom with a shorter unofficial note; the Privacy page says CloudPrep is a Shubham Works project; `docs/SHUBHAM_WORKS.md` for the other sites; version 3.4.0; acceptance criteria below | Done, merged and live (PR #23) |
 | Open source licences (D-061) | `LICENSE` (MIT, code) and `LICENSE-CONTENT.md` (CC BY-NC-SA 4.0, questions); README License section; a Privacy page section on the licences and how the questions were made (AI-assisted, checked against AWS pages); `license` in package.json; version 3.3.0; acceptance criteria below | Done, merged and live (PR #22) |
@@ -416,7 +417,7 @@ Requested by the user on 2026-11-01, as the first step to bring visitors: let se
 
 Acceptance criteria (tests are tagged `AC-S.x`, `src/app/seo.test.ts`):
 - AC-S.1 The production build serves `/robots.txt`: it allows the site, blocks signed-in areas, the sign-in flow, exam screens and `/admin`, and names the sitemap with an absolute address. Local builds (no production address) leave the sitemap line out. Neither file is kept in `public/`.
-- AC-S.2 The production build serves `/sitemap.xml` listing the public pages (`/`, `/practice`, `/privacy`) with absolute addresses; none of them is blocked by `robots.txt`.
+- AC-S.2 The production build serves `/sitemap.xml` listing the public pages (`/`, `/practice`, `/privacy`; since D-066 `/`, `/privacy` and each launched exam's `/<exam>` and `/<exam>/practice`) with absolute addresses; none of them is blocked by `robots.txt`.
 - AC-S.3 `index.html`'s title names the exam ("AWS Cloud Practitioner", "CLF-C02") and its description mentions CLF-C02, so search engines and link previews see them before the app loads.
 - AC-S.4 `vercel.json` sets `"trailingSlash": false`, so `/practice/` permanently redirects to `/practice` and each page has one address; sitemap addresses have no trailing slash.
 
@@ -437,6 +438,27 @@ Acceptance criteria:
 - AC-W.1 The Privacy page's "Usage statistics" section says the live site measures page speed with Vercel Speed Insights, lists what is sent with each measurement, and says app data is never sent (`PrivacyPage.test.tsx`).
 - AC-W.2 `<SpeedInsights />` (`@vercel/speed-insights/react`) is mounted in `src/main.tsx` beside `<Analytics />`, only when `import.meta.env.MODE === 'production'`, so development and E2E builds load and send nothing.
 - Checked by hand after deploying (DEPLOYMENT.md): `/_vercel/speed-insights/script.js` loads with status 200 on the live site and Core Web Vitals appear in the Vercel dashboard.
+
+## More exams (D-066)
+
+Requested by the user on 2026-11-05: AWS Certified Solutions Architect – Associate (SAA-C03) and Developer – Associate (DVA-C03, which replaces DVA-C02 on 1 December 2026), with everything CLF-C02 has. Exam facts are in D-066.
+
+**Step 1 – multi-exam app (version 4.0.0).** Acceptance criteria (tests are tagged `AC-M.x`):
+- AC-M.1 `EXAMS` lists CLF-C02, SAA-C03 and DVA-C03 with the facts from their official exam guides: code, name, guide address, 65 questions (50 scored), minutes (90, 130, 130), passing score (700, 720, 720), domains with weights adding up to 100 and every task statement.
+- AC-M.2 Exam pages live under the exam id (`/:examId/practice`, `/:examId/exam`, `/:examId/results/:attemptId`, …); an unknown exam id shows the not-found page; old addresses redirect to the same page of the exam used last (CLF-C02 for new visitors), with the same search string; an old result address opens under its attempt's exam.
+- AC-M.3 `/` offers every launched exam ("Choose your exam" when there is more than one); each exam has its own landing page with its facts; the navigation shows the current exam and lets the person switch to the same section of another; the last exam used is remembered.
+- AC-M.4 The full exam uses the exam's question count and time; a short exam keeps that exam's pace; results and help text show the exam's own passing score; the benchmark setting stays shared.
+- AC-M.5 Dashboard, Learning mode, Review due, bookmarks, progress, readiness, history and results show only the current exam's questions and data.
+- AC-M.6 Saved sessions, attempts and the active exam without an exam id are read as CLF-C02 (local data, imports and server rows); old data is kept; items of an unknown exam are dropped; history limits apply per exam.
+- AC-M.7 Only one exam can be in progress across all exams; the exam watcher submits an expired exam on any page; starting a second exam asks to finish the first.
+- AC-M.8 Sync writes each item with its own `exam_id` and reads every exam.
+- AC-M.9 Question ids carry the exam prefix; validation checks each question's domain and task statement against its exam's guide; `publish:questions` and `check:published` handle every exam that has questions; the app loads and caches each exam's bank separately.
+- AC-M.10 Search engines see each launched exam's landing page and Learning mode in `sitemap.xml`, and `robots.txt` blocks signed-in and flow pages under every exam id; page titles name the current exam.
+- AC-M.11 An exam that is not launched is hidden in production builds and available in development and E2E builds.
+- AC-M.12 Everything CLF-C02 did before still works (the existing tests pass with the new addresses).
+- AC-M.13 Choosing another exam in the landing page's "Choose your exam" section keeps the scroll position instead of jumping to the top (user request, 2026-11-05). "What's covered" now comes before "Two ways to study", in the page and in its top links.
+
+**Steps 2 and 3 – question banks.** For each exam: 2,000 original questions in batches of about 40, spread by domain weight (SAA-C03 about 600 / 520 / 480 / 400; DVA-C03 about 600 / 520 / 440 / 440) and across every task statement; each batch checked against its cited AWS pages and logged in CONTENT_REVIEW.md; `BANK_VERSION` bumped and published. The exam is marked launched once the user agrees its bank is ready.
 
 ## UI redesign (D-057)
 

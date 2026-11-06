@@ -37,7 +37,7 @@ function controlledLoader(cached: BankSnapshot | null = null) {
 describe('loading questions', () => {
   it('AC-B.14 pages wait for the first download, then show', async () => {
     const control = controlledLoader();
-    renderApp('/practice', { questions: control.loader });
+    renderApp('/clf-c02/practice', { questions: control.loader });
     expect(await screen.findByText('Loading questions…')).toBeInTheDocument();
     expect(screen.queryByRole('heading', { level: 1, name: 'Learning mode' })).toBeNull();
     control.resolve(current);
@@ -46,7 +46,7 @@ describe('loading questions', () => {
 
   it('AC-B.14 explains a failed download and retries', async () => {
     const control = controlledLoader();
-    const { user } = renderApp('/practice', { questions: control.loader });
+    const { user } = renderApp('/clf-c02/practice', { questions: control.loader });
     await waitFor(() => {
       expect(control.latest).toHaveBeenCalledTimes(1);
     });
@@ -66,7 +66,7 @@ describe('loading questions', () => {
 
   it('AC-B.14 keeps working from the cache when the download fails (offline)', async () => {
     const control = controlledLoader(current);
-    renderApp('/practice', { questions: control.loader });
+    renderApp('/clf-c02/practice', { questions: control.loader });
     expect(await screen.findByRole('heading', { level: 1, name: 'Learning mode' })).toBeVisible();
     control.reject(new Error('offline'));
     await new Promise((r) => setTimeout(r, 50));
@@ -75,7 +75,7 @@ describe('loading questions', () => {
   });
 
   it('AC-B.14 says when the site has no question source; settings still open', async () => {
-    const { unmount } = renderApp('/practice', { questions: null });
+    const { unmount } = renderApp('/clf-c02/practice', { questions: null });
     expect(await screen.findByText(/isn't connected to its database/)).toBeVisible();
     unmount();
     renderApp('/settings', { questions: null });
@@ -86,7 +86,7 @@ describe('loading questions', () => {
     const store = createTestStore();
     store.startExam(makeExam({ startedAt: Date.now() - 3 * 60 * 60_000 }));
     const control = controlledLoader();
-    renderApp('/exam/session', { store, questions: control.loader });
+    renderApp('/clf-c02/exam/session', { store, questions: control.loader });
     await waitFor(() => {
       expect(control.latest).toHaveBeenCalled();
     });

@@ -21,7 +21,7 @@ test('settings persist across reloads', async ({ page }) => {
 test('export, reset everything, import: data comes back', async ({ page, browserName }) => {
   test.skip(browserName === 'webkit', 'Download handling is covered in Chromium');
   // Create some data: a bookmark.
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await page.getByRole('button', { name: 'Start practice' }).click();
   await page.getByRole('button', { name: 'Bookmark' }).click();
 
@@ -37,7 +37,7 @@ test('export, reset everything, import: data comes back', async ({ page, browser
   const dialog = page.getByRole('dialog', { name: 'Reset all CloudPrep data?' });
   await dialog.getByRole('textbox').fill('RESET');
   await dialog.getByRole('button', { name: 'Reset everything' }).click();
-  await page.goto('/bookmarks');
+  await page.goto('/clf-c02/bookmarks');
   await expect(page.getByRole('heading', { name: 'No bookmarks yet' })).toBeVisible();
 
   await page.goto('/settings');
@@ -54,7 +54,7 @@ test('export, reset everything, import: data comes back', async ({ page, browser
     .getByRole('button', { name: 'Merge data' })
     .click();
 
-  await page.goto('/bookmarks');
+  await page.goto('/clf-c02/bookmarks');
   await expect(page.getByRole('button', { name: /^Remove bookmark:/ })).toHaveCount(1);
 });
 

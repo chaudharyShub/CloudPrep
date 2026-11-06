@@ -24,7 +24,7 @@ test.describe('as a guest', () => {
         .map((v) => v.id),
     ).toEqual([]);
 
-    await page.goto('/dashboard');
+    await page.goto('/clf-c02/dashboard');
     await expect(page).toHaveURL(/\/sign-in/);
     await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
 
@@ -40,8 +40,8 @@ test.describe('as a guest', () => {
     await page.getByRole('link', { name: 'Continue as a guest' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Learning mode' })).toBeVisible();
 
-    await page.goto('/exam');
-    await expect(page).toHaveURL(/\/sign-in\?next=%2Fexam$/);
+    await page.goto('/clf-c02/exam');
+    await expect(page).toHaveURL(/\/sign-in\?next=%2Fclf-c02%2Fexam$/);
     await expect(page.getByText('Sign in to continue')).toBeVisible();
   });
 
@@ -56,7 +56,7 @@ test.describe('as a guest', () => {
     page,
     isMobile,
   }) => {
-    await page.goto('/history');
+    await page.goto('/clf-c02/history');
     await page.getByRole('button', { name: 'Continue with Google' }).click();
     // The fake goes through /auth/callback like the real redirect.
     await expect(page.getByRole('heading', { level: 1, name: 'Exam history' })).toBeVisible();
@@ -74,7 +74,7 @@ test.describe('as a guest', () => {
       .getByRole('dialog', { name: 'Sign out of CloudPrep?' })
       .getByRole('button', { name: 'Sign out' })
       .click();
-    await expect(page).toHaveURL(/\/sign-in\?next=%2Fhistory$/);
+    await expect(page).toHaveURL(/\/sign-in\?next=%2Fclf-c02%2Fhistory$/);
     await page.reload();
     await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
   });

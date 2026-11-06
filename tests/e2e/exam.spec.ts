@@ -18,7 +18,7 @@ function clockSeconds(text: string | null): number {
 }
 
 async function startFullExam(page: Page) {
-  await page.goto('/exam');
+  await page.goto('/clf-c02/exam');
   await page.getByRole('button', { name: 'Start full exam' }).click();
   await page.getByRole('button', { name: 'Start exam' }).click();
   await expect(page.getByRole('heading', { level: 1, name: /^Question 1 of \d+$/ })).toBeVisible();
@@ -45,7 +45,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     'Desktop flow; covered on phones by the mobile test',
   );
   await page.clock.install({ time: new Date('2026-10-21T09:00:00Z') });
-  await page.goto('/exam');
+  await page.goto('/clf-c02/exam');
   await page.evaluate(() => {
     window.localStorage.clear();
   });
@@ -54,7 +54,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 test('take the full exam: answer, flag, review, confirm and see results', async ({ page }) => {
   // Several full-page accessibility scans (the results page is long) are slow in WebKit.
   test.setTimeout(90_000);
-  await page.goto('/exam');
+  await page.goto('/clf-c02/exam');
   await expect(page.getByRole('button', { name: 'Start full exam' })).toBeVisible();
   await expectNoSeriousA11yViolations(page);
   await startFullExam(page);
@@ -99,11 +99,11 @@ test('take the full exam: answer, flag, review, confirm and see results', async 
   await expect(page.getByRole('heading', { name: 'Sources' })).toBeVisible();
   await expectNoSeriousA11yViolations(page);
 
-  await page.goto('/progress');
+  await page.goto('/clf-c02/progress');
   await expect(page.getByText('Not enough data yet')).toBeVisible();
   await expectNoSeriousA11yViolations(page);
 
-  await page.goto('/history');
+  await page.goto('/clf-c02/history');
   await expect(page.getByRole('link', { name: /Full exam · 65 questions/ })).toBeVisible();
 });
 
@@ -167,7 +167,7 @@ test('an exam that expired while the browser was closed is submitted on return',
 
   const reopened = await context.newPage();
   await reopened.clock.install({ time: new Date('2026-10-21T11:00:00Z') }); // 2 hours later
-  await reopened.goto('/exam/session');
+  await reopened.goto('/clf-c02/exam/session');
   await expect(reopened.getByRole('heading', { level: 1, name: 'Exam results' })).toBeVisible();
   await expect(reopened.getByText(/ended while CloudPrep was closed/)).toBeVisible();
 });

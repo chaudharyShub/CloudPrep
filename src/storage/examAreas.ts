@@ -2,7 +2,14 @@ import type { ExamKind } from '@/domain/exam/config';
 import type { ExamSession, ExamStatus, SubmitReason } from '@/domain/exam/session';
 import type { AreaDefinition, Parsed } from './envelope';
 import { parseIntegrityLog } from './integrityParse';
-import { isCount, isNonEmptyString, isRecord, isTimestamp, isUniqueStringArray } from './guards';
+import {
+  isCount,
+  isNonEmptyString,
+  isRecord,
+  isTimestamp,
+  isUniqueStringArray,
+  parseExamId,
+} from './guards';
 
 export const KINDS: readonly ExamKind[] = ['full', 'short'];
 const STATUSES: readonly ExamStatus[] = ['in_progress', 'confirming', 'submitted'];
@@ -42,9 +49,11 @@ export function parseExamSession(value: unknown): ExamSession | null {
     submittedAt,
     submitReason,
   } = value;
+  const examId = parseExamId(value['examId']);
 
   if (
     !isNonEmptyString(id) ||
+    examId === null ||
     !includes(KINDS, kind) ||
     typeof bankVersion !== 'string' ||
     !Number.isInteger(seed) ||
@@ -101,6 +110,7 @@ export function parseExamSession(value: unknown): ExamSession | null {
 
   return {
     id,
+    examId,
     kind,
     bankVersion,
     seed: seed as number,

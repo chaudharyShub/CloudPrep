@@ -12,6 +12,11 @@ describe('validateQuestion', () => {
     expect(validateQuestion(makeMultiQuestion())).toEqual([]);
   });
 
+  it('accepts official Kiro documentation as a reference (in scope for DVA-C03)', () => {
+    const references = [{ title: 'Kiro documentation', url: 'https://kiro.dev/docs/' }];
+    expect(validateQuestion({ ...makeQuestion(), references })).toEqual([]);
+  });
+
   it('rejects values that are not objects', () => {
     expect(codes(null)).toEqual(['NOT_AN_OBJECT']);
     expect(codes('question')).toEqual(['NOT_AN_OBJECT']);
@@ -155,6 +160,25 @@ describe('validateQuestion', () => {
     expect(result).toEqual(
       expect.arrayContaining(['EMPTY_STEM', 'EMPTY_EXPLANATION', 'INVALID_DIFFICULTY']),
     );
+  });
+});
+
+describe('validateQuestion for each exam (D-066)', () => {
+  it('AC-M.9 checks SAA-C03 and DVA-C03 questions against their own exam guides', () => {
+    // SAA-C03 has task statement 4.4; CLF-C02 and DVA-C03 stop at 4.3.
+    const saa = makeQuestion({ id: 'saa-d4-0001', domain: 'D4', taskStatement: '4.4' });
+    expect(validateQuestion(saa)).toEqual([]);
+    expect(codes({ ...saa, id: 'clf-d4-0001' })).toEqual(['INVALID_TASK_STATEMENT']);
+    expect(codes({ ...saa, id: 'dva-d4-0001' })).toEqual(['INVALID_TASK_STATEMENT']);
+    // DVA-C03 Domain 2 has a task 2.3 (AI security); SAA-C03 Domain 2 stops at 2.2.
+    const dva = makeQuestion({ id: 'dva-d2-0001', domain: 'D2', taskStatement: '2.3' });
+    expect(validateQuestion(dva)).toEqual([]);
+    expect(codes({ ...dva, id: 'saa-d2-0001' })).toEqual(['INVALID_TASK_STATEMENT']);
+  });
+
+  it('AC-M.9 rejects ids without a known exam prefix', () => {
+    expect(codes(makeQuestion({ id: 'sap-d1-0001' }))).toEqual(['INVALID_ID']);
+    expect(codes(makeQuestion({ id: 'saa-d3-0001' }))).toEqual(['ID_DOMAIN_MISMATCH']);
   });
 });
 

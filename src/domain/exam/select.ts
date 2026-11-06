@@ -1,4 +1,9 @@
-import { DOMAINS, type DomainId, type TaskStatementId } from '@/domain/exam-guide/clf-c02';
+import {
+  DOMAIN_IDS,
+  type DomainId,
+  type ExamDomain,
+  type TaskStatementId,
+} from '@/domain/exam-guide/types';
 import { createRandom, shuffle, type Random } from '@/domain/lib/random';
 import type { Question } from '@/domain/questions/types';
 import { allocateByWeight, fitsAvailability, type DomainCounts } from './blueprint';
@@ -19,7 +24,7 @@ export function examEligibleQuestions(bank: readonly Question[]): Question[] {
 }
 
 export function countByDomain(questions: readonly Question[]): DomainCounts {
-  const counts = Object.fromEntries(DOMAINS.map((d) => [d.id, 0])) as DomainCounts;
+  const counts = Object.fromEntries(DOMAIN_IDS.map((id) => [id, 0])) as DomainCounts;
   for (const question of questions) counts[question.domain]++;
   return counts;
 }
@@ -80,6 +85,8 @@ export interface SelectExamInput {
   /** Exam-eligible questions (see `examEligibleQuestions`). */
   questions: readonly Question[];
   questionCount: number;
+  /** The exam's domains, for the weighting. */
+  domains: readonly ExamDomain[];
   seed: number;
   /** Question ids used in previous exam attempts; used only to prefer fresh questions. */
   seenIds?: ReadonlySet<string>;
@@ -93,10 +100,11 @@ export interface SelectExamInput {
 export function selectExamQuestions({
   questions,
   questionCount,
+  domains,
   seed,
   seenIds = new Set(),
 }: SelectExamInput): SelectionResult {
-  const allocation = allocateByWeight(questionCount);
+  const allocation = allocateByWeight(questionCount, domains);
   // Defensive: treat duplicate ids in the input as one question.
   const unique = [...new Map(questions.map((q) => [q.id, q])).values()];
   const available = countByDomain(unique);
@@ -106,19 +114,19 @@ export function selectExamQuestions({
       ok: false,
       reason: 'insufficient',
       allocation,
-      shortfalls: DOMAINS.filter((d) => available[d.id] < allocation[d.id]).map((d) => ({
-        domain: d.id,
-        required: allocation[d.id],
-        available: available[d.id],
+      shortfalls: DOMAIN_IDS.filter((id) => available[id] < allocation[id]).map((id) => ({
+        domain: id,
+        required: allocation[id],
+        available: available[id],
       })),
     };
   }
 
   const random = createRandom(seed);
-  const picked = DOMAINS.flatMap((domain) =>
+  const picked = DOMAIN_IDS.flatMap((id) =>
     pickFromDomain(
-      unique.filter((q) => q.domain === domain.id),
-      allocation[domain.id],
+      unique.filter((q) => q.domain === id),
+      allocation[id],
       seenIds,
       random,
     ),

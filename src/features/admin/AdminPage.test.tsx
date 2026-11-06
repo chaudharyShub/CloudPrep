@@ -82,13 +82,13 @@ describe('Admin page', () => {
   });
 
   it('AC-A.1 the admin page is not in the navigation', async () => {
-    renderApp('/dashboard');
+    renderApp('/clf-c02/dashboard');
     await screen.findByRole('heading', { level: 1 });
     expect(screen.queryByRole('link', { name: /admin/i })).not.toBeInTheDocument();
   });
 
   it('AC-A.5 admins get an Admin link in the navigation that opens the admin page', async () => {
-    const { user, router } = renderApp('/dashboard', {
+    const { user, router } = renderApp('/clf-c02/dashboard', {
       admin: createFakeAdminClient({ admin: true, users: USERS }),
     });
     const [link] = await screen.findAllByRole('link', { name: 'Admin' });
@@ -99,7 +99,7 @@ describe('Admin page', () => {
   });
 
   it('AC-A.5 guests never see the Admin link', async () => {
-    renderApp('/practice', {
+    renderApp('/clf-c02/practice', {
       auth: createFakeAuthClient(),
       admin: createFakeAdminClient({ admin: true }),
     });

@@ -1,0 +1,78 @@
+import type { DomainId, TaskStatementId } from '@/domain/exam-guide/types';
+import type { Difficulty, Question, ReviewStatus, SourceReference } from '@/domain/questions/types';
+
+/** Option ids in order; the first option is 'a'. */
+const LETTERS = ['a', 'b', 'c', 'd', 'e', 'f'] as const;
+export type Letter = (typeof LETTERS)[number];
+
+const LEVELS: Record<'e' | 'm' | 'h', Difficulty> = { e: 'easy', m: 'medium', h: 'hard' };
+
+/**
+ * A question written in compact form. Options are `[text, explanation]` pairs; their ids are
+ * assigned in order ('a', 'b', …). `a` is the correct letter, or letters for multiple response.
+ * `K` is the exam's reference keys (its `refs.ts`).
+ */
+export interface QuestionSpec<K extends string = string> {
+  /** Number part of the ID: 45 → <exam>-d<domain>-0045. Never reuse a number. */
+  readonly n: number;
+  readonly t: TaskStatementId;
+  readonly lv: keyof typeof LEVELS;
+  /** Question text. */
+  readonly q: string;
+  readonly o: readonly (readonly [text: string, explanation: string])[];
+  readonly a: Letter | readonly Letter[];
+  /** Why the correct answer is correct. */
+  readonly x: string;
+  readonly r: readonly K[];
+  readonly tags?: readonly string[];
+  /** Overrides the batch status, e.g. a question that couldn't be confirmed during review. */
+  readonly st?: ReviewStatus;
+  /** Revision, raised when the question changes in substance (default 1). */
+  readonly rev?: number;
+}
+
+export interface BatchMeta {
+  readonly domain: DomainId;
+  /** YYYY-MM-DD the batch was written. */
+  readonly written: string;
+  readonly status?: ReviewStatus;
+  /** YYYY-MM-DD the batch was checked against its cited pages (becomes `lastVerified`). */
+  readonly checked?: string;
+}
+
+const DOMAIN_NUMBER: Record<DomainId, number> = { D1: 1, D2: 2, D3: 3, D4: 4 };
+
+/**
+ * The batch writer for one exam: expands compact specs into full questions with the exam's
+ * id prefix (`clf`, `saa`, `dva`) and references. Validation happens in the bank validator.
+ */
+export function questionAuthor<K extends string>(
+  prefix: string,
+  refs: Readonly<Record<K, SourceReference>>,
+): (meta: BatchMeta, specs: readonly QuestionSpec<K>[]) => Question[] {
+  return (meta, specs) =>
+    specs.map((spec) => {
+      const correct = typeof spec.a === 'string' ? [spec.a] : [...spec.a];
+      return {
+        id: `${prefix}-d${DOMAIN_NUMBER[meta.domain]}-${String(spec.n).padStart(4, '0')}`,
+        revision: spec.rev ?? 1,
+        type: correct.length > 1 ? 'multiple' : 'single',
+        stem: spec.q,
+        options: spec.o.map(([text, explanation], index) => ({
+          id: LETTERS[index] ?? `x${index}`,
+          text,
+          explanation,
+        })),
+        correctOptionIds: correct,
+        explanation: spec.x,
+        domain: meta.domain,
+        taskStatement: spec.t,
+        difficulty: LEVELS[spec.lv],
+        tags: spec.tags ?? [],
+        references: spec.r.map((key) => refs[key]),
+        review: spec.st
+          ? { status: spec.st, lastVerified: meta.written }
+          : { status: meta.status ?? 'unverified', lastVerified: meta.checked ?? meta.written },
+      };
+    });
+}

@@ -9,7 +9,7 @@ const OTHER_SITE = new RegExp(`^${FRONTEND_PREP.name}`);
 
 describe('Developer credit', () => {
   it('AC-D.1 the navigation footer links the developer’s portfolio in a new tab', async () => {
-    renderApp('/dashboard', { auth: createFakeAuthClient() });
+    renderApp('/clf-c02/dashboard', { auth: createFakeAuthClient() });
     await screen.findByRole('heading', { level: 1 });
     const [link] = screen.getAllByRole('link', { name: CREDIT });
     expect(link).toHaveAttribute('href', DEVELOPER.url);
@@ -26,7 +26,7 @@ describe('Developer credit', () => {
   });
 
   it('AC-D.3 the navigation footer links Frontend Interview Prep in a new tab, under the credit', async () => {
-    renderApp('/dashboard', { auth: createFakeAuthClient() });
+    renderApp('/clf-c02/dashboard', { auth: createFakeAuthClient() });
     await screen.findByRole('heading', { level: 1 });
     const [link] = screen.getAllByRole('link', { name: OTHER_SITE });
     expect(link).toHaveAttribute('href', FRONTEND_PREP.url);
@@ -55,7 +55,7 @@ describe('Developer credit', () => {
   });
 
   it('AC-D.6 the navigation footer says CloudPrep is a Shubham Works project, above the credit', async () => {
-    renderApp('/dashboard', { auth: createFakeAuthClient() });
+    renderApp('/clf-c02/dashboard', { auth: createFakeAuthClient() });
     await screen.findByRole('heading', { level: 1 });
     const [umbrella] = screen.getAllByText(`A ${MAKER_BRAND} project`);
     const [credit] = screen.getAllByText(/^Made by/);

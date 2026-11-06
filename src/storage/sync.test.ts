@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createFakeUserTables, type FakeUserTables } from '@/backend/fakeUserTables';
 import { createUserDataRemote } from '@/backend/userDataRemote';
-import { EXAM_ID } from '@/domain/exam-guide/clf-c02';
+import { CLF_C02 } from '@/domain/exam-guide';
 import type { PracticeSessionSummary } from '@/domain/practice/session';
 import { EXAM_QUESTIONS } from '@/test/bank';
 import { examQuestion, makeAttempt, makeExam } from '@/test/exam';
@@ -14,6 +14,7 @@ const T0 = Date.UTC(2026, 9, 1, 9, 0, 0);
 
 const session = (id: string, finishedAt: number): PracticeSessionSummary => ({
   id,
+  examId: 'clf-c02',
   label: 'Domain 1',
   startedAt: finishedAt - 60_000,
   finishedAt,
@@ -41,7 +42,7 @@ function device(tables: FakeUserTables, driver: StorageDriver = createMemoryDriv
   const store = createAppStore({ driver, persistent: true, now: () => T0 });
   const sync = createSyncEngine({
     store,
-    remote: createUserDataRemote(tables, USER, EXAM_ID),
+    remote: createUserDataRemote(tables, USER),
     driver,
     debounceMs: 50,
     retryMs: [1_000],
@@ -224,7 +225,7 @@ describe('sync engine', () => {
       [
         {
           user_id: USER,
-          exam_id: EXAM_ID,
+          exam_id: CLF_C02.id,
           question_id: 'bad',
           attempts: 1,
           correct: 5, // more correct than attempts
@@ -239,7 +240,7 @@ describe('sync engine', () => {
     );
     await tables.upsert(
       'active_exams',
-      [{ user_id: USER, exam_id: EXAM_ID, session: { id: 'broken' } }],
+      [{ user_id: USER, exam_id: CLF_C02.id, session: { id: 'broken' } }],
       'user_id,exam_id',
     );
 

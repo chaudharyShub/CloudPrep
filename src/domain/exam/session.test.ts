@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { CLF_C02 } from '@/domain/exam-guide';
 import { makeMultiQuestion, makeQuestion } from '@/test/fixtures/questions';
-import { FULL_EXAM, shortExamConfig } from './config';
+import { fullExamConfig, shortExamConfig } from './config';
 import {
   answerState,
   createExamSession,
@@ -18,7 +19,7 @@ const START = 1_000_000;
 function newSession(overrides: Partial<Parameters<typeof createExamSession>[0]> = {}) {
   return createExamSession({
     id: 'exam-1',
-    config: shortExamConfig(3),
+    config: shortExamConfig(CLF_C02, 3),
     bankVersion: 'v1',
     seed: 99,
     startedAt: START,
@@ -35,7 +36,7 @@ describe('createExamSession', () => {
   it('sets absolute start and end times from the configured duration', () => {
     const session = createExamSession({
       id: 'x',
-      config: FULL_EXAM,
+      config: fullExamConfig(CLF_C02),
       bankVersion: 'v1',
       seed: 1,
       startedAt: START,

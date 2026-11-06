@@ -18,7 +18,7 @@ function navigatorButton(name: RegExp) {
 
 describe('QA journey C: full 65-question exam', () => {
   it('runs a full exam: 65 unique questions, 90 minutes, answer, change, flag, navigate, review, submit and score', async () => {
-    const { user, store } = renderApp('/exam');
+    const { user, store } = renderApp('/clf-c02/exam');
     await user.click(await screen.findByRole('button', { name: 'Start full exam' }));
     await user.click(screen.getByRole('button', { name: 'Start exam' }));
     await screen.findByRole('heading', { level: 1, name: 'Question 1 of 65' });

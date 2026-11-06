@@ -1,4 +1,4 @@
-import type { DomainId, TaskStatementId } from '@/domain/exam-guide/clf-c02';
+import type { DomainId, TaskStatementId } from '@/domain/exam-guide/types';
 import type { Question } from '@/domain/questions/types';
 import type { ExamKind } from './config';
 import {
@@ -31,6 +31,8 @@ export interface AttemptQuestion {
 export interface ExamAttempt {
   /** Same as the exam session id. */
   readonly id: string;
+  /** The exam it belongs to (D-066); saved attempts without one are CLF-C02. */
+  readonly examId: string;
   readonly kind: ExamKind;
   readonly bankVersion: string;
   readonly startedAt: number;
@@ -97,6 +99,7 @@ export function buildAttempt(
   const summary = summarizeAttemptQuestions(questions);
   return {
     id: session.id,
+    examId: session.examId,
     kind: session.kind,
     bankVersion: session.bankVersion,
     startedAt: session.startedAt,

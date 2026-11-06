@@ -12,6 +12,7 @@ import type { AttemptQuestion, ExamAttempt } from '@/domain/exam/attempt';
 import type { QuestionOutcome } from '@/domain/exam/scoring';
 import { evaluateAnswer } from '@/domain/questions/evaluate';
 import { cn } from '@/lib/cn';
+import { useExamPath } from '@/app/paths';
 import { useExamAttempts } from '@/state/hooks';
 import { BookmarkButton } from '@/features/shared/question/BookmarkButton';
 import { FeedbackPanel } from '@/features/shared/question/FeedbackPanel';
@@ -43,6 +44,7 @@ export function AnswerReviewPage() {
 }
 
 function AnswerReview({ attempt }: { attempt: ExamAttempt }) {
+  const path = useExamPath();
   const [params, setParams] = useSearchParams();
   const headingRef = useRef<HTMLHeadingElement>(null);
   const counts = { ...attempt.summary, all: attempt.summary.total };
@@ -76,7 +78,10 @@ function AnswerReview({ attempt }: { attempt: ExamAttempt }) {
         title="Answer review"
         description="Every question with your answer, the correct answer, and why each option is right or wrong."
         actions={
-          <Link to={`/results/${attempt.id}`} className={buttonClasses({ variant: 'secondary' })}>
+          <Link
+            to={path(`results/${attempt.id}`)}
+            className={buttonClasses({ variant: 'secondary' })}
+          >
             <ArrowLeft size={18} strokeWidth={1.75} aria-hidden="true" />
             Back to results
           </Link>

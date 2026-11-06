@@ -19,7 +19,7 @@ import { useToast } from '@/components/ui/Toast';
 import { downloadText, formatBytes } from '@/lib/download';
 import { formatDateTime } from '@/lib/format';
 import { useAppStore } from '@/state/StoreProvider';
-import { useUserData } from '@/state/hooks';
+import { useAllUserData } from '@/state/hooks';
 import { useUserDataScope } from '@/state/UserDataProvider';
 import type { BackupInfo, ImportMode } from '@/storage/store';
 import {
@@ -50,8 +50,8 @@ export function DataManagement() {
   const store = useAppStore();
   const { scope } = useUserDataScope();
   const clearCopy = scope === 'account' ? ACCOUNT_CLEAR_COPY : CLEAR_COPY;
-  // Subscribing re-renders this section whenever stored data changes.
-  const data = useUserData();
+  // Subscribing re-renders this section whenever stored data changes (every exam's, D-066).
+  const data = useAllUserData();
   const { showToast } = useToast();
   const fileInput = useRef<HTMLInputElement>(null);
   const fileInputId = useId();

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { DomainId, TaskStatementId } from '@/domain/exam-guide/clf-c02';
+import { CLF_C02, type DomainId, type TaskStatementId } from '@/domain/exam-guide';
 import type { AttemptQuestion, ExamAttempt } from '@/domain/exam/attempt';
 import { summarizeAttemptQuestions } from '@/domain/exam/attempt';
 import { meetsBenchmark, type QuestionOutcome } from '@/domain/exam/scoring';
@@ -52,6 +52,7 @@ function attempt(
   const summary = summarizeAttemptQuestions(questions);
   return {
     id,
+    examId: 'clf-c02',
     kind: 'full',
     bankVersion: 'v',
     startedAt: 0,
@@ -84,25 +85,27 @@ const balanced = (id: string, pct: number, at: number) =>
 describe('weakAreas and nextSteps', () => {
   it('lists domains below the benchmark, most costly (by exam weight) first', () => {
     const a = attempt('a', { D1: [5, 10], D3: [5, 10], D4: [9, 10] });
-    const weak = weakAreas(a, 70);
+    const weak = weakAreas(a, 70, CLF_C02.domains);
     // D3 (34%) outranks D1 (24%) at the same score; D4 is above the benchmark.
     expect(weak.domains.map((d) => d.domain)).toEqual(['D3', 'D1']);
   });
 
   it('lists topics with at least two misses', () => {
     const a = attempt('a', { D1: [1, 4], D2: [3, 4] });
-    expect(weakAreas(a, 70).topics).toEqual([{ taskStatement: '1.1', missed: 3, total: 4 }]);
+    expect(weakAreas(a, 70, CLF_C02.domains).topics).toEqual([
+      { taskStatement: '1.1', missed: 3, total: 4 },
+    ]);
   });
 
   it('suggests pacing, weak domains, missed questions and a retake', () => {
     const a = attempt('a', { D1: [2, 6], D2: [5, 6] }, { unanswered: 2 });
-    const kinds = nextSteps(a).map((s) => s.kind);
+    const kinds = nextSteps(a, CLF_C02.domains).map((s) => s.kind);
     expect(kinds).toEqual(['pacing', 'practise-domain', 'practise-missed', 'retake']);
   });
 
   it('suggests confirming consistency after meeting the benchmark', () => {
     const a = attempt('a', { D1: [10, 10] });
-    expect(nextSteps(a).map((s) => s.kind)).toEqual(['confirm-consistency']);
+    expect(nextSteps(a, CLF_C02.domains).map((s) => s.kind)).toEqual(['confirm-consistency']);
   });
 });
 

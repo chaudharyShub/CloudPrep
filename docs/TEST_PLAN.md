@@ -1,6 +1,6 @@
 # CloudPrep — Test Plan
 
-> Status: **Describes the tests as built** (version 3.5.0) · Last updated: 2026-11-04
+> Status: **Describes the tests as built** (version 4.0.0) · Last updated: 2026-11-05
 > This replaces the first draft of 2026-10-21, which planned spec files and a fixture flag that were never created.
 
 ## 1. Strategy at a glance
@@ -8,7 +8,7 @@
 | Layer | Tool | What it covers | Where |
 |---|---|---|---|
 | Unit | Vitest | Domain logic (blueprint, selection, session reducer, timer, scoring, attempts, practice, progress, review schedule, readiness, proctor rules, validator, PRNG), storage (envelope, areas, migrations, store, sync, transfer, account copy, question cache), backend mappers and adapters | `src/**/*.test.ts` |
-| Content | Vitest + `validate:questions` | Every question in the real bank against the validator | `src/content/questions/bank.test.ts`, `scripts/validate-questions.mjs` |
+| Content | Vitest + `validate:questions` | Every question in every exam's bank against the validator, ids with the exam's prefix, unique ids across exams (D-066) | `src/content/banks.test.ts`, `scripts/validate-questions.mjs` |
 | Database | Vitest + PGlite | Migrations, RLS, grants, constraints, publish rows and a real sync round trip | `src/backend/schema.test.ts` |
 | Component | Vitest + jsdom + Testing Library + user-event | UI primitives and whole pages rendered through `renderApp` | `src/**/*.test.tsx` |
 | End-to-end | Playwright (Chromium, WebKit, Pixel 7) | User journeys against a production-like build with a fake sign-in | `tests/e2e/*.spec.ts` |
@@ -21,8 +21,8 @@ Test philosophy: test behaviour, not implementation. Query by role and label. No
 
 ## 2. Test data and helpers
 
-- **Test bank** (`src/test/bank.ts`, `src/test/fixtures/`): a small fixture bank for most unit and component tests. `FullExam.test.tsx` and `ExamUnavailable.test.tsx` swap in a generated or tiny bank with `vi.mock` (D-040).
-- **`renderApp(path, options)`** (`src/test/renderApp.tsx`): renders the real routes with an in-memory store, a ready question bank, and a fake sign-in that is signed in by default. Pass `createFakeAuthClient()` for a guest, `admin` (`createFakeAdminClient({ admin: true, users })`) for the Admin page, a loader to test question loading, or `accounts` (`createAccountManager` with `createFakeUserTables`) to test sync and guest data.
+- **Test bank** (`src/test/bank.ts`, `src/test/fixtures/`): a small fixture bank for most unit and component tests. `SAA_TEST_BANK` and `DVA_TEST_BANK` are generated banks for SAA-C03 and DVA-C03 (`makeBank(perDomain, exam)`), until those exams have real questions (D-066). `FullExam.test.tsx` and `ExamUnavailable.test.tsx` swap in a generated or tiny bank with `vi.mock` (D-040).
+- **`renderApp(path, options)`** (`src/test/renderApp.tsx`): renders the real routes with an in-memory store, a ready question bank, and a fake sign-in that is signed in by default. Paths include the exam (`/clf-c02/practice`, D-066); the default is `/clf-c02/dashboard`. Pass `banks: [TEST_BANK, SAA_TEST_BANK, DVA_TEST_BANK]` to have the other exams ready too. Pass `createFakeAuthClient()` for a guest, `admin` (`createFakeAdminClient({ admin: true, users })`) for the Admin page, a loader to test question loading, or `accounts` (`createAccountManager` with `createFakeUserTables`) to test sync and guest data.
 - **E2E build:** `npm run test:e2e` builds `dist-e2e/` with `vite build --mode e2e`. That build uses the bundled questions and a fake sign-in that reads `cloudprep-e2e-auth` from `localStorage`; production builds contain neither (D-045, D-046).
 - **E2E fixtures** (`tests/e2e/support/fixtures.ts`): import `test` / `expect` from here. Signed in by default; `test.use({ signedIn: false })` for guests; `test.use({ sync: true })` adds a fake server. Specs that seed storage while signed in use the `cloudprep-account:` keys.
 - **AI proctor:** unit tests use fake readings and devices; E2E tests script the models through `window.__cloudprepProctorAnalyzer`, with Chromium's fake camera and a silent fake microphone (`tests/e2e/fixtures/silence.wav`).
@@ -34,9 +34,9 @@ Test philosophy: test behaviour, not implementation. Query by role and label. No
 
 | Spec | Covers |
 |---|---|
-| `app-shell.spec.ts` | Every page passes axe (dark and light), not-found page, sidebar vs menu drawer, skip link, keyboard navigation, dialog focus |
+| `app-shell.spec.ts` | Every page passes axe (dark and light) and names its exam in the tab title (AC-M.10), an old address opens the CLF-C02 page (AC-M.2), not-found page, sidebar vs menu drawer, skip link, keyboard navigation, dialog focus |
 | `admin.spec.ts` | Admin page: guests go to sign-in, non-admins see no data, admins see the user list (AC-A.1–A.3); only admins get the Admin link (AC-A.5) |
-| `landing.spec.ts` | Landing page motion: entrance, demo answer, scroll reveals and bars end fully visible and pass axe; reduced motion shows everything at once (AC-V.9) |
+| `landing.spec.ts` | Landing page motion: entrance, demo answer, scroll reveals and bars end fully visible and pass axe; reduced motion shows everything at once (AC-V.9); an exam's own landing page (`/saa-c03`) with its facts, example and exam chooser passes axe (AC-M.3) |
 | `auth.spec.ts` | Guests get the landing page at `/` (AC-V.7), are sent to sign-in from account-only pages and keep Learning mode; email link request; Google sign-in returns to the page; sign-out (AC-B.6–B.10) |
 | `learning-mode.spec.ts` | Domain practice, checking answers, bookmarks, progress after reload, session summary, keyboard-only answers, phone layout, recovery from corrupt saved progress, old progress shown as review due (AC-R.7), the Review due "i" panel fitting a phone screen and passing axe (AC-I.5) |
 | `exam.spec.ts` | Full exam (answer, flag, review, confirm, results), restore after reload with absolute timing, low-time warnings and auto-submit at zero, expired while closed, mobile layout |
@@ -56,7 +56,7 @@ Projects: `chromium`, `webkit` and `mobile` (Pixel 7) run everything except `@re
 | R-2 Correct time and answers after a reload | `timer.test.ts`, `exam.spec.ts` (restore after reload) |
 | R-3 Submitted exactly once | `session.test.ts`, `Exam.test.tsx` ("submits once…", auto-submit, expired while closed) |
 | R-4 No answers in exam pages | `session.test.ts` (no correct answers in the session), `Exam.test.tsx` ("never puts correct answers or explanations in the page…") |
-| R-5 Every question valid | `validate.test.ts` (one case per rule), `bank.test.ts`, `npm run validate:questions` |
+| R-5 Every question valid | `validate.test.ts` (one case per rule, and per exam), `banks.test.ts`, `npm run validate:questions` |
 | R-6 Keyboard and axe | `app-shell.spec.ts`, keyboard tests in `learning-mode.spec.ts` and `qa-journeys.spec.ts`, jsx-a11y lint |
 | R-7 Export / import round trip | `transfer.test.ts`, `DataManagement.test.tsx`, `data.spec.ts` |
 | R-8 Corrupt or unavailable storage | `storage.test.ts`, `driver.test.ts`, `examStorage.test.ts`, `historyStorage.test.ts`, `learning-mode.spec.ts` (corrupt progress) |
@@ -65,7 +65,7 @@ Projects: `chromium`, `webkit` and `mobile` (Pixel 7) run everything except `@re
 
 ## 5. Acceptance-criteria tags
 
-Criteria from Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`), Review due (`AC-R.x`, D-052) search engine files (`AC-S.x`, D-063, `src/app/seo.test.ts`) reloading after a deploy (`AC-U.x`, D-053) the admin page and its link (`AC-A.x`, D-054, D-055) the developer credit, the Frontend Interview Prep link and the Shubham Works footer (`AC-D.x`, D-056, D-059, D-061, D-062, `PrivacyPage.test.tsx`) Speed Insights on the Privacy page (`AC-W.x`, D-065, `PrivacyPage.test.tsx`) the "i" explanation (`AC-I.x`, D-058: `InfoTip.test.tsx`, the Learning mode and dashboard page tests, and `learning-mode.spec.ts` on a phone screen with axe) and the UI redesign (`AC-V.x`, D-057: colour contrast of every token pair in `src/styles/tokens.test.ts`, including the `maker` colour of the Shubham Works mark (D-062), `weakestDomain` and `formatMinutes`, the dashboard, the Learning mode answer sheet, and the landing page and its motion in `LandingPage.test.tsx`, `motion.test.ts`, `landing.spec.ts` and `auth.spec.ts`) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
+Criteria from more exams (`AC-M.x`, D-066: `examGuide.test.ts`, `blueprint.test.ts`, `select.test.ts`, `validate.test.ts`, `banks.test.ts`, `contentRows.test.ts`, `examScope.test.ts`, `userDataRemoteExams.test.ts`, `QuestionBankProvider.test.tsx`, `CurrentExam.test.ts`, `ExamSwitcher.test.ts`, `multiExam.test.tsx`, `navigation.test.tsx`, `seo.test.ts`, `app-shell.spec.ts`, `landing.spec.ts`), Phase 7 (AI proctoring, `AC-7.x`), Phase 8 (backend, `AC-B.x`), Review due (`AC-R.x`, D-052) search engine files (`AC-S.x`, D-063, `src/app/seo.test.ts`) reloading after a deploy (`AC-U.x`, D-053) the admin page and its link (`AC-A.x`, D-054, D-055) the developer credit, the Frontend Interview Prep link and the Shubham Works footer (`AC-D.x`, D-056, D-059, D-061, D-062, `PrivacyPage.test.tsx`) Speed Insights on the Privacy page (`AC-W.x`, D-065, `PrivacyPage.test.tsx`) the "i" explanation (`AC-I.x`, D-058: `InfoTip.test.tsx`, the Learning mode and dashboard page tests, and `learning-mode.spec.ts` on a phone screen with axe) and the UI redesign (`AC-V.x`, D-057: colour contrast of every token pair in `src/styles/tokens.test.ts`, including the `maker` colour of the Shubham Works mark (D-062), `weakestDomain` and `formatMinutes`, the dashboard, the Learning mode answer sheet, and the landing page and its motion in `LandingPage.test.tsx`, `motion.test.ts`, `landing.spec.ts` and `auth.spec.ts`) are tagged in test titles, for example `it('AC-B.4 content rows hold no answers or explanations', …)`; search for `AC-` to find them. The earlier phases (P0–P9 in IMPLEMENTATION_PLAN.md) were verified by the tests above without tags, and old tests weren't renamed after the fact (D-051). New acceptance criteria are tagged.
 
 ## 6. Manual checks (each release)
 

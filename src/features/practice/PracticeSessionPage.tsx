@@ -17,21 +17,23 @@ import {
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { cn } from '@/lib/cn';
 import { newId, newSeed } from '@/lib/ids';
+import { useExamPath } from '@/app/paths';
 import { useAppStore } from '@/state/StoreProvider';
-import { usePracticeQuestions } from '@/state/hooks';
+import { useCurrentExam, usePracticeQuestions } from '@/state/hooks';
 import { BookmarkButton } from '@/features/shared/question/BookmarkButton';
 import { FeedbackPanel } from '@/features/shared/question/FeedbackPanel';
 import { OptionList } from '@/features/shared/question/OptionList';
 import { QuestionMeta } from '@/features/shared/question/QuestionMeta';
-import { parseSessionSetup, type SessionSetup } from './sessionSetup';
+import { parseSessionSetup, SESSION_PAGE, type SessionSetup } from './sessionSetup';
 import { SessionSummaryView } from './SessionSummaryView';
 
 const NUMBER_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five'];
 
 export function PracticeSessionPage() {
   const location = useLocation();
+  const path = useExamPath();
   const setup = parseSessionSetup(location.state);
-  if (!setup) return <Navigate to="/practice" replace />;
+  if (!setup) return <Navigate to={path('practice')} replace />;
   // A new navigation (e.g. "Retry incorrect") starts a fresh session.
   return <PracticeSessionRunner key={location.key} setup={setup} />;
 }
@@ -39,6 +41,8 @@ export function PracticeSessionPage() {
 function PracticeSessionRunner({ setup }: { setup: SessionSetup }) {
   const store = useAppStore();
   const navigate = useNavigate();
+  const exam = useCurrentExam();
+  const path = useExamPath();
   const { byId } = usePracticeQuestions();
   const [session, dispatch] = useReducer(practiceReducer, setup, (initial): PracticeSession => {
     const questions = initial.questionIds
@@ -46,6 +50,7 @@ function PracticeSessionRunner({ setup }: { setup: SessionSetup }) {
       .filter((question): question is Question => question !== undefined);
     return createPracticeSession({
       id: newId(),
+      examId: exam.id,
       label: initial.label,
       seed: newSeed(),
       startedAt: Date.now(),
@@ -89,7 +94,7 @@ function PracticeSessionRunner({ setup }: { setup: SessionSetup }) {
         session={session}
         questionsById={byId}
         onRetry={(questionIds) => {
-          void navigate('/practice/session', {
+          void navigate(path(SESSION_PAGE), {
             state: {
               setup: {
                 label: `Retry: ${session.label.replace(/^Retry: /, '')}`,
@@ -105,7 +110,7 @@ function PracticeSessionRunner({ setup }: { setup: SessionSetup }) {
 
   const questionId = session.questionIds[session.currentIndex];
   const question = questionId ? byId.get(questionId) : undefined;
-  if (!question) return <Navigate to="/practice" replace />;
+  if (!question) return <Navigate to={path('practice')} replace />;
 
   const answer = session.answers[question.id] ?? { selected: [], result: null };
   const outcomes =
@@ -138,7 +143,7 @@ function PracticeSessionRunner({ setup }: { setup: SessionSetup }) {
   }
 
   function exit() {
-    if (checkedCount === 0) void navigate('/practice');
+    if (checkedCount === 0) void navigate(path('practice'));
     else setConfirmExit(true);
   }
 

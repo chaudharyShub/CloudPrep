@@ -29,5 +29,6 @@ describe('formatDocumentTitle', () => {
   it('suffixes the app name', () => {
     expect(formatDocumentTitle('Settings')).toBe('Settings · CloudPrep');
     expect(formatDocumentTitle('')).toBe('CloudPrep');
+    expect(formatDocumentTitle('Mock exam', 'SAA-C03')).toBe('Mock exam · SAA-C03 · CloudPrep');
   });
 });

@@ -1,8 +1,11 @@
-// Flags near-duplicate questions: stems (plus correct answers) with very similar wording.
-// Usage: node scripts/check-duplicates.mjs [threshold=0.6]   (exits 1 if any pair is above it)
+// Flags near-duplicate questions: stems (plus correct answers) with very similar wording,
+// within each exam's bank (D-066).
+// Usage: node scripts/check-duplicates.mjs [threshold=0.6] [exam id]   (exits 1 if any pair is
+// above it; without an exam id, every exam is checked)
 import { createServer } from 'vite';
 
 const threshold = Number(process.argv[2] ?? '0.6');
+const onlyExam = process.argv[3];
 const server = await createServer({
   appType: 'custom',
   logLevel: 'error',
@@ -34,25 +37,30 @@ const jaccard = (a, b) => {
 
 let exitCode = 0;
 try {
-  const { QUESTION_BANK } = await server.ssrLoadModule('/src/content/questions/index.ts');
-  const items = QUESTION_BANK.map((q) => {
-    const correct = q.options
-      .filter((o) => q.correctOptionIds.includes(o.id))
-      .map((o) => o.text)
-      .join(' ');
-    return { id: q.id, sig: shingles(`${q.stem} ${correct}`) };
-  });
-  const pairs = [];
-  for (let i = 0; i < items.length; i++) {
-    for (let j = i + 1; j < items.length; j++) {
-      const score = jaccard(items[i].sig, items[j].sig);
-      if (score >= threshold) pairs.push([score, items[i].id, items[j].id]);
+  const { BANKS } = await server.ssrLoadModule('/src/content/banks.ts');
+  for (const [examId, bank] of Object.entries(BANKS)) {
+    if (onlyExam && examId !== onlyExam) continue;
+    const items = bank.questions.map((q) => {
+      const correct = q.options
+        .filter((o) => q.correctOptionIds.includes(o.id))
+        .map((o) => o.text)
+        .join(' ');
+      return { id: q.id, sig: shingles(`${q.stem} ${correct}`) };
+    });
+    const pairs = [];
+    for (let i = 0; i < items.length; i++) {
+      for (let j = i + 1; j < items.length; j++) {
+        const score = jaccard(items[i].sig, items[j].sig);
+        if (score >= threshold) pairs.push([score, items[i].id, items[j].id]);
+      }
     }
+    pairs.sort((a, b) => b[0] - a[0]);
+    for (const [score, a, b] of pairs) console.log(`${score.toFixed(2)}  ${a}  ${b}`);
+    console.log(
+      `${examId}: ${bank.questions.length} questions, ${pairs.length} pairs at or above ${threshold}`,
+    );
+    if (pairs.length > 0) exitCode = 1;
   }
-  pairs.sort((a, b) => b[0] - a[0]);
-  for (const [score, a, b] of pairs) console.log(`${score.toFixed(2)}  ${a}  ${b}`);
-  console.log(`${QUESTION_BANK.length} questions, ${pairs.length} pairs at or above ${threshold}`);
-  if (pairs.length > 0) exitCode = 1;
 } finally {
   await server.close();
 }

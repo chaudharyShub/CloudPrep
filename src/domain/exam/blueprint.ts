@@ -1,4 +1,4 @@
-import { DOMAINS, type DomainId } from '@/domain/exam-guide/clf-c02';
+import { DOMAIN_IDS, type DomainId, type ExamDomain } from '@/domain/exam-guide/types';
 
 export type DomainCounts = Record<DomainId, number>;
 
@@ -11,14 +11,14 @@ export type DomainCounts = Record<DomainId, number>;
  *    fractional remainders. Ties go to the domain with the larger weight, then to the
  *    lower domain number, so the result is always deterministic.
  *
- * The result always sums to `total`. For 65 questions: 15.6 / 19.5 / 22.1 / 7.8 → 16 / 19 / 22 / 8.
+ * The result always sums to `total`. For 65 CLF-C02 questions: 15.6 / 19.5 / 22.1 / 7.8 → 16 / 19 / 22 / 8.
  * The official weights apply to the 50 scored questions; applying them to all 65 is an
  * approximation (docs/DECISIONS.md D-007).
  */
-export function allocateByWeight(total: number): DomainCounts {
+export function allocateByWeight(total: number, domains: readonly ExamDomain[]): DomainCounts {
   if (!Number.isInteger(total) || total < 0)
     throw new RangeError('total must be a non-negative integer');
-  const exact = DOMAINS.map((domain) => ({
+  const exact = domains.map((domain) => ({
     domain,
     share: (total * domain.weightPercent) / 100,
   }));
@@ -42,13 +42,17 @@ export function allocateByWeight(total: number): DomainCounts {
 
 /** True when every domain has at least as many questions available as it needs. */
 export function fitsAvailability(required: DomainCounts, available: DomainCounts): boolean {
-  return DOMAINS.every((domain) => available[domain.id] >= required[domain.id]);
+  return DOMAIN_IDS.every((id) => available[id] >= required[id]);
 }
 
 /** The largest balanced exam (≤ `upTo` questions) the available questions can supply. */
-export function maxBalancedQuestionCount(available: DomainCounts, upTo: number): number {
+export function maxBalancedQuestionCount(
+  available: DomainCounts,
+  upTo: number,
+  domains: readonly ExamDomain[],
+): number {
   for (let n = upTo; n > 0; n--) {
-    if (fitsAvailability(allocateByWeight(n), available)) return n;
+    if (fitsAvailability(allocateByWeight(n, domains), available)) return n;
   }
   return 0;
 }

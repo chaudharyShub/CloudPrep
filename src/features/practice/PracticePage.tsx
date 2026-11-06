@@ -9,30 +9,24 @@ import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Field, SegmentedControl, Select, Switch } from '@/components/ui/FormControls';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { DOMAINS, type DomainId, type TaskStatementId } from '@/domain/exam-guide/clf-c02';
+import { useExamPath } from '@/app/paths';
+import type { DomainId } from '@/domain/exam-guide';
 import { mistakeIds, practiceStats } from '@/domain/practice/progress';
 import { localDay, reviewOverview } from '@/domain/practice/review';
 import { filterQuestions } from '@/domain/questions/query';
 import type { Difficulty } from '@/domain/questions/types';
 import { useNow } from '@/hooks/useNow';
 import { formatDateTime, formatPercent } from '@/lib/format';
-import { usePracticeQuestions, useUserData } from '@/state/hooks';
+import { useCurrentExam, usePracticeQuestions, useUserData } from '@/state/hooks';
 import { describeDueDay, questionCount, reviewSessionSetup } from './reviewSession';
 import { ReviewDueInfo } from './ReviewDueInfo';
-import { SESSION_PATH, sessionState, type SessionSetup } from './sessionSetup';
+import { SESSION_PAGE, sessionState, type SessionSetup } from './sessionSetup';
 
 type DomainChoice = 'all' | DomainId;
-type TopicChoice = 'all' | TaskStatementId;
+/** 'all' or a task statement id. */
+type TopicChoice = string;
 type DifficultyChoice = 'any' | Difficulty;
 type LengthChoice = '5' | '10' | '20' | 'all';
-
-const DOMAIN_OPTIONS: readonly { value: DomainChoice; label: string }[] = [
-  { value: 'all', label: 'All domains' },
-  ...DOMAINS.map((domain) => ({
-    value: domain.id,
-    label: `Domain ${domain.number}: ${domain.name}`,
-  })),
-];
 
 const DIFFICULTY_OPTIONS = [
   { value: 'any', label: 'Any' },
@@ -54,6 +48,13 @@ const REVIEW_REFRESH_MS = 60_000;
 
 export function PracticePage() {
   const navigate = useNavigate();
+  const exam = useCurrentExam();
+  const path = useExamPath();
+  const domains = exam.domains;
+  const domainOptions: readonly { value: DomainChoice; label: string }[] = [
+    { value: 'all', label: 'All domains' },
+    ...domains.map((d) => ({ value: d.id, label: `Domain ${d.number}: ${d.name}` })),
+  ];
   const { questions, byId, ids } = usePracticeQuestions();
   const { progress, bookmarks, sessions, preferences } = useUserData();
 
@@ -63,7 +64,7 @@ export function PracticePage() {
   const [length, setLength] = useState<LengthChoice>(preferences.practiceSessionLength);
   const [unansweredOnly, setUnansweredOnly] = useState(false);
 
-  const selectedDomain = DOMAINS.find((d) => d.id === domain);
+  const selectedDomain = domains.find((d) => d.id === domain);
   const topicOptions: readonly { value: TopicChoice; label: string }[] = [
     { value: 'all', label: 'All topics' },
     ...(selectedDomain?.taskStatements.map((task) => ({
@@ -100,7 +101,7 @@ export function PracticePage() {
   );
 
   function start(setup: SessionSetup) {
-    void navigate(SESSION_PATH, { state: sessionState(setup) });
+    void navigate(path(SESSION_PAGE), { state: sessionState(setup) });
   }
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
@@ -122,7 +123,7 @@ export function PracticePage() {
     <>
       <PageHeader
         title="Learning mode"
-        description="Practise by domain or topic. Check each answer as you go and read why every option is right or wrong."
+        description={`Practise ${exam.code} by domain or topic. Check each answer as you go and read why every option is right or wrong.`}
       />
 
       {questions.length === 0 ? (
@@ -148,7 +149,7 @@ export function PracticePage() {
                       <Select
                         id={id}
                         value={domain}
-                        options={DOMAIN_OPTIONS}
+                        options={domainOptions}
                         onValueChange={(value) => {
                           setDomain(value);
                           setTopic('all');
@@ -220,7 +221,7 @@ export function PracticePage() {
               to each question.
             </p>
             <ul className="grid gap-4 md:grid-cols-2">
-              {DOMAINS.map((d) => {
+              {domains.map((d) => {
                 const domainStats = stats.byDomain[d.id];
                 return (
                   <li key={d.id} className="min-w-0">
@@ -357,7 +358,7 @@ export function PracticePage() {
                   description="Questions you saved to come back to."
                   action={
                     <Link
-                      to="/bookmarks"
+                      to={path('bookmarks')}
                       className={buttonClasses({ variant: 'ghost', size: 'sm' })}
                     >
                       View all

@@ -1,9 +1,17 @@
-import { DOMAINS, type DomainId } from '@/domain/exam-guide/clf-c02';
+import { DOMAIN_IDS as ALL_DOMAIN_IDS, type DomainId } from '@/domain/exam-guide/types';
 import type { ProgressMap, QuestionProgress } from '@/domain/practice/progress';
 import { isReviewLevel, legacyReviewLevel } from '@/domain/practice/review';
 import type { DomainTally, PracticeSessionSummary } from '@/domain/practice/session';
 import type { AreaDefinition, Parsed } from './envelope';
-import { isCount, isNonEmptyString, isRecord, isSafeKey, isTimestamp } from './guards';
+import {
+  capPerExam,
+  isCount,
+  isNonEmptyString,
+  isRecord,
+  isSafeKey,
+  isTimestamp,
+  parseExamId,
+} from './guards';
 
 /**
  * Persisted storage areas. Each has its own key and schema version, so a problem in one
@@ -15,7 +23,7 @@ export type Bookmarks = Readonly<Record<string, { readonly addedAt: number }>>;
 /** Newest first. Older summaries beyond this are dropped. */
 export const MAX_SESSION_SUMMARIES = 50;
 
-const DOMAIN_IDS = new Set<string>(DOMAINS.map((domain) => domain.id));
+const DOMAIN_IDS = new Set<string>(ALL_DOMAIN_IDS);
 
 function parseQuestionProgress(value: unknown): QuestionProgress | null {
   if (!isRecord(value)) return null;
@@ -138,8 +146,10 @@ function parseSummary(value: unknown): PracticeSessionSummary | null {
   const { id, label, startedAt, finishedAt, total, answered, correct, incorrectQuestionIds } =
     value;
   const byDomain = parseByDomain(value['byDomain']);
+  const examId = parseExamId(value['examId']);
   if (
     !isNonEmptyString(id) ||
+    examId === null ||
     typeof label !== 'string' ||
     !isTimestamp(startedAt) ||
     !isTimestamp(finishedAt) ||
@@ -156,6 +166,7 @@ function parseSummary(value: unknown): PracticeSessionSummary | null {
   }
   return {
     id,
+    examId,
     label,
     startedAt,
     finishedAt,
@@ -181,7 +192,7 @@ export function parseSessions(data: unknown): Parsed<readonly PracticeSessionSum
       dropped++;
     }
   }
-  return { value: value.slice(0, MAX_SESSION_SUMMARIES), dropped };
+  return { value: capPerExam(value, MAX_SESSION_SUMMARIES), dropped };
 }
 
 export const PROGRESS_AREA: AreaDefinition<ProgressMap> = {

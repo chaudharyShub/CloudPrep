@@ -1,4 +1,4 @@
-import { DOMAINS, type DomainId } from '@/domain/exam-guide/clf-c02';
+import { DOMAIN_IDS, type DomainId } from '@/domain/exam-guide/types';
 
 /**
  * Deterministic exam scoring. No partial credit (docs/DECISIONS.md D-012):
@@ -67,7 +67,7 @@ function emptyDomain(): DomainResult {
 export function summarizeOutcomes(
   records: readonly { domain: DomainId; outcome: QuestionOutcome }[],
 ): ScoreSummary {
-  const byDomain = Object.fromEntries(DOMAINS.map((d) => [d.id, emptyDomain()])) as Record<
+  const byDomain = Object.fromEntries(DOMAIN_IDS.map((id) => [id, emptyDomain()])) as Record<
     DomainId,
     DomainResult
   >;

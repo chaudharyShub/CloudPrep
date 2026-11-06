@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CLF_C02 } from '@/domain/exam-guide';
 import { indexQuestions } from '@/domain/questions/query';
 import { makeMultiQuestion, makeQuestion } from '@/test/fixtures/questions';
 import { buildAttempt, snapshotKey, timeUsed } from './attempt';
@@ -15,7 +16,7 @@ const START = 1_000;
 function submittedSession(actions: ExamAction[], submitAt = START + 60_000) {
   const session = createExamSession({
     id: 'exam-1',
-    config: shortExamConfig(4),
+    config: shortExamConfig(CLF_C02, 4),
     bankVersion: 'v1',
     seed: 1,
     startedAt: START,
@@ -97,7 +98,7 @@ describe('buildAttempt', () => {
   it('refuses to build an attempt from an unsubmitted session', () => {
     const session = createExamSession({
       id: 'x',
-      config: shortExamConfig(1),
+      config: shortExamConfig(CLF_C02, 1),
       bankVersion: 'v1',
       seed: 1,
       startedAt: 0,

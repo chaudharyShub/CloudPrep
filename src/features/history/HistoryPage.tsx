@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { useExamPath } from '@/app/paths';
 import { ChevronRight, History } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/Badge';
@@ -6,15 +7,17 @@ import { buttonClasses } from '@/components/ui/buttonStyles';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { formatDateTime } from '@/lib/format';
-import { useExamAttempts } from '@/state/hooks';
+import { useCurrentExam, useExamAttempts } from '@/state/hooks';
 
 export function HistoryPage() {
   const attempts = useExamAttempts();
+  const exam = useCurrentExam();
+  const path = useExamPath();
   return (
     <>
       <PageHeader
         title="Exam history"
-        description="Your submitted mock exams in this browser, newest first."
+        description={`Your submitted ${exam.code} mock exams, newest first.`}
       />
       <Card>
         {attempts.length === 0 ? (
@@ -23,7 +26,7 @@ export function HistoryPage() {
             title="No exam attempts yet"
             description="Each mock exam you submit will be listed here, so you can review answers and track your scores."
             action={
-              <Link to="/exam" className={buttonClasses({ variant: 'secondary' })}>
+              <Link to={path('exam')} className={buttonClasses({ variant: 'secondary' })}>
                 Go to mock exam
               </Link>
             }
@@ -36,7 +39,7 @@ export function HistoryPage() {
               return (
                 <li key={attempt.id}>
                   <Link
-                    to={`/results/${attempt.id}`}
+                    to={path(`results/${attempt.id}`)}
                     className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-surface-2"
                   >
                     <span className="min-w-0 flex-1">

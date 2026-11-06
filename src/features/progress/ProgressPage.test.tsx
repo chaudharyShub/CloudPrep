@@ -25,7 +25,7 @@ function addAttempt(
 
 describe('ProgressPage', () => {
   it('shows honest empty states with no history', async () => {
-    renderApp('/progress');
+    renderApp('/clf-c02/progress');
     await screen.findByRole('heading', { level: 1, name: 'Progress' });
     expect(screen.getByText('Not enough data yet')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'No exams yet' })).toBeVisible();
@@ -37,7 +37,7 @@ describe('ProgressPage', () => {
   it('gives no readiness judgement after a single perfect exam', async () => {
     const store = createTestStore();
     addAttempt(store, 'a', 5, 1_000);
-    renderApp('/progress', { store });
+    renderApp('/clf-c02/progress', { store });
     await screen.findByRole('heading', { level: 1, name: 'Progress' });
     expect(screen.getByText('Not enough data yet')).toBeVisible();
     expect(screen.getByText('1 of 3 taken')).toBeVisible();
@@ -51,7 +51,7 @@ describe('ProgressPage', () => {
     const store = createTestStore();
     addAttempt(store, 'a', 2, 1_000);
     addAttempt(store, 'b', 4, 2_000);
-    renderApp('/progress', { store });
+    renderApp('/clf-c02/progress', { store });
     const table = await screen.findByRole('table', { name: 'Recent exam scores, oldest first' });
     const rows = within(table).getAllByRole('row').slice(1);
     expect(rows.map((r) => within(r).getAllByRole('cell')[2]?.textContent)).toEqual(['40%', '80%']);
@@ -63,7 +63,7 @@ describe('ProgressPage', () => {
     const id = q(0).id;
     store.recordAnswer({ questionId: id, isCorrect: false, at: 1, sessionId: 's1' });
     store.recordAnswer({ questionId: id, isCorrect: false, at: 2, sessionId: 's2' });
-    const { user, router } = renderApp('/progress', { store });
+    const { user, router } = renderApp('/clf-c02/progress', { store });
     await screen.findByRole('heading', { level: 1, name: 'Progress' });
 
     expect(screen.getByText('Missed 2 of 2')).toBeVisible();
@@ -72,7 +72,7 @@ describe('ProgressPage', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Repeated mistakes' }),
     ).toBeVisible();
-    expect(router.state.location.pathname).toBe('/practice/session');
+    expect(router.state.location.pathname).toBe('/clf-c02/practice/session');
   });
 
   it('explains the criteria behind readiness guidance after three exams', async () => {
@@ -80,7 +80,7 @@ describe('ProgressPage', () => {
     addAttempt(store, 'a', 5, 1_000);
     addAttempt(store, 'b', 5, 2_000);
     addAttempt(store, 'c', 5, 3_000);
-    renderApp('/progress', { store });
+    renderApp('/clf-c02/progress', { store });
     await screen.findByRole('heading', { level: 1, name: 'Progress' });
     // Perfect scores but too few questions per domain: never the top level.
     expect(screen.getByText('Approaching your benchmark')).toBeVisible();
@@ -93,7 +93,7 @@ describe('Dashboard readiness', () => {
   it('summarises the latest exam without implying readiness from one attempt', async () => {
     const store = createTestStore();
     addAttempt(store, 'a', 4, 1_000);
-    renderApp('/dashboard', { store });
+    renderApp('/clf-c02/dashboard', { store });
     await screen.findByRole('heading', { level: 1, name: 'Dashboard' });
     // The card is named for what it shows (one exam), not "Readiness".
     expect(screen.queryByRole('heading', { name: 'Readiness' })).not.toBeInTheDocument();
@@ -103,6 +103,9 @@ describe('Dashboard readiness', () => {
     expect(latest).toHaveTextContent('80%');
     expect(screen.getByText('Practice benchmark met (70%)')).toBeVisible();
     expect(screen.getByText('Readiness guidance starts after 3 exams (1 so far).')).toBeVisible();
-    expect(screen.getByRole('link', { name: 'See progress' })).toHaveAttribute('href', '/progress');
+    expect(screen.getByRole('link', { name: 'See progress' })).toHaveAttribute(
+      'href',
+      '/clf-c02/progress',
+    );
   });
 });

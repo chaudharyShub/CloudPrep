@@ -30,18 +30,22 @@ import {
   type DomainEvidence,
   type ReadinessAssessment,
 } from '@/domain/analytics/readiness';
-import { DOMAINS } from '@/domain/exam-guide/clf-c02';
+import { useExamPath } from '@/app/paths';
+import type { ExamGuide } from '@/domain/exam-guide';
 import { practiceStats } from '@/domain/practice/progress';
 import { formatDateTime, formatPercent } from '@/lib/format';
 import { cn } from '@/lib/cn';
-import { usePracticeQuestions, useUserData } from '@/state/hooks';
-import { SESSION_PATH, sessionState } from '@/features/practice/sessionSetup';
+import { useCurrentExam, usePracticeQuestions, useUserData } from '@/state/hooks';
+import { SESSION_PAGE, sessionState } from '@/features/practice/sessionSetup';
 
-const domainName = (id: string) => DOMAINS.find((d) => d.id === id)?.name ?? id;
-const taskTitle = (id: string) =>
-  DOMAINS.flatMap((d) => d.taskStatements).find((t) => t.id === id)?.title ?? id;
+const domainName = (exam: ExamGuide, id: string) =>
+  exam.domains.find((d) => d.id === id)?.name ?? id;
+const taskTitle = (exam: ExamGuide, id: string) =>
+  exam.domains.flatMap((d) => d.taskStatements).find((t) => t.id === id)?.title ?? id;
 
 export function ProgressPage() {
+  const exam = useCurrentExam();
+  const path = useExamPath();
   const { attempts, progress, preferences } = useUserData();
   const { questions, byId, ids } = usePracticeQuestions();
   const benchmark = preferences.benchmarkPercent;
@@ -77,7 +81,7 @@ export function ProgressPage() {
                 title="No exams yet"
                 description="Your scores appear here after your first mock exam."
                 action={
-                  <Link to="/exam" className={buttonClasses({ variant: 'secondary' })}>
+                  <Link to={path('exam')} className={buttonClasses({ variant: 'secondary' })}>
                     Go to mock exam
                   </Link>
                 }
@@ -109,7 +113,7 @@ export function ProgressPage() {
           />
           <CardBody>
             <ul className="flex flex-col gap-4">
-              {DOMAINS.map((d) => {
+              {exam.domains.map((d) => {
                 const stats = coverage.byDomain[d.id];
                 return (
                   <li key={d.id}>
@@ -156,7 +160,7 @@ export function ProgressPage() {
                   <li key={topic.taskStatement} className="flex items-start justify-between gap-3">
                     <span className="text-fg">
                       <span className="text-fg-subtle tabular-nums">{topic.taskStatement}</span>{' '}
-                      {taskTitle(topic.taskStatement)}
+                      {taskTitle(exam, topic.taskStatement)}
                     </span>
                     <span className="shrink-0 text-fg-muted tabular-nums">
                       {topic.misses} missed
@@ -362,6 +366,7 @@ const STATUS_COPY: Record<DomainEvidence['status'], { label: string; tone: Badge
 };
 
 function DomainEvidenceList({ evidence }: { evidence: DomainEvidence[] }) {
+  const exam = useCurrentExam();
   if (evidence.every((d) => d.total === 0)) {
     return (
       <p className="text-sm text-fg-muted">Take a mock exam to see how each domain is going.</p>
@@ -376,7 +381,7 @@ function DomainEvidenceList({ evidence }: { evidence: DomainEvidence[] }) {
             key={d.domain}
             className="flex flex-wrap items-center justify-between gap-2 py-3 first:pt-0 last:pb-0"
           >
-            <span className="text-sm text-fg">{domainName(d.domain)}</span>
+            <span className="text-sm text-fg">{domainName(exam, d.domain)}</span>
             <span className="flex items-center gap-3">
               <span className="text-sm text-fg-muted tabular-nums">
                 {d.correct}/{d.total} · {formatPercent(d.ratio)}
@@ -402,6 +407,7 @@ function RepeatedMistakesCard({
   }[];
 }) {
   const navigate = useNavigate();
+  const path = useExamPath();
   return (
     <Card className="mt-6">
       <CardHeader
@@ -414,7 +420,7 @@ function RepeatedMistakesCard({
               variant="secondary"
               icon={RotateCcw}
               onClick={() => {
-                void navigate(SESSION_PATH, {
+                void navigate(path(SESSION_PAGE), {
                   state: sessionState({
                     label: 'Repeated mistakes',
                     questionIds: items.map((i) => i.questionId),

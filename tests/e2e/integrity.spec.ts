@@ -18,14 +18,14 @@ test.use({
 
 test.beforeEach(async ({ page, browserName, isMobile }) => {
   test.skip(browserName !== 'chromium' || isMobile, 'Uses Chromium fake media devices');
-  await page.goto('/exam');
+  await page.goto('/clf-c02/exam');
   await page.evaluate(() => {
     window.localStorage.clear();
   });
 });
 
 async function startStrictExam(page: Page) {
-  await page.goto('/exam');
+  await page.goto('/clf-c02/exam');
   await page.getByRole('radio', { name: /^Strict practice/ }).check();
   await page.getByRole('button', { name: 'Start full exam' }).click();
   await page.getByRole('button', { name: 'Start exam' }).click();
@@ -126,7 +126,7 @@ const trackStates = (page: Page) =>
   );
 
 async function checkIn(page: Page) {
-  await page.goto('/exam');
+  await page.goto('/clf-c02/exam');
   await page.getByRole('radio', { name: /AI-proctored exam/ }).check();
   await page.getByRole('button', { name: 'Start full exam' }).click();
   await expect(
@@ -200,7 +200,7 @@ test('AC-7.1 AC-7.4 AC-7.7 proctored exam: check-in, warning, then ended by a ph
   await expect(table.getByText('Head turned away', { exact: true })).toBeVisible();
   await expect(table.getByText('Exam ended', { exact: true })).toBeVisible();
 
-  await page.goto('/history');
+  await page.goto('/clf-c02/history');
   await expect(page.getByText('Ended by proctor')).toBeVisible();
 });
 

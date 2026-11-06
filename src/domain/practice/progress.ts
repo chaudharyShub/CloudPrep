@@ -1,4 +1,4 @@
-import { DOMAINS, type DomainId } from '@/domain/exam-guide/clf-c02';
+import { DOMAIN_IDS, type DomainId } from '@/domain/exam-guide/types';
 import type { Question } from '@/domain/questions/types';
 import { nextReviewLevel } from './review';
 
@@ -125,7 +125,7 @@ export function practiceStats(
   questions: readonly Question[],
 ): { overall: PracticeStats; byDomain: Record<DomainId, PracticeStats> } {
   const overall = emptyStats();
-  const byDomain = Object.fromEntries(DOMAINS.map((domain) => [domain.id, emptyStats()])) as Record<
+  const byDomain = Object.fromEntries(DOMAIN_IDS.map((id) => [id, emptyStats()])) as Record<
     DomainId,
     PracticeStats
   >;
@@ -136,9 +136,10 @@ export function practiceStats(
   }
   return {
     overall: finalize(overall),
-    byDomain: Object.fromEntries(
-      DOMAINS.map((domain) => [domain.id, finalize(byDomain[domain.id])]),
-    ) as Record<DomainId, PracticeStats>,
+    byDomain: Object.fromEntries(DOMAIN_IDS.map((id) => [id, finalize(byDomain[id])])) as Record<
+      DomainId,
+      PracticeStats
+    >,
   };
 }
 
@@ -151,17 +152,17 @@ export const WEAKEST_MIN_ANSWERED = 20;
  * to the domain listed first.
  */
 export function weakestDomain(byDomain: Record<DomainId, PracticeStats>): DomainId | null {
-  const eligible = DOMAINS.filter(
-    (domain) => byDomain[domain.id].answeredQuestions >= WEAKEST_MIN_ANSWERED,
+  const eligible = DOMAIN_IDS.filter(
+    (id) => byDomain[id].answeredQuestions >= WEAKEST_MIN_ANSWERED,
   );
   if (eligible.length < 2) return null;
   let weakest: DomainId | null = null;
   let lowest = Infinity;
-  for (const domain of eligible) {
-    const accuracy = byDomain[domain.id].accuracy ?? 0;
+  for (const id of eligible) {
+    const accuracy = byDomain[id].accuracy ?? 0;
     if (accuracy < lowest) {
       lowest = accuracy;
-      weakest = domain.id;
+      weakest = id;
     }
   }
   return weakest;

@@ -1,7 +1,9 @@
 import { NavLink } from 'react-router';
 import { ADMIN_NAV, PRIMARY_NAV, SECONDARY_NAV, type NavItem } from '@/app/navigation';
+import { useExamPath } from '@/app/paths';
 import { cn } from '@/lib/cn';
 import { useIsAdmin } from '@/state/AdminProvider';
+import { ExamSwitcher } from './ExamSwitcher';
 
 function NavItemLink({
   item,
@@ -30,14 +32,23 @@ function NavItemLink({
   );
 }
 
-/** Main navigation links. NavLink sets aria-current="page" on the active item. */
+/**
+ * Main navigation: the exam picker, then the current exam's pages (D-066), then shared ones.
+ * NavLink sets aria-current="page" on the active item.
+ */
 export function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const isAdmin = useIsAdmin();
+  const path = useExamPath();
   return (
     <nav aria-label="Main" className="flex flex-col gap-3">
+      <ExamSwitcher onNavigate={onNavigate} />
       <ul className="flex flex-col gap-0.5">
         {PRIMARY_NAV.map((item) => (
-          <NavItemLink key={item.to} item={item} onNavigate={onNavigate} />
+          <NavItemLink
+            key={item.page}
+            item={{ to: path(item.page), label: item.label }}
+            onNavigate={onNavigate}
+          />
         ))}
       </ul>
       <ul className="flex flex-col gap-0.5 border-t border-border pt-3">

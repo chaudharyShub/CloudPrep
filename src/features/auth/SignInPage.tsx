@@ -1,3 +1,4 @@
+import { useExamPath } from '@/app/paths';
 import { useState, type SyntheticEvent } from 'react';
 import { Link, Navigate, useSearchParams } from 'react-router';
 import { Mail } from 'lucide-react';
@@ -16,6 +17,7 @@ import { callbackUrl, DEFAULT_AFTER_SIGN_IN, safeNextPath } from './redirect';
 
 export function SignInPage() {
   const { state, client } = useAuth();
+  const path = useExamPath();
   const [params] = useSearchParams();
   const next = safeNextPath(params.get('next'));
   const [email, setEmail] = useState('');
@@ -169,7 +171,10 @@ export function SignInPage() {
           Learning mode and bookmarks work without an account. As a guest, your progress stays in
           this browser only.
           <div className="mt-3">
-            <Link to="/practice" className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
+            <Link
+              to={path('practice')}
+              className={buttonClasses({ variant: 'secondary', size: 'sm' })}
+            >
               Continue as a guest
             </Link>
           </div>

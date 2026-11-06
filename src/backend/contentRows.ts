@@ -1,15 +1,4 @@
-import {
-  DOMAINS,
-  EXAM_CODE,
-  EXAM_DURATION_MINUTES,
-  EXAM_GUIDE_URL,
-  EXAM_ID,
-  EXAM_NAME,
-  EXAM_QUESTION_COUNT,
-  EXAM_SCORED_QUESTION_COUNT,
-  type DomainId,
-  type TaskStatementId,
-} from '@/domain/exam-guide/clf-c02';
+import type { DomainId, ExamGuide } from '@/domain/exam-guide/types';
 import { requiredSelectionCount } from '@/domain/questions/evaluate';
 import type {
   Difficulty,
@@ -93,34 +82,40 @@ export interface QuestionRows {
   revision: QuestionRevisionRow;
 }
 
-/** The CLF-C02 catalogue rows, from the exam guide in code. */
-export function clfExamRows(): {
+/**
+ * One exam's catalogue rows, from its exam guide in code (D-066). `published` says whether
+ * the exam has questions to publish; user data can reference the exam either way.
+ */
+export function examRows(
+  guide: ExamGuide,
+  published: boolean,
+): {
   exam: ExamRow;
   domains: ExamDomainRow[];
   topics: ExamTopicRow[];
 } {
   return {
     exam: {
-      id: EXAM_ID,
-      code: EXAM_CODE,
-      name: EXAM_NAME,
+      id: guide.id,
+      code: guide.code,
+      name: guide.name,
       provider: 'AWS',
-      question_count: EXAM_QUESTION_COUNT,
-      scored_question_count: EXAM_SCORED_QUESTION_COUNT,
-      duration_minutes: EXAM_DURATION_MINUTES,
-      guide_url: EXAM_GUIDE_URL,
-      is_published: true,
+      question_count: guide.questionCount,
+      scored_question_count: guide.scoredQuestionCount,
+      duration_minutes: guide.durationMinutes,
+      guide_url: guide.guideUrl,
+      is_published: published,
     },
-    domains: DOMAINS.map((domain) => ({
-      exam_id: EXAM_ID,
+    domains: guide.domains.map((domain) => ({
+      exam_id: guide.id,
       id: domain.id,
       number: domain.number,
       name: domain.name,
       weight_percent: domain.weightPercent,
     })),
-    topics: DOMAINS.flatMap((domain) =>
+    topics: guide.domains.flatMap((domain) =>
       domain.taskStatements.map((task, position) => ({
-        exam_id: EXAM_ID,
+        exam_id: guide.id,
         id: task.id,
         domain_id: domain.id,
         title: task.title,
@@ -192,7 +187,7 @@ export function rowsToQuestion(row: QuestionRow, key: QuestionKeyRow): Question 
     explanation: key.explanation,
     // CLF-C02 is the only exam; the app's types are still specific to it.
     domain: row.domain_id as DomainId,
-    taskStatement: row.topic_id as TaskStatementId,
+    taskStatement: row.topic_id,
     difficulty: row.difficulty,
     tags: row.tags,
     references: key.references,

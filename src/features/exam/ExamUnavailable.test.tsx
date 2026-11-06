@@ -13,7 +13,7 @@ const MIN = 60_000;
 
 describe('exam start page with a small question bank', () => {
   it('explains that the full exam is unavailable and offers alternatives', async () => {
-    renderApp('/exam');
+    renderApp('/clf-c02/exam');
     expect(await screen.findByText("The full exam isn't available yet")).toBeVisible();
     const table = screen.getByRole('table', { name: /questions needed and available/i });
     expect(within(table).getByRole('row', { name: /Cloud Concepts 16 10/ })).toBeVisible();
@@ -21,12 +21,12 @@ describe('exam start page with a small question bank', () => {
     expect(screen.getByRole('button', { name: 'Start shorter exam' })).toBeEnabled();
     expect(screen.getByRole('link', { name: 'Practise in Learning mode' })).toHaveAttribute(
       'href',
-      '/practice',
+      '/clf-c02/practice',
     );
   });
 
   it('starts a shorter exam at the real pace', async () => {
-    const { user, store } = renderApp('/exam');
+    const { user, store } = renderApp('/clf-c02/exam');
     await user.click(await screen.findByRole('button', { name: 'Start shorter exam' }));
     const dialog = screen.getByRole('dialog', { name: 'Start the shorter exam?' });
     expect(dialog).toHaveAccessibleDescription(/41 questions, 57 minutes/);
@@ -41,7 +41,7 @@ describe('exam start page with a small question bank', () => {
   });
 
   it('advertises the shorter exam on the dashboard instead of the unavailable full exam', async () => {
-    renderApp('/dashboard');
+    renderApp('/clf-c02/dashboard');
     expect(await screen.findByText('Timed mock exam (shorter)')).toBeVisible();
     expect(screen.getByText('41 questions · 57 minutes')).toBeVisible();
   });

@@ -15,7 +15,7 @@ async function expectNoSeriousA11yViolations(page: Page) {
 }
 
 async function startFullExam(page: Page) {
-  await page.goto('/exam');
+  await page.goto('/clf-c02/exam');
   await page.getByRole('button', { name: 'Start full exam' }).click();
   await page.getByRole('button', { name: 'Start exam' }).click();
   await expect(page.getByRole('heading', { level: 1, name: /^Question 1 of \d+$/ })).toBeVisible();
@@ -41,7 +41,7 @@ async function submitExam(page: Page) {
 
 test.beforeEach(async ({ page, isMobile }) => {
   test.skip(isMobile, 'Desktop journeys; phone layouts are covered in the other spec files');
-  await page.goto('/dashboard');
+  await page.goto('/clf-c02/dashboard');
   await page.evaluate(() => {
     window.localStorage.clear();
   });
@@ -70,9 +70,9 @@ test('A. first visit: dashboard empty states, navigation, settings survive a ref
     await nav.getByRole('link', { name: link }).click();
     await expect(page.getByRole('heading', { level: 1, name: heading })).toBeVisible();
   }
-  await page.goto('/history');
+  await page.goto('/clf-c02/history');
   await expect(page.getByText(/No (exam )?attempts yet|No exams yet/).first()).toBeVisible();
-  await page.goto('/progress');
+  await page.goto('/clf-c02/progress');
   await expect(page.getByText('Not enough data yet')).toBeVisible();
 
   await page.goto('/settings');
@@ -89,7 +89,7 @@ test('B. learning mode: single and multiple-response questions, explanations, bo
   page,
 }) => {
   test.setTimeout(90_000);
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await page.getByRole('combobox', { name: 'Domain' }).selectOption('D2');
   await page.getByRole('radio', { name: 'All', exact: true }).check();
   await page.getByRole('button', { name: 'Start practice' }).click();
@@ -119,7 +119,7 @@ test('B. learning mode: single and multiple-response questions, explanations, bo
   expect(sawSingle && sawMulti).toBe(true);
 
   await page.reload();
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   const card = page.getByRole('listitem').filter({ hasText: 'Domain 2' }).first();
   await expect(card.getByText(/^2 of \d+$/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Practise bookmarks (1)' })).toBeEnabled();
@@ -140,7 +140,7 @@ test('E. results: a previous attempt still opens correctly after a new attempt',
   await expect(page.getByText('0 of 65 questions correct')).toBeVisible();
   expect(page.url()).not.toBe(firstUrl);
 
-  await page.goto('/history');
+  await page.goto('/clf-c02/history');
   const links = page.getByRole('link', { name: /Full exam · 65 questions/ });
   await expect(links).toHaveCount(2);
   await links.last().click(); // newest first, so the last link is the first attempt
@@ -158,7 +158,7 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
   await answerCurrent(page);
   await submitExam(page);
   const score = await page.getByText(/of 65 questions correct/).textContent();
-  await page.goto('/practice');
+  await page.goto('/clf-c02/practice');
   await page.getByRole('button', { name: 'Start practice' }).click();
   await page.getByRole('button', { name: 'Bookmark' }).click();
 
@@ -203,7 +203,7 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
 
   // A dark device: the saved "system" choice must survive the migration and show dark.
   await page.emulateMedia({ colorScheme: 'dark' });
-  await page.goto('/history');
+  await page.goto('/clf-c02/history');
   await page
     .getByRole('link', { name: /Full exam · 65 questions/ })
     .first()
@@ -219,9 +219,9 @@ test('F. data: old-format saved data is migrated, and one category can be cleare
     .getByRole('dialog', { name: 'Clear exam history?' })
     .getByRole('button', { name: 'Clear history' })
     .click();
-  await page.goto('/history');
+  await page.goto('/clf-c02/history');
   await expect(page.getByRole('link', { name: /Full exam/ })).toHaveCount(0);
-  await page.goto('/bookmarks');
+  await page.goto('/clf-c02/bookmarks');
   await expect(page.getByRole('button', { name: /^Remove bookmark:/ })).toHaveCount(1);
 });
 
@@ -237,7 +237,7 @@ test.describe('G. practice integrity', () => {
       navigator.mediaDevices.getUserMedia = () =>
         Promise.reject(new DOMException('Permission denied', 'NotAllowedError'));
     });
-    await page.goto('/exam');
+    await page.goto('/clf-c02/exam');
     await page.getByRole('radio', { name: /AI-proctored exam/ }).check();
     await page.getByRole('button', { name: 'Start full exam' }).click();
     // The check-in page loads on demand: wait for its six rules.
@@ -255,7 +255,7 @@ test.describe('G. practice integrity', () => {
   });
 
   test('strict practice logs focus changes in a neutral report', async ({ page }) => {
-    await page.goto('/exam');
+    await page.goto('/clf-c02/exam');
     await page.getByRole('radio', { name: /^Strict practice/ }).check();
     await page.getByRole('button', { name: 'Start full exam' }).click();
     await page.getByRole('button', { name: 'Start exam' }).click();
@@ -276,7 +276,7 @@ test.describe('G. practice integrity', () => {
 test.describe('accessibility and motion', () => {
   test('reduced motion from the operating system is respected', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/dashboard');
+    await page.goto('/clf-c02/dashboard');
     const duration = await page.evaluate(() => {
       const probe = document.createElement('div');
       probe.className = 'transition-colors duration-300';

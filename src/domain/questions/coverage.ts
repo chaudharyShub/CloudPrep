@@ -1,4 +1,4 @@
-import { DOMAINS, type DomainId, type TaskStatementId } from '@/domain/exam-guide/clf-c02';
+import type { DomainId, ExamGuide, TaskStatementId } from '@/domain/exam-guide/types';
 import type { Difficulty, Question, QuestionType, ReviewStatus } from './types';
 
 export interface BankCoverage {
@@ -12,11 +12,14 @@ export interface BankCoverage {
   uncoveredTaskStatements: TaskStatementId[];
 }
 
-/** Counts questions by domain, task statement, type, difficulty and review status. */
-export function bankCoverage(questions: readonly Question[]): BankCoverage {
-  const byDomain = Object.fromEntries(DOMAINS.map((d) => [d.id, 0])) as Record<DomainId, number>;
+/** Counts one exam's questions by domain, task statement, type, difficulty and review status. */
+export function bankCoverage(questions: readonly Question[], exam: ExamGuide): BankCoverage {
+  const byDomain = Object.fromEntries(exam.domains.map((d) => [d.id, 0])) as Record<
+    DomainId,
+    number
+  >;
   const byTaskStatement = Object.fromEntries(
-    DOMAINS.flatMap((d) => d.taskStatements.map((t) => [t.id, 0])),
+    exam.domains.flatMap((d) => d.taskStatements.map((t) => [t.id, 0])),
   ) as Record<TaskStatementId, number>;
   const byType: Record<QuestionType, number> = { single: 0, multiple: 0 };
   const byDifficulty: Record<Difficulty, number> = { easy: 0, medium: 0, hard: 0 };
@@ -30,7 +33,7 @@ export function bankCoverage(questions: readonly Question[]): BankCoverage {
 
   for (const question of questions) {
     byDomain[question.domain]++;
-    byTaskStatement[question.taskStatement]++;
+    byTaskStatement[question.taskStatement] = (byTaskStatement[question.taskStatement] ?? 0) + 1;
     byType[question.type]++;
     byDifficulty[question.difficulty]++;
     byStatus[question.review.status]++;
@@ -43,8 +46,6 @@ export function bankCoverage(questions: readonly Question[]): BankCoverage {
     byType,
     byDifficulty,
     byStatus,
-    uncoveredTaskStatements: (Object.keys(byTaskStatement) as TaskStatementId[]).filter(
-      (id) => byTaskStatement[id] === 0,
-    ),
+    uncoveredTaskStatements: Object.keys(byTaskStatement).filter((id) => byTaskStatement[id] === 0),
   };
 }

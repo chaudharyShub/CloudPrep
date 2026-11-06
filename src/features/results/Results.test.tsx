@@ -32,7 +32,7 @@ function storeWithAttempt(id = 'att-1', extra: ExamAction[] = []) {
 describe('ResultsPage', () => {
   it('shows score, counts, time used and an honest benchmark outcome', async () => {
     const { store } = storeWithAttempt();
-    renderApp('/results/att-1', { store });
+    renderApp('/clf-c02/results/att-1', { store });
     await screen.findByRole('heading', { level: 1, name: 'Exam results' });
 
     const scoreLine = screen.getByText('2 of 5 questions correct');
@@ -50,7 +50,7 @@ describe('ResultsPage', () => {
 
   it('shows domain performance as a table, separating score from accuracy and flagging small samples', async () => {
     const { store } = storeWithAttempt();
-    renderApp('/results/att-1', { store });
+    renderApp('/clf-c02/results/att-1', { store });
     const table = await screen.findByRole('table', { name: 'Results by exam domain' });
     const row = within(table).getByRole('row', { name: /Cloud Concepts/ });
     expect(row).toHaveTextContent('2/5');
@@ -62,36 +62,36 @@ describe('ResultsPage', () => {
 
   it('lists weak areas and next steps with working actions', async () => {
     const { store } = storeWithAttempt();
-    const { user, router } = renderApp('/results/att-1', { store });
+    const { user, router } = renderApp('/clf-c02/results/att-1', { store });
     await screen.findByRole('heading', { level: 1, name: 'Exam results' });
     expect(screen.getByRole('heading', { name: 'Weak areas' })).toBeVisible();
     expect(screen.getByText('Work on pacing')).toBeVisible();
     expect(screen.getByRole('link', { name: 'Take another exam' })).toHaveAttribute(
       'href',
-      '/exam',
+      '/clf-c02/exam',
     );
     const main = screen.getByRole('main');
     expect(within(main).getByRole('link', { name: 'Dashboard' })).toHaveAttribute(
       'href',
-      '/dashboard',
+      '/clf-c02/dashboard',
     );
 
     await user.click(screen.getByRole('button', { name: 'Practise 3 missed' }));
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Missed exam questions' }),
     ).toBeVisible();
-    expect(router.state.location.pathname).toBe('/practice/session');
+    expect(router.state.location.pathname).toBe('/clf-c02/practice/session');
   });
 
   it('shows a not-found state for unknown attempts', async () => {
-    renderApp('/results/nope');
+    renderApp('/clf-c02/results/nope');
     expect(await screen.findByRole('heading', { name: 'Results not found' })).toBeVisible();
   });
 
   it('keeps showing the benchmark the exam was taken with after the setting changes', async () => {
     const { store } = storeWithAttempt();
     store.setPreferences({ benchmarkPercent: 50 });
-    renderApp('/results/att-1', { store });
+    renderApp('/clf-c02/results/att-1', { store });
     expect(await screen.findByText('Practice benchmark not met (70%)')).toBeVisible();
   });
 });
@@ -99,7 +99,7 @@ describe('ResultsPage', () => {
 describe('AnswerReviewPage', () => {
   it('opens on incorrect answers and shows everything needed to learn from them', async () => {
     const { store } = storeWithAttempt();
-    renderApp('/results/att-1/review', { store });
+    renderApp('/clf-c02/results/att-1/review', { store });
     await screen.findByRole('heading', { level: 1, name: 'Answer review' });
 
     expect(screen.getByRole('radio', { name: 'Incorrect (1)' })).toBeChecked();
@@ -132,7 +132,7 @@ describe('AnswerReviewPage', () => {
 
   it('moves between incorrect, unanswered and correct questions', async () => {
     const { store } = storeWithAttempt();
-    const { user } = renderApp('/results/att-1/review', { store });
+    const { user } = renderApp('/clf-c02/results/att-1/review', { store });
     await screen.findByRole('heading', { level: 1, name: 'Answer review' });
 
     await user.click(screen.getByRole('radio', { name: 'Unanswered (2)' }));
@@ -157,7 +157,7 @@ describe('AnswerReviewPage', () => {
 
   it('bookmarks a question from the review', async () => {
     const { store } = storeWithAttempt();
-    const { user } = renderApp('/results/att-1/review', { store });
+    const { user } = renderApp('/clf-c02/results/att-1/review', { store });
     await user.click(await screen.findByRole('button', { name: 'Bookmark' }));
     expect(store.getSnapshot().data.bookmarks).toHaveProperty(q(1).id);
   });
@@ -165,13 +165,13 @@ describe('AnswerReviewPage', () => {
 
 describe('HistoryPage', () => {
   it('shows an empty state with no history', async () => {
-    renderApp('/history');
+    renderApp('/clf-c02/history');
     expect(await screen.findByRole('heading', { name: 'No exam attempts yet' })).toBeVisible();
   });
 
   it('lists past attempts with saved scores and opens their results', async () => {
     const { store } = storeWithAttempt();
-    const { user } = renderApp('/history', { store });
+    const { user } = renderApp('/clf-c02/history', { store });
     const link = await screen.findByRole('link', { name: /Shorter exam · 5 questions/ });
     expect(link).toHaveTextContent('40%');
     expect(link).toHaveTextContent('Benchmark not met (70%)');

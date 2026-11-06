@@ -17,6 +17,13 @@ const README =
   )[0] ?? '';
 const PUBLIC_SEO_FILES = Object.keys(import.meta.glob('/public/{robots.txt,sitemap.xml}'));
 
+/** robots.txt matching: a `Disallow` rule is a path prefix in which `*` matches anything. */
+function isBlocked(path: string): boolean {
+  return BLOCKED_PATHS.some((rule) =>
+    new RegExp(`^${rule.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')}`).test(path),
+  );
+}
+
 describe('Search engine files', () => {
   it('AC-S.1 robots.txt allows the site, blocks private areas and points to the sitemap', () => {
     const robots = robotsTxt(ORIGIN);
@@ -41,8 +48,31 @@ describe('Search engine files', () => {
   it('AC-S.2 no listed page is also blocked', () => {
     for (const path of INDEXED_PATHS) {
       if (path === '/') continue;
-      expect(BLOCKED_PATHS.some((blocked) => path.startsWith(blocked))).toBe(false);
+      expect(isBlocked(path), path).toBe(false);
     }
+  });
+
+  it('AC-M.10 lists each launched exam’s own page and Learning mode, and no other exam', () => {
+    expect(INDEXED_PATHS).toEqual(
+      expect.arrayContaining(['/', '/privacy', '/clf-c02', '/clf-c02/practice']),
+    );
+    expect(INDEXED_PATHS.some((path) => path.startsWith('/saa-c03'))).toBe(false);
+    expect(INDEXED_PATHS.some((path) => path.startsWith('/dva-c03'))).toBe(false);
+  });
+
+  it('AC-M.10 blocks signed-in and flow pages under every exam and at their old addresses', () => {
+    for (const path of [
+      '/clf-c02/dashboard',
+      '/saa-c03/exam',
+      '/dva-c03/exam/session',
+      '/clf-c02/results/abc',
+      '/saa-c03/practice/session',
+      '/dashboard',
+      '/practice/session',
+    ]) {
+      expect(isBlocked(path), path).toBe(true);
+    }
+    expect(robotsTxt(ORIGIN)).toContain('Disallow: /*/exam\n');
   });
 
   it('AC-S.3 the page title and description name the exam before the app loads', () => {

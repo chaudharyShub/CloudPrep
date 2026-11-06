@@ -2,7 +2,7 @@
 
 > Lightweight ADRs. Status: **Accepted** · **Superseded** (replaced by a later decision; the entry is kept for history).
 > Early entries were written as proposals before the app existed; on 2026-10-26 every status was checked against the code (D-051). Entries keep their original text, with updates noted.
-> Last updated: 2026-10-29
+> Last updated: 2026-11-05
 
 | ID | Decision | Status |
 |---|---|---|
@@ -71,6 +71,7 @@
 | D-063 | Search engine basics: `robots.txt` and `sitemap.xml` from the build, a descriptive page title, no trailing slashes; version 3.4.1 | Accepted (live, PR #24) |
 | D-064 | New live address https://aws-cloud-prepare.vercel.app, written in `SITE_ORIGIN`; icons for search results; version 3.4.2 | Accepted |
 | D-065 | Vercel Speed Insights for Core Web Vitals, production builds only; version 3.5.0 | Accepted (live, PR #25) |
+| D-066 | More exams: Solutions Architect – Associate (SAA-C03) and Developer – Associate (DVA-C03) with everything CLF-C02 has; exam in the address; one store with data tagged by exam; version 4.0.0 | Accepted (step 1 built on `feature/multi-exam`; 600 checked questions per new exam so far) |
 
 ---
 
@@ -486,3 +487,20 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Hosting:** the script and its endpoint are under `/_vercel/speed-insights/`, already left alone by the SPA rewrite (D-038, D-048). Speed Insights must be enabled once in the Vercel project (*Speed Insights → Enable*); until then nothing is collected.
 - **Deployment:** through the usual Git flow (merge the PR; Vercel deploys `master`), not `vercel --prod` from a local folder, as in D-048.
 - **Version:** 3.5.0.
+
+---
+
+### D-066 More exams: SAA-C03 and DVA-C03
+
+- **Requested by the user (2026-11-05):** CloudPrep should also prepare people for AWS Certified Solutions Architect – Associate and AWS Certified Developer – Associate, with "each and everything" CLF-C02 has: a full question bank checked against AWS pages, Learning mode, Review due, timed and proctored exams, results, review, history, readiness, sync and the landing page.
+- **Exam versions (checked 2026-11-05 on the AWS exam guides):** SAA-C03 (guide revised 29 October 2026) and DVA-C03, which replaces DVA-C02 (last day 30 November 2026). DVA-C02 is not built, because it retires before the bank would be ready. Both exams have 65 questions (50 scored), 130 minutes and a passing score of 720. SAA-C03 domains: Design Secure Architectures 30%, Design Resilient Architectures 26%, Design High-Performing Architectures 24%, Design Cost-Optimized Architectures 20% (14 task statements). DVA-C03 domains: Development with AWS Services 30%, Security 26%, Testing and Deployment 22%, Troubleshooting and Optimization 22% (12 tasks).
+- **Exam guides as data:** each exam is a guide object (`src/domain/exam-guide/`: id, code, name, guide address, question count, scored count, minutes, passing score, domains with weights and task statements) in one list, `EXAMS`. Domain logic receives the guide instead of importing CLF constants. All three exams have four domains, so `DomainId` stays `D1`–`D4`; task statement ids become plain strings checked against the guide.
+- **Exam in the address:** pages that belong to an exam live under its id: `/clf-c02/practice`, `/saa-c03/exam`, `/dva-c03/results/:id`. Each exam has its own landing page (`/clf-c02`, `/saa-c03`, `/dva-c03`) for search engines; `/` shows the landing page of the exam used last (CLF-C02 for new visitors) with a "Choose your exam" section when more than one exam is offered. Old addresses (`/practice`, `/exam`, `/results/:id`, …) redirect in the browser to the same page of the exam used last, which is CLF-C02 for new visitors and search engines, so old links keep working (old result links go to their attempt's exam). Privacy, settings, sign-in and admin stay shared. The app remembers the exam used last as the `exam` setting, saved when a page of an exam is opened; an **Exam** picker at the top of the navigation (shown when more than one exam is offered) opens the same section of another exam. Tab titles name the exam ("Learning mode · SAA-C03 · CloudPrep").
+- **One store, data tagged by exam:** question ids carry the exam (`clf-`, `saa-`, `dva-`), so progress, bookmarks and the question archive need no change. Practice sessions, exam attempts and the active exam get an `examId` field. Each parser reads an item without one as CLF-C02 and drops items of an unknown exam, so browser data, import files and server rows from before 4.0.0 all read the same way and no schema version changed (the shape only gained a field). The history limits (100 attempts, 50 practice sessions) apply per exam, so one exam never pushes out another's history. Pages read their exam's data through `useUserData()`, which returns only the current exam's progress, bookmarks, sessions and attempts; `useAllUserData()` is for shared pages (settings, export). Preferences stay shared. The current exam is read from the address, so layouts above the exam's routes (the sidebar) see it too. This matches the database, where progress and bookmarks are keyed by question id, `user_preferences` is per user and every row carries `exam_id`; sync writes each item's own `exam_id` and reads all exams. One store was chosen over one store per exam: it keeps one sync, one set of preferences and one export file.
+- **One exam at a time:** only one exam can be in progress, whichever exam it belongs to, as with the real test centre. Starting another asks the person to finish or submit the first.
+- **Pass mark:** the practice benchmark stays one shared setting (default 70%, steps of 5); results and help text show each exam's own passing score (700 for CLF-C02, 720 for SAA-C03 and DVA-C03).
+- **Questions:** same rules as CLF-C02 (original, from public AWS pages, every option explained, `unverified` until checked against the cited pages; D-022, D-041, D-042). Ids are `saa-d<n>-<nnnn>` and `dva-d<n>-<nnnn>`. Each bank aims at 2,000 questions spread by domain weight, written and checked in batches of about 40, with a per-exam section in CONTENT_REVIEW.md. The publish script publishes every exam that has questions.
+- **Launch:** an exam appears in the live app only when its guide is marked `launched`, so the live site never offers an exam without questions. Until then it is available in development, tests and E2E builds, and left out of the sitemap. The publish script publishes every exam's catalogue rows (exam, domains, topics) so user data can refer to them, and its questions once it has some.
+- **Per-exam text:** each guide also has a short name, level and exam fee ($100 for CLF-C02, $150 for SAA-C03 and DVA-C03, from the certification pages); the landing page uses them with an original example question per exam (`src/features/landing/landingContent.ts`).
+- **Version:** 4.0.0 for the multi-exam app (addresses change); question banks follow as content updates.
+- **Update (2026-11-05): first banks.** SAA-C03 and DVA-C03 each have 600 questions (15 batches of 40), all checked against their cited pages (bank version `2026-11-05.1`). DVA-C03 covers Kiro, which is in scope for the exam; Kiro's documentation lives on `kiro.dev`, linked from AWS's documentation overview, so `kiro.dev` was added to the validator's allowed reference hosts (with a test). The exams stay unlaunched until the banks are published and the user agrees.
