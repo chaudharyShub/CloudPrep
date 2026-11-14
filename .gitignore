@@ -1,0 +1,21 @@
+node_modules/
+dist/
+dist-e2e/
+coverage/
+*.tsbuildinfo
+.vite/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+!.env.example
+# AI proctor runtime and models (created by scripts/setup-proctor-assets.mjs)
+public/proctor/
+google_user_content.json
+# Private question banks: a checkout of CloudPrep-questions (D-072)
+src/content/

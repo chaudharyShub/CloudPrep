@@ -1,0 +1,51 @@
+import type { ExamGuide } from '@/domain/exam-guide/types';
+import type { ReviewStatus } from '@/domain/questions/types';
+
+export type ExamKind = 'full' | 'short';
+
+export interface ExamConfig {
+  /** The exam this practice exam is for (D-066). */
+  examId: string;
+  kind: ExamKind;
+  questionCount: number;
+  durationMs: number;
+}
+
+const MINUTE = 60_000;
+
+/** The default practice exam: same length and time as the real exam. */
+export function fullExamConfig(exam: ExamGuide): ExamConfig {
+  return {
+    examId: exam.id,
+    kind: 'full',
+    questionCount: exam.questionCount,
+    durationMs: exam.durationMinutes * MINUTE,
+  };
+}
+
+/** A shorter timed exam is only offered if at least this many balanced questions exist. */
+export const MIN_SHORT_EXAM_QUESTIONS = 10;
+
+/**
+ * A shorter exam keeps the real exam's pace, rounded up to a whole minute: e.g. 41 CLF-C02
+ * questions → ceil(41 × 90 / 65) = 57 minutes.
+ */
+export function shortExamConfig(exam: ExamGuide, questionCount: number): ExamConfig {
+  const minutes = Math.ceil((questionCount * exam.durationMinutes) / exam.questionCount);
+  return { examId: exam.id, kind: 'short', questionCount, durationMs: minutes * MINUTE };
+}
+
+/**
+ * Review statuses allowed in exams (docs/DECISIONS.md D-016, D-041): the same as Learning Mode.
+ */
+export const EXAM_ELIGIBLE_STATUSES: readonly ReviewStatus[] = [
+  'unverified',
+  'checked',
+  'approved',
+];
+
+/** Practice score needed to count as a pass (unofficial; see PRODUCT_SPEC §6). */
+export const DEFAULT_BENCHMARK_PERCENT = 70;
+
+/** Low-time warnings, in milliseconds remaining. */
+export const WARNING_THRESHOLDS_MS = { low: 10 * MINUTE, critical: 5 * MINUTE } as const;

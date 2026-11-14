@@ -1,0 +1,431 @@
+@import 'tailwindcss';
+
+/*
+ * CloudPrep design tokens: "Study notes in aubergine" (D-057).
+ *
+ * Raw values live in --cp-* custom properties, one set per theme. Tailwind utilities
+ * (bg-surface, text-fg-muted, border-border, rounded-lg, …) reference them through
+ * `@theme inline`, so switching `data-theme` on <html> restyles everything with
+ * no per-component theme code.
+ *
+ * Colour roles:
+ * - accent: aubergine, readable on surfaces (text, links, borders, fills under on-accent).
+ * - highlight: the soft tint for selected/active backgrounds; text on it is on-highlight.
+ * - primary: main buttons. meter: progress fills. ink: the answer sheet's hairlines.
+ * - flag: flagged questions (orange, so it never looks like "selected").
+ * - maker: the Shubham Works dial mark in the credit (D-062), shared with the developer's other sites.
+ * src/styles/tokens.test.ts checks the contrast of every pair below.
+ */
+
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  /* Surfaces: soft lilac-grey paper */
+  --cp-bg: #f3f0f2;
+  --cp-surface: #ffffff;
+  --cp-surface-2: #f8f5f7;
+  --cp-surface-3: #e9e0e6;
+
+  --cp-border: #d9cfd5;
+  --cp-border-strong: #998d95;
+  --cp-border-control: #8e828b;
+  --cp-ink: #1f1a1e;
+
+  --cp-fg: #1f1a1e;
+  --cp-fg-muted: #4a4148;
+  --cp-fg-subtle: #5b5158;
+
+  --cp-accent: #6a2c5e;
+  --cp-accent-hover: #4a1e41;
+  --cp-accent-fg: #6a2c5e;
+  --cp-on-accent: #ffffff;
+
+  --cp-highlight: #f1e0ec;
+  --cp-highlight-hover: #e9cfe1;
+  --cp-on-highlight: #4a1e41;
+
+  --cp-primary: #6a2c5e;
+  --cp-primary-hover: #4a1e41;
+  --cp-on-primary: #ffffff;
+
+  --cp-meter: #6a2c5e;
+
+  --cp-flag: #fbe7d3;
+  --cp-flag-border: #1f1a1e;
+  --cp-on-flag: #1f1a1e;
+  --cp-maker: #c2410c;
+
+  --cp-success: #166534;
+  --cp-warning: #8a3f06;
+  --cp-danger: #b91c1c;
+  --cp-info: #1f5fd6;
+  --cp-danger-hover: #991b1b;
+  --cp-on-danger: #ffffff;
+
+  --cp-focus: #1f5fd6;
+
+  --cp-shadow-overlay: 0 16px 48px -12px rgb(31 26 30 / 0.22), 0 0 0 1px rgb(31 26 30 / 0.06);
+  --cp-shadow-lift: 0 10px 24px -14px rgb(31 26 30 / 0.35);
+  --cp-backdrop: rgb(31 26 30 / 0.45);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Surfaces: true black with neutral grey layers (no tint, so the aubergine stays clean) */
+  --cp-bg: #000000;
+  --cp-surface: #121214;
+  --cp-surface-2: #1a1a1d;
+  --cp-surface-3: #2e2e33;
+
+  /* Borders and separators */
+  --cp-border: #2a2a2e;
+  --cp-border-strong: #5e5e64;
+  --cp-border-control: #7a7a80; /* form control outlines: ≥3:1 vs surfaces */
+  --cp-ink: #ededed;
+
+  /* Text */
+  --cp-fg: #ededed;
+  --cp-fg-muted: #c8c8cc;
+  --cp-fg-subtle: #a6a6ab;
+
+  /* Accent: a lighter aubergine for dark surfaces */
+  --cp-accent: #d9a0cb;
+  --cp-accent-hover: #e8bfdd;
+  --cp-accent-fg: #dda6cf;
+  --cp-on-accent: #000000;
+
+  /* Selected/active tint */
+  --cp-highlight: #3d2338;
+  --cp-highlight-hover: #4a2b44;
+  --cp-on-highlight: #f6d2ec;
+
+  /* Primary buttons */
+  --cp-primary: #d9a0cb;
+  --cp-primary-hover: #e8bfdd;
+  --cp-on-primary: #000000;
+
+  --cp-meter: #d9a0cb;
+
+  /* Flagged questions */
+  --cp-flag: #3a2a1e;
+  --cp-flag-border: #f0a060;
+  --cp-on-flag: #ffd9b8;
+  --cp-maker: #fb923c;
+
+  /* Status */
+  --cp-success: #5cc48e;
+  --cp-warning: #f0a060;
+  --cp-danger: #f07a68;
+  --cp-info: #8db6f0;
+  --cp-danger-hover: #f49585;
+  --cp-on-danger: #000000;
+
+  /* Focus: blue, so it never blends with the aubergine selection */
+  --cp-focus: #8db6f0;
+
+  /* Elevation (overlays only — cards use borders) */
+  --cp-shadow-overlay: 0 16px 48px -12px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.05);
+  --cp-shadow-lift: 0 10px 24px -12px rgb(0 0 0 / 0.8), 0 0 0 1px rgb(255 255 255 / 0.06);
+  --cp-backdrop: rgb(0 0 0 / 0.75);
+}
+
+:root {
+  /* Theme-independent tokens */
+  --cp-duration-fast: 120ms;
+  --cp-duration-base: 180ms;
+  --cp-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --cp-duration-fast: 0ms;
+    --cp-duration-base: 0ms;
+  }
+}
+
+/* The "Reduce motion" setting forces the same behaviour regardless of the OS. */
+[data-motion='reduce'] {
+  --cp-duration-fast: 0ms;
+  --cp-duration-base: 0ms;
+}
+
+@theme inline {
+  /* Remove Tailwind's default palette so only design-system colours exist. */
+  --color-*: initial;
+
+  --color-bg: var(--cp-bg);
+  --color-surface: var(--cp-surface);
+  --color-surface-2: var(--cp-surface-2);
+  --color-surface-3: var(--cp-surface-3);
+  --color-border: var(--cp-border);
+  --color-border-strong: var(--cp-border-strong);
+  --color-border-control: var(--cp-border-control);
+  --color-fg: var(--cp-fg);
+  --color-fg-muted: var(--cp-fg-muted);
+  --color-fg-subtle: var(--cp-fg-subtle);
+  --color-accent: var(--cp-accent);
+  --color-accent-hover: var(--cp-accent-hover);
+  --color-accent-fg: var(--cp-accent-fg);
+  --color-accent-subtle: color-mix(in oklab, var(--cp-accent) 14%, transparent);
+  --color-on-accent: var(--cp-on-accent);
+  --color-highlight: var(--cp-highlight);
+  --color-highlight-hover: var(--cp-highlight-hover);
+  --color-highlight-subtle: color-mix(in oklab, var(--cp-highlight) 22%, transparent);
+  --color-on-highlight: var(--cp-on-highlight);
+  --color-primary: var(--cp-primary);
+  --color-primary-hover: var(--cp-primary-hover);
+  --color-on-primary: var(--cp-on-primary);
+  --color-meter: var(--cp-meter);
+  --color-flag: var(--cp-flag);
+  --color-flag-border: var(--cp-flag-border);
+  --color-on-flag: var(--cp-on-flag);
+  --color-maker: var(--cp-maker);
+  --color-ink: var(--cp-ink);
+  --color-success: var(--cp-success);
+  --color-success-subtle: color-mix(in oklab, var(--cp-success) 14%, transparent);
+  --color-warning: var(--cp-warning);
+  --color-warning-subtle: color-mix(in oklab, var(--cp-warning) 14%, transparent);
+  --color-danger: var(--cp-danger);
+  --color-danger-hover: var(--cp-danger-hover);
+  --color-danger-subtle: color-mix(in oklab, var(--cp-danger) 14%, transparent);
+  --color-on-danger: var(--cp-on-danger);
+  --color-info: var(--cp-info);
+  --color-info-subtle: color-mix(in oklab, var(--cp-info) 14%, transparent);
+  --color-focus: var(--cp-focus);
+  --color-backdrop: var(--cp-backdrop);
+
+  /* Typography — Tailwind's default type scale (12/14/16/18/20/24/30px) is kept.
+     Sans for text, serif for page and section headings, mono for the answer sheet and numbers. */
+  --font-sans:
+    'Source Sans 3 Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    sans-serif;
+  --font-serif: 'Newsreader Variable', Georgia, 'Times New Roman', serif;
+  --font-mono:
+    'IBM Plex Mono', ui-monospace, 'Cascadia Code', 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Radii: sm = inputs/badges/small tiles, md = list items and option rows, lg = cards/dialogs.
+     Buttons, nav items and badges are pills (rounded-full). */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+
+  /* Shadows */
+  --shadow-overlay: var(--cp-shadow-overlay);
+
+  /* Spacing: Tailwind's 4px scale, plus layout tokens */
+  --spacing-sidebar: 15.5rem;
+  --spacing-topbar: 3.5rem;
+  --container-content: 70rem;
+  --container-prose: 47.5rem;
+
+  /* Motion */
+  --default-transition-duration: var(--cp-duration-fast);
+  --default-transition-timing-function: var(--cp-ease);
+}
+
+/* Landing page motion (D-057). Every rule here is switched off by the reduce-motion rules below. */
+@keyframes cp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* Fades and rises into place once; stagger with an inline animation-delay. */
+@utility animate-rise {
+  animation: cp-rise 560ms var(--cp-ease) both;
+}
+
+/* A slight lift on hover for cards and buttons. */
+@utility hover-lift {
+  transition-property: color, background-color, border-color, transform, box-shadow !important;
+  transition-duration: var(--cp-duration-base);
+  transition-timing-function: var(--cp-ease);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--cp-shadow-lift);
+  }
+}
+
+@utility duration-fast {
+  transition-duration: var(--cp-duration-fast);
+}
+
+@utility duration-base {
+  transition-duration: var(--cp-duration-base);
+}
+
+@layer base {
+  html {
+    background-color: var(--cp-bg);
+    -webkit-text-size-adjust: 100%;
+    /* Keep scrolled-to and focused elements clear of the sticky mobile top bar. */
+    scroll-padding-top: calc(var(--spacing-topbar) + 0.5rem);
+  }
+
+  @media (width >= 64rem) {
+    html {
+      scroll-padding-top: 0;
+    }
+  }
+
+  /* A pre-rendered public page shows the guest version (D-068); a signed-in visitor sees
+     nothing until the app replaces it with their own page (index.html marks them). */
+  html[data-signed-in] #root[data-prerendered] {
+    visibility: hidden;
+  }
+
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    min-height: 100dvh;
+  }
+
+  /* Numbers line up in tables, timers and scores. */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background-color: var(--cp-highlight);
+    color: var(--cp-on-highlight);
+  }
+
+  /* One focus style everywhere. Components must not remove it. */
+  :focus-visible {
+    outline: 2px solid var(--cp-focus);
+    outline-offset: 2px;
+  }
+
+  /* Programmatic focus targets (e.g. <main> after navigation) don't need a ring. */
+  [tabindex='-1']:focus {
+    outline: none;
+  }
+
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+
+  /* Lock page scroll while a modal dialog is open. */
+  html:has(dialog[open]) {
+    overflow: hidden;
+  }
+
+  [data-motion='reduce'] .hover-lift:hover {
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hover-lift:hover {
+      transform: none;
+    }
+  }
+
+  dialog::backdrop {
+    background-color: var(--cp-backdrop);
+  }
+
+  [data-motion='reduce'] *,
+  [data-motion='reduce'] *::before,
+  [data-motion='reduce'] *::after {
+    animation-delay: 0s !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-delay: 0s !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Native <select> lists in the theme's colours. Browsers that support customizable selects
+   (Chromium 135+) also get a themed, rounded list; others keep their own list with these
+   colours. The control keeps full native keyboard and screen-reader support. */
+@layer components {
+  .cp-select {
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .cp-select option {
+    background-color: var(--cp-surface);
+    color: var(--cp-fg);
+  }
+
+  .cp-select option:checked {
+    background-color: var(--cp-highlight);
+    color: var(--cp-on-highlight);
+  }
+
+  @supports (appearance: base-select) {
+    .cp-select,
+    .cp-select::picker(select) {
+      appearance: base-select;
+    }
+
+    .cp-select {
+      display: flex;
+      align-items: center;
+    }
+
+    /* The control draws its own chevron. */
+    .cp-select::picker-icon {
+      display: none;
+    }
+
+    .cp-select::picker(select) {
+      margin-block: 6px;
+      padding: 4px;
+      border: 1px solid var(--cp-border);
+      border-radius: var(--radius-md);
+      background-color: var(--cp-surface);
+      box-shadow: var(--cp-shadow-overlay);
+      color: var(--cp-fg);
+      font: inherit;
+    }
+
+    .cp-select option {
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+
+    .cp-select option + option {
+      margin-top: 3px;
+    }
+
+    .cp-select option::checkmark {
+      display: none;
+    }
+
+    .cp-select option:hover,
+    .cp-select option:focus-visible {
+      background-color: var(--cp-surface-3);
+      color: var(--cp-fg);
+    }
+
+    .cp-select option:checked {
+      background-color: var(--cp-highlight);
+      color: var(--cp-on-highlight);
+      font-weight: 600;
+    }
+
+    .cp-select option:focus-visible {
+      outline: 2px solid var(--cp-focus);
+      outline-offset: -2px;
+    }
+  }
+}

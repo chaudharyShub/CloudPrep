@@ -1,0 +1,82 @@
+import { useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import { proctorStatus } from '@/domain/exam/proctor';
+import { isExpired } from '@/domain/exam/timer';
+import { useToast } from '@/components/ui/Toast';
+import { useNow } from '@/hooks/useNow';
+import { useAuth } from '@/state/AuthProvider';
+import { examPath } from '@/app/paths';
+import { useExamBankState } from '@/state/QuestionBankProvider';
+import { useActiveExam } from '@/state/hooks';
+import { useAppStore } from '@/state/StoreProvider';
+import { useExamActions } from './useExamActions';
+
+/**
+ * Mounted once at the app root. Submits the active exam when its time runs out or the AI
+ * proctor ends it, on any page, including when the app loads with an exam that expired while
+ * it was closed.
+ * On exam pages it opens the results (the exam layout may mount only after the submission,
+ * e.g. while sign-in is still loading); elsewhere a notification is shown.
+ */
+export function ExamWatcher() {
+  const exam = useActiveExam();
+  const store = useAppStore();
+  const { submit } = useExamActions();
+  const { showToast } = useToast();
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const now = useNow(1000, exam !== null);
+  const isFirstCheck = useRef(true);
+  // Wait until sign-in is known, so the exam pages (which need sign-in) are on screen first and
+  // can show the results themselves.
+  const authLoading = useAuth().state.status === 'loading';
+  // Scoring needs the questions of the exam in progress, whichever page is open (D-066).
+  const bankReady = useExamBankState(exam?.examId ?? null).state.status === 'ready';
+
+  useEffect(() => {
+    if (authLoading || (exam !== null && !bankReady)) return;
+    const firstCheck = isFirstCheck.current;
+    isFirstCheck.current = false;
+    if (!exam) return;
+    // The AI proctor's verdict comes from the saved log, so it also applies after a reload.
+    const endedByProctor =
+      exam.status !== 'submitted' &&
+      exam.integrity.mode === 'proctored' &&
+      proctorStatus(exam.integrity).endedBy !== null;
+    const needsSubmit =
+      exam.status === 'submitted' || endedByProctor || isExpired(exam.endsAt, Date.now());
+    if (!needsSubmit) return;
+
+    if (endedByProctor) {
+      store.dispatchExam({
+        type: 'logIntegrity',
+        event: { type: 'exam-ended-by-proctor', at: Date.now() },
+      });
+    }
+    const reason =
+      exam.status === 'submitted'
+        ? (exam.submitReason ?? 'manual')
+        : endedByProctor
+          ? 'proctor_ended'
+          : firstCheck
+            ? 'expired_while_away'
+            : 'time_expired';
+    const attempt = submit(reason);
+    const onExamScreen =
+      pathname === examPath(exam.examId, 'exam/session') ||
+      pathname === examPath(exam.examId, 'exam/review');
+    if (attempt && onExamScreen) {
+      void navigate(examPath(exam.examId, `results/${attempt.id}`), { replace: true });
+    } else if (attempt && !pathname.startsWith(examPath(exam.examId, 'exam'))) {
+      showToast({
+        tone: 'warning',
+        title:
+          reason === 'proctor_ended' ? 'The proctor ended your exam' : 'Your exam time ran out',
+        description: 'It was submitted automatically. Open Exam history to see your results.',
+        durationMs: null,
+      });
+    }
+  }, [exam, now, submit, showToast, pathname, store, navigate, authLoading, bankReady]);
+
+  return null;
+}

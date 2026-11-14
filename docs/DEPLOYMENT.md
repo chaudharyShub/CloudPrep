@@ -1,0 +1,171 @@
+# Deployment
+
+CloudPrep has two parts:
+
+- **The app:** a static single-page app. `npm run build` produces plain HTML, CSS, JavaScript and fonts in `dist/`, hosted on Vercel and deployed automatically from `master`.
+- **The backend:** a Supabase project (Postgres with Row Level Security, and Supabase Auth). The app calls it directly with the public (publishable) key. It holds the published questions and signed-in users' data (D-044 to D-047).
+
+Without Supabase settings the app still builds and runs, for guests only, and says sign-in isn't set up.
+
+## Environment variables
+
+| Variable | Where | Notes |
+|---|---|---|
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | Vercel (Production and Preview) and `.env.local` | Public values, built into the app. Redeploy after changing them |
+| `VITE_EMAIL_SIGN_IN=true` | Vercel (optional) | Shows email sign-in links. Only set it once custom SMTP is set up (see below) |
+| `SUPABASE_URL`, `SUPABASE_SECRET_KEY` | `.env.local` only | Used by `npm run publish:questions`. The secret key bypasses Row Level Security: never commit it, never add it to Vercel, never give it a `VITE_` prefix |
+
+Copy `.env.example` to `.env.local` (git-ignored) and fill it in from the Supabase dashboard (*Project Settings → API keys*).
+
+## Vercel
+
+The repository includes `vercel.json`:
+
+| Setting | Value |
+|---|---|
+| Framework preset | Vite |
+| Build command | `npm run build` (prepares the proctor files, type check, then `vite build`) |
+| Output directory | `dist` |
+| Node.js | 22 or newer (Vercel's default is fine) |
+| Rewrites | Every path except `/assets/*` and Vercel's own `/_vercel/*` falls back to `/index.html`, so links like `/results/<id>/review` work when opened directly or refreshed |
+| Headers | `/assets/*` files have content hashes in their names, so they are cached for a year (`immutable`) |
+
+Vercel serves real files first, so `/favicon.svg`, the icons and the files in `/assets/` are never rewritten. A missing `/assets/` file returns a 404 instead of the HTML page.
+
+### AI proctor files
+
+`npm run build` (and `npm run dev`) first runs `scripts/setup-proctor-assets.mjs`. It copies the MediaPipe WebAssembly runtime from `node_modules` and downloads the two models, checked against pinned SHA-256 hashes, into `public/proctor/`. They end up in `dist/proctor/` (about 36 MB; a browser downloads about 25 MB of it). The first build therefore needs internet access. `public/proctor/` is git-ignored because it is recreated on every build. These files keep the default caching (revalidated on each visit), because their names don't change when MediaPipe is upgraded.
+
+## First-time setup
+
+### 1. Supabase project and database
+
+1. Create a project at supabase.com and copy its URL and keys into `.env.local`.
+2. **Link the project:** `npx supabase login`, then `npx supabase link --project-ref <project-ref>` (it asks for the database password).
+3. **Create the tables:** `npm run db:push` applies `supabase/migrations/`.
+4. **Publish the questions:** they are in the private repo (D-072), so first `git clone https://github.com/chaudharyShub/CloudPrep-questions.git src/content` (needs access). Then `npm run publish:questions -- --dry-run` to check, then `npm run publish:questions`, then `npm run check:published` to confirm the app receives exactly the checked-out questions. Without `src/content/` both scripts stop with a message; the sample bank is never published.
+5. **Check:** in the dashboard's Table Editor, `exams` has one row (`clf-c02`, `is_published` true, `bank_version` set) and `questions` has every non-draft question.
+
+Note: free-tier projects pause after about a week without activity; resume them from the dashboard.
+
+### 2. Sign-in
+
+1. **Redirect URLs** (Supabase: *Authentication → URL Configuration*): Site URL = your live URL (for example `https://<app>.vercel.app`). Redirect URLs: `https://<app>.vercel.app/**`, `http://localhost:5173/**` and `http://localhost:4173/**`. Add preview URLs too if you sign in on preview deployments.
+2. **Google:** in Google Cloud Console create an OAuth client (*Web application*) with the authorised redirect URI `https://<project-ref>.supabase.co/auth/v1/callback`. Enter its client ID and secret in Supabase under *Authentication → Sign In / Providers → Google* and enable it. Publish the Google app (out of "Testing") so anyone can sign in.
+3. **Email sign-in links (off by default):** the sign-in page shows only Google unless `VITE_EMAIL_SIGN_IN=true` is set. Supabase's built-in email only reaches your project team's addresses, a few per hour, so first set up custom SMTP under *Authentication → Emails → SMTP Settings* (for example Resend or Brevo, with a sender on a domain you own), then add the variable in Vercel and redeploy.
+
+### Admin access (D-054)
+
+The `/admin` page shows signed-in accounts and their activity, only to accounts listed in `public.admins`. After `npm run db:push` has created the table, sign in to the live site once with your Google account. Then put your email in `.env.local` (next to `SUPABASE_URL` and `SUPABASE_SECRET_KEY`; several emails can be comma-separated) and run `npm run admin:add` (D-055):
+
+```
+ADMIN_EMAIL=you@example.com
+```
+
+Don't add `ADMIN_EMAIL` to Vercel, and never as `VITE_ADMIN_EMAIL`: the app doesn't use it, and `VITE_` values end up in the public site. Or, without the script, run this in the Supabase *SQL Editor* (replace the email):
+
+```sql
+insert into public.admins (user_id)
+select id from auth.users where email = 'you@example.com';
+```
+
+Reload the site: admins get an **Admin** link in the navigation, which opens `/admin`. To remove an admin: `delete from public.admins where user_id = (select id from auth.users where email = 'you@example.com');`. The table can't be read or changed from the app, only here.
+
+### 3. Vercel project
+
+1. Sign in at vercel.com, choose *Add New → Project*, and import the GitHub repository. Vercel reads `vercel.json`; leave the settings as detected.
+2. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` under *Settings → Environment Variables* (Production and Preview). Never add the secret key.
+3. Enable Web Analytics and Speed Insights once (*Analytics → Enable*, *Speed Insights → Enable*; see below).
+4. Deploy, then run the smoke test below.
+
+## Updating
+
+- **App changes:** work on a branch, open a pull request and merge it into `master`. Vercel builds and deploys `master` automatically; pull requests get preview deployments.
+- **Question changes:** in `src/content/` (the private repo, D-072): bump the exam's `BANK_VERSION`, commit and push there, then run `npm run publish:questions` and `npm run check:published` (both handle every exam, D-066). **The live site only shows published questions**, and visitors get the new set on their next visit (it's cached in their browser by version).
+- **More exams (4.0.0, D-066):** run `npm run publish:questions` and `npm run check:published` before or right after merging 4.0.0. They publish the SAA-C03 and DVA-C03 catalogue rows (exam, domains, topics) and their 600 questions each; 4.0.0 marks both exams `launched`, so their pages need the published questions. The live 3.5.0 app reads only CLF-C02 rows, so publishing first is safe. No migration is needed. A new exam appears on the live site when its guide in `src/domain/exam-guide/` has `launched: true`; set that only once its bank is published, then add its landing figure in `src/features/landing/landingContent.ts`.
+- **Vercel and the private questions (D-072):** Vercel builds the public repo without `src/content/` (it is git-ignored, not a submodule, so there is nothing private to fetch). The production build never bundles questions; the live site reads the published ones from Supabase.
+- **Moving to the fresh public repo (D-072, once):** rename the old repo to `CloudPrep-archive` and make it private (Settings → General), create a new public `CloudPrep` and push this tree to it as its first commit, then in Vercel → Project → Settings → Git disconnect the old repository and connect the new one (production branch `master`). The domains, environment variables, Analytics and Speed Insights stay on the Vercel project. Check that the next deploy builds from the new repo.
+- **Database changes:** add a new migration in `supabase/migrations/` and run `npm run db:push` before deploying app code that needs it.
+- **User data is kept:** signed-in users' data is in Supabase with a copy in the browser, and guests' data is in their browser. Every stored shape is versioned and migrated (see `src/storage/`).
+
+A deployment renames the page files and removes the old ones. If someone has CloudPrep open during it, opening a page their tab hasn't loaded yet reloads the site once, briefly showing "CloudPrep was updated. Loading the latest version…" (D-053). If the page still can't load (for example offline), "Something went wrong" appears with a **Reload** button. No data is lost either way.
+
+### Testing a branch on a preview link
+
+Every pushed branch and pull request gets its own Vercel **preview deployment** (a separate URL shown on the pull request and in the Vercel dashboard). The live site keeps running `master` until the pull request is merged. Use previews to try a change, or to share it for feedback, before it goes live (for example the 3.0.0 redesign, D-057).
+
+- Previews use the same Supabase project and the same `VITE_` variables as production (set them for the *Preview* environment in Vercel if you scoped them to *Production* only). Data written on a preview is real account data.
+- **Google sign-in on previews:** in Supabase, *Authentication → URL Configuration → Redirect URLs*, add `https://*-<your-vercel-team>.vercel.app/**` (the wildcard that matches your preview URLs; copy the pattern from a preview link). Without it, signing in on a preview returns to the live site instead. Guests can use a preview without this.
+- To go back to the previous interface after a merge, redeploy the `archive/ui-v2` branch or tag `v2.4.0` (Vercel: *Deployments → Promote*, or *Instant Rollback* to the last 2.4.0 deployment). Both are kept on GitHub.
+
+## Smoke test after each deployment
+
+1. Open the site signed out: you land on the sign-in page, with no errors in the browser console. "Continue as a guest" opens Learning mode.
+2. Open `<your-url>/clf-c02/practice` and `<your-url>/settings` directly in a new tab, then refresh. Both must load (this checks the route fallback). Open `<your-url>/practice`: it moves to `/clf-c02/practice` (old addresses, D-066).
+3. Open `<your-url>/does-not-exist`. You should see CloudPrep's "Page not found" page, not a Vercel 404.
+4. As a guest, start a short practice session and check an answer. Reload: progress is kept, and the Review due card in Learning mode shows when the question comes back.
+5. Sign in with Google: you return to the page you came from and your account shows in the navigation. If you have guest data, you're asked once whether to add it.
+6. Start a timed exam, answer a question, reload the page: the exam resumes with the timer still running. Submit it and open the results.
+7. Open the site in another browser and sign in: the exam appears in Exam history.
+8. In Settings, export your data. The file downloads.
+9. Optional: in strict practice, allow fullscreen, then leave it. A warning appears.
+
+## Web Analytics (D-048)
+
+1. In the Vercel project, open *Analytics* and choose *Enable* (Web Analytics; the free tier is enough for personal use).
+2. Deploy as usual. The app loads Vercel's script only in production builds.
+3. **Check:** open the live site and visit a few pages, then look at *Analytics* in the Vercel dashboard; visits appear within a minute or so. Ad blockers can block the script, so test in a normal window without one. In the browser's network panel, `/_vercel/insights/script.js` should load with status 200.
+
+## Speed Insights (D-065)
+
+1. In the Vercel project, open *Speed Insights* and choose *Enable* (the free tier is enough for this site).
+2. Deploy as usual (merge the pull request). The app loads Vercel's script only in production builds.
+3. **Check:** open the live site in a normal window without an ad blocker and move between a few pages. In the browser's network panel, `/_vercel/speed-insights/script.js` should load with status 200, and requests to `/_vercel/speed-insights/vitals` appear as you use or leave the page. Core Web Vitals (LCP, INP, CLS, FCP, TTFB) appear under *Speed Insights* in the Vercel dashboard once enough visits have been measured; on a quiet site this can take a while.
+
+## Link previews (D-050)
+
+The preview image's address is `SITE_ORIGIN` in `src/app/seo.ts` (https://aws-cloud-prepare.vercel.app, D-064), used when the build runs on Vercel; nothing needs setting there. If the live address changes, change `SITE_ORIGIN` (and the README links), keep the old domain on the project as a permanent redirect, and update Supabase's URLs and Search Console (below). **Check:** paste the live link into a chat app (WhatsApp, Slack) or a preview checker such as opengraph.xyz; it should show the CloudPrep image and title. Apps cache previews, so a link shared before a change may show the old one for a while.
+
+## Search engines (D-063)
+
+The production build writes `robots.txt` and `sitemap.xml` (from `src/app/seo.ts`) using the same live address as the link previews (`SITE_ORIGIN`). When you add a public page, add it to `INDEXED_PATHS` there, and give it a title and description in `PAGE_HEADS` (`src/app/pageHeads.ts`) and a rewrite in `vercel.json` (D-068; `pageHeads.test.ts` fails until both match); when you add a signed-in area, add it to `BLOCKED_PATHS`.
+
+**Public pages (D-068), check after deploying:** `curl -s https://aws-cloud-prepare.vercel.app/saa-c03 | grep "<title>"` should print the SAA-C03 page's title, not the shared one, and `curl -s https://aws-cloud-prepare.vercel.app/saa-c03 | grep -c "data-prerendered"` should print 1 (the page's content is in the HTML). `/settings` should come back with an empty `<div id="root"></div>` (the app page, `spa.html`). To see what a shared link looks like, paste a page address into LinkedIn's Post Inspector (https://www.linkedin.com/post-inspector/); it also refreshes LinkedIn's saved preview.
+
+**Check after deploying:** open `/robots.txt` and `/sitemap.xml` on the live site. Each should show plain text or XML, not the CloudPrep app. Opening `/practice/` should land on `/practice` (`vercel.json` sets `"trailingSlash": false`, so each page has one address).
+
+**Google Search Console (once):**
+1. Go to https://search.google.com/search-console and sign in with Google.
+2. *Add property* → *URL prefix* → enter the live address (`https://aws-cloud-prepare.vercel.app/`).
+3. Verify with the *HTML file* method: put the file Google offers (`google<code>.html`) in `public/`, deploy, check that the live address `/google<code>.html` shows its one line, then press *Verify*. Keep the file, or the site stops being verified. (A `*.vercel.app` address can't use the DNS method.) CloudPrep's file is `public/googlec9536a809aa9ed01.html` (added 2026-11-01).
+4. Open *Sitemaps*, enter `sitemap.xml` and press *Submit*.
+5. Optional: use *URL inspection* on the home page and press *Request indexing*. Do this after icon changes too: the icon beside the result comes from the home page's PNG icon (a multiple of 48 px) or `/favicon.ico`, and Google refreshes it slowly.
+6. After changing the site name data in `index.html` (D-067): run the live home page through https://search.google.com/test/rich-results (it should find a *WebSite* item), then *Request indexing* for the home page. The name in results changes after Google crawls it again; on a shared `vercel.app` domain Google may still show the domain.
+
+Google takes a few days to a few weeks to list a new site. *Performance* then shows the searches that bring visitors. **When the address changes** (done on 2026-11-02, from `cloud-prep-aws.vercel.app`, D-064; again later for a custom domain):
+1. Add the new domain in Vercel and make the old one redirect to it (*Settings → Domains*, permanent redirect). Keep the old domain on the project.
+2. Change `SITE_ORIGIN` in `src/app/seo.ts` and the README links, and deploy. Check that `/sitemap.xml` and `/robots.txt` name the new address.
+3. Supabase, *Authentication → URL Configuration*: set the Site URL to the new address and add `https://<new address>/**` to Redirect URLs, or Google sign-in may return to the old address.
+4. Search Console: add the new address as a property (the same verification file works), then on the **old** property open *Settings → Change of address* and pick the new one, and submit `sitemap.xml` in the new property. Don't use the *Removals* tool on the old address; the redirect is enough. The old property can be deleted afterwards.
+
+## Other static hosts
+
+Any static host works if it can serve `index.html` for unknown paths and set the two `VITE_SUPABASE_*` variables at build time. Web Analytics and Speed Insights only work on Vercel.
+- **Netlify:** build `npm run build`, publish `dist`, and add `public/_redirects` containing `/*  /index.html  200`.
+- **Cloudflare Pages:** build `npm run build`, output `dist`. Single-page-app fallback is automatic when there is no `404.html`.
+- **GitHub Pages:** it has no fallback, so deep links would 404. It would need a hash router (D-004 option B); that isn't set up.
+
+The site must be served from the domain root (`/`). Serving it from a sub-path would need Vite's `base` option and the router's `basename`. Any new address also needs adding to Supabase's redirect URLs.
+
+## Checks before publishing
+
+```bash
+npm run check      # type check, lint, format, question validation, unit tests, build, E2E
+npm run preview    # inspect the production build at http://localhost:4173
+```
+
+What to expect in the production build (`dist/`):
+- **Keys:** only the public Supabase URL and publishable key. The secret key is never read by app code.
+- **Network:** the app talks to its own files, the Supabase project and, in production, Vercel Web Analytics and Speed Insights. Links to AWS documentation open in a new tab.
+- **No test code:** the fake sign-in used by E2E builds is removed from production builds (D-045), and the bundle contains no questions; they're downloaded from Supabase (D-046).
+- **Paths:** asset paths are absolute (`/assets/...`), which is correct for a root-domain deployment.

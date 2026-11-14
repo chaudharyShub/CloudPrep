@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark light" />
+    <meta
+      name="description"
+      content="CloudPrep is a free, unofficial practice exam simulator for three AWS certifications: Cloud Practitioner (CLF-C02), Solutions Architect – Associate (SAA-C03) and Developer – Associate (DVA-C03)."
+    />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#f3f0f2" />
+    <!-- Link previews (D-050). %SITE_URL% is the production address on Vercel (vite.config.ts). -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CloudPrep" />
+    <meta property="og:title" content="CloudPrep: AWS exam practice" />
+    <meta
+      property="og:description"
+      content="Unofficial practice for the AWS Cloud Practitioner, Solutions Architect – Associate and Developer – Associate exams: Learning mode, timed mock exams and progress tracking."
+    />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:image" content="%SITE_URL%/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="CloudPrep logo with the text: Practice for AWS certification exams: Cloud Practitioner, Solutions Architect and Developer"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- The site name Google shows in search results instead of the domain (D-067). -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "CloudPrep",
+        "alternateName": ["CloudPrep AWS exam practice"],
+        "url": "%SITE_URL%/"
+      }
+    </script>
+    <!-- What search engines and link previews see before the app sets the page title (D-063). -->
+    <title>CloudPrep: free AWS practice exams for CLF-C02, SAA-C03 and DVA-C03</title>
+    <script>
+      // Apply the saved theme before first paint, so dark-theme users don't see a light flash.
+      // The app applies the same setting again once it loads (src/lib/theme.ts).
+      try {
+        // A signed-in user's copy (src/storage/account.ts) wins over guest settings.
+        var owner = JSON.parse(localStorage.getItem('cloudprep-account:owner') || 'null');
+        var signedIn = Boolean(owner && owner.data && owner.data.signedIn);
+        // Pre-rendered public pages show the guest version (D-068); hide it from a signed-in
+        // visitor until the app replaces it with their own page.
+        if (signedIn) document.documentElement.setAttribute('data-signed-in', '');
+        var key = signedIn ? 'cloudprep-account:cloudprep:preferences' : 'cloudprep:preferences';
+        var saved = JSON.parse(localStorage.getItem(key) || 'null');
+        // No saved choice means the default, "light" (src/storage/preferencesArea.ts).
+        var theme = (saved && saved.data && saved.data.theme) || 'light';
+        if (theme === 'system') {
+          theme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        }
+        if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      } catch (e) {
+        // Storage unavailable or unreadable: keep the default light theme.
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

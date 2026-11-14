@@ -1,0 +1,52 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/privacy",
+      "destination": "/privacy/index.html"
+    },
+    {
+      "source": "/clf-c02",
+      "destination": "/clf-c02/index.html"
+    },
+    {
+      "source": "/clf-c02/practice",
+      "destination": "/clf-c02/practice/index.html"
+    },
+    {
+      "source": "/saa-c03",
+      "destination": "/saa-c03/index.html"
+    },
+    {
+      "source": "/saa-c03/practice",
+      "destination": "/saa-c03/practice/index.html"
+    },
+    {
+      "source": "/dva-c03",
+      "destination": "/dva-c03/index.html"
+    },
+    {
+      "source": "/dva-c03/practice",
+      "destination": "/dva-c03/practice/index.html"
+    },
+    {
+      "source": "/((?!assets/|_vercel/).*)",
+      "destination": "/spa.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
+}
