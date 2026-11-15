@@ -1,5 +1,5 @@
 import { Link } from 'react-router';
-import { DEVELOPER, FRONTEND_PREP, MAKER_BRAND } from '@/app/developer';
+import { DEVELOPER, MAKER_BRAND, OTHER_SITES } from '@/app/developer';
 import { LogoTile } from '@/components/brand/LogoMark';
 import { MakerMark } from '@/components/brand/MakerMark';
 import { ExternalLink } from '@/components/ui/ExternalLink';
@@ -43,7 +43,7 @@ export function UnofficialNote({ compact = false }: { compact?: boolean }) {
 
 /**
  * The shared "Shubham Works" footer (D-062), the same on all the developer's sites: maker mark,
- * umbrella line, credit (D-056) and links to the developer's other sites (D-059).
+ * umbrella line, credit (D-056), the developer's newest other sites and the portfolio (D-073).
  */
 export function MadeBy() {
   return (
@@ -57,11 +57,20 @@ export function MadeBy() {
           {DEVELOPER.name}
         </ExternalLink>
       </p>
-      {/* The developer's other sites; the current one is already named in the header. */}
+      {/* The developer's other sites, never this one (docs/SHUBHAM_WORKS.md). */}
       <p>
         Also:{' '}
-        <ExternalLink href={FRONTEND_PREP.url} className="font-normal">
-          {FRONTEND_PREP.name}
+        {OTHER_SITES.map((site, index) => (
+          <span key={site.url}>
+            {index > 0 && ', '}
+            <ExternalLink href={site.url} className="font-normal">
+              {site.name}
+            </ExternalLink>
+          </span>
+        ))}
+        {' · '}
+        <ExternalLink href={DEVELOPER.url} className="font-normal">
+          All projects
         </ExternalLink>
       </p>
     </div>

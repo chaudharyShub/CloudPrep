@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { DEVELOPER, FRONTEND_PREP, MAKER_BRAND } from '@/app/developer';
+import { DEVELOPER, FRONTEND_PREP, MAKER_BRAND, OTHER_SITES } from '@/app/developer';
 import { createFakeAuthClient } from '@/backend/fakeAuth';
 import { renderApp } from '@/test/renderApp';
 
@@ -32,7 +32,27 @@ describe('Developer credit', () => {
     expect(link).toHaveAttribute('href', FRONTEND_PREP.url);
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
-    expect(link?.closest('p')).toHaveTextContent(`Also: ${FRONTEND_PREP.name}`);
+    expect(link?.closest('p')).toHaveTextContent(/^Also:/);
+  });
+
+  it('AC-D.7 "Also:" lists at most 3 other sites, newest first, never CloudPrep, then All projects', async () => {
+    renderApp('/clf-c02/dashboard', { auth: createFakeAuthClient() });
+    await screen.findByRole('heading', { level: 1 });
+    expect(OTHER_SITES.length).toBeLessThanOrEqual(3);
+    const [first] = screen.getAllByRole('link', { name: new RegExp(`^${OTHER_SITES[0]?.name}`) });
+    const line = first?.closest('p') as HTMLElement;
+    const links = within(line).getAllByRole('link');
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      ...OTHER_SITES.map((site) => site.url),
+      DEVELOPER.url,
+    ]);
+    expect(links.at(-1)).toHaveAccessibleName(/^All projects/);
+    for (const link of links) {
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+      expect(link.textContent).not.toMatch(/CloudPrep/);
+    }
+    expect(line).toHaveTextContent(/^Also:/);
   });
 
   it('AC-D.3 the landing page footer shows the same link to guests', async () => {

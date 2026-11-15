@@ -1,6 +1,6 @@
 # CloudPrep — Product Specification
 
-> Status: **Describes the app as built** (version 4.4.0) · Last updated: 2026-11-14
+> Status: **Describes the app as built** (version 4.5.0) · Last updated: 2026-11-15
 > CloudPrep is an unofficial practice tool. It is not affiliated with, endorsed by, or sponsored by Amazon Web Services.
 >
 > This replaces the first draft of 2026-10-21. What changed from that plan is in IMPLEMENTATION_PLAN.md ("Changes from the original plan") and the reasons are in DECISIONS.md.
@@ -111,7 +111,7 @@ Pages that belong to an exam have its id in the address: `/clf-c02/practice`, `/
 
 ### 4.3 Not built
 
-- An onboarding flow and an About page. The landing page at `/` introduces CloudPrep to guests (D-057); signed-in users can't open it. The unofficial-tool note and the shared Shubham Works footer (D-062: the maker mark, "A Shubham Works project", the developer credit "Made by Shubham Chaudhary" linking to his portfolio, D-056, and "Also: Frontend Interview Prep" linking to his frontend interview practice site, https://frontend-interview-prepare.vercel.app/, D-059) are in the sidebar, the mobile menu and the landing page footer; the scoring explanation is on the exam and results pages.
+- An onboarding flow and an About page. The landing page at `/` introduces CloudPrep to guests (D-057); signed-in users can't open it. The unofficial-tool note and the shared Shubham Works footer (D-062: the maker mark, "A Shubham Works project", the developer credit "Made by Shubham Chaudhary" linking to his portfolio, D-056, and "Also:" with at most 3 of the developer's other sites, newest first, then "All projects" linking to the portfolio, D-073: today Git, Drawn Out, https://git-drawn-out.vercel.app/, and Frontend Interview Prep, https://frontend-interview-prepare.vercel.app/, D-059) are in the sidebar, the mobile menu and the landing page footer; the scoring explanation is on the exam and results pages.
 - Comparing two attempts side by side.
 - Exam time accommodation (+30 minutes), keyboard shortcuts, custom-length quizzes.
 - Installable offline app (PWA): icons and "Add to Home Screen" exist, but there's no service worker.
