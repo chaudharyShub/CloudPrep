@@ -174,7 +174,7 @@ Also:
 
 - [Git, Drawn Out](https://git-drawn-out.vercel.app/): a visual field guide to Git
 - [Frontend Interview Prep](https://frontend-interview-prepare.vercel.app/): frontend interview questions with answers
-- [All projects](https://shubhamworks.vercel.app/)
+- [All projects](https://shubhamworks.vercel.app/projects)
 
 In the app, the same credit is in the sidebar, the mobile menu and the landing page footer ([docs/SHUBHAM_WORKS.md](docs/SHUBHAM_WORKS.md)). The Privacy page says who runs the site.
 

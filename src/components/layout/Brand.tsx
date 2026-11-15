@@ -69,7 +69,7 @@ export function MadeBy() {
           </span>
         ))}
         {' · '}
-        <ExternalLink href={DEVELOPER.url} className="font-normal">
+        <ExternalLink href={DEVELOPER.projectsUrl} className="font-normal">
           All projects
         </ExternalLink>
       </p>

@@ -44,7 +44,7 @@ describe('Developer credit', () => {
     const links = within(line).getAllByRole('link');
     expect(links.map((link) => link.getAttribute('href'))).toEqual([
       ...OTHER_SITES.map((site) => site.url),
-      DEVELOPER.url,
+      DEVELOPER.projectsUrl,
     ]);
     expect(links.at(-1)).toHaveAccessibleName(/^All projects/);
     for (const link of links) {
