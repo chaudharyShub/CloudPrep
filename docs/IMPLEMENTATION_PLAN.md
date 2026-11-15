@@ -41,6 +41,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | More SAA-C03 and DVA-C03 questions (D-070) | 200 more questions for each exam (5 batches of 40, following the domain weights), each checked against its cited pages; 800 per exam (240 / 200 / 200 / 160); banks `2026-11-09.1`; landing page shows 800; version 4.2.0; acceptance criteria below | Done, merged (PR #30) and live |
 | SAA-C03 and DVA-C03 at 1,000 (D-071) | The remaining 200 questions for each exam, each checked against its cited pages; SAA-C03 300 / 260 / 240 / 200 and DVA-C03 300 / 260 / 220 / 220; banks `2026-11-12.1`; landing page and exam page descriptions show 1,000; version 4.3.0; acceptance criteria below | Done and live (shipped with 4.4.0; PR #31 closed, D-072) |
 | Questions kept private (D-072) | The question banks and review log move to the private repo `CloudPrep-questions`, checked out at `src/content/` (git-ignored); a public sample bank (`src/sample-content/`) for tests, E2E and development; scripts need the checkout (validation falls back to the sample); questions all rights reserved on the Privacy page, README and `LICENSE-CONTENT.md`; fresh public repo, old one private as the archive; version 4.4.0; acceptance criteria below | Done and live (first commit of the fresh public repo) |
+| Shubham Works footer update (D-073) | "Also:" lists at most 3 other sites, newest first (Git, Drawn Out, Frontend Interview Prep), then "All projects" (the portfolio); the owner's own browsers are left out of Web Analytics and Speed Insights (secret link, shared with the other sites); version 4.5.0; acceptance criteria below | Done, merged (PR #1) and live |
 | Speed Insights (D-065) | Vercel Speed Insights (Core Web Vitals) beside Web Analytics, production builds only; the Privacy page says what it measures; version 3.5.0; acceptance criteria below | Done, merged and live (PR #25) |
 | Shubham Works footer (D-062) | The credit becomes a shared footer for all the developer's sites: the orange "Dial" maker mark (`maker` token; SVGs in `docs/brand/`), "A Shubham Works project", "Made by Shubham Chaudhary", and "Also: Frontend Interview Prep" (replaces "Also by me"); a less crowded sidebar bottom with a shorter unofficial note; the Privacy page says CloudPrep is a Shubham Works project; `docs/SHUBHAM_WORKS.md` for the other sites; version 3.4.0; acceptance criteria below | Done, merged and live (PR #23) |
 | Open source licences (D-061) | `LICENSE` (MIT, code) and `LICENSE-CONTENT.md` (CC BY-NC-SA 4.0, questions); README License section; a Privacy page section on the licences and how the questions were made (AI-assisted, checked against AWS pages); `license` in package.json; version 3.3.0; acceptance criteria below | Done, merged and live (PR #22) |
@@ -459,6 +460,19 @@ Acceptance criteria (`src/app/pageHeads.test.ts`, `src/app/pageHeadTitles.test.t
 - AC-S.13 A first-time guest's browser takes each pre-rendered page over (hydration) with no mismatch, and the page then works (the landing page's demo runs, links navigate); a guest whose exam differs (home page, last used another exam) gets a fresh render instead.
 - AC-S.14 A signed-in visitor to a pre-rendered page never sees the guest version and gets their dashboard, without errors; only a guest whose first render uses the same exam takes the HTML over (`canTakeOver`).
 - Checked by hand after deploying: `curl -s https://aws-cloud-prepare.vercel.app/saa-c03 | grep "<title>"` shows the SAA-C03 title, and `curl -s https://aws-cloud-prepare.vercel.app/saa-c03 | grep -c "data-prerendered"` prints 1; a link preview checker (for example LinkedIn's Post Inspector) shows each page's own title and description.
+
+## Shubham Works footer update (D-073)
+
+Requested by the user on 2026-11-15: follow the updated `docs/SHUBHAM_WORKS.md`. Version 4.5.0.
+
+Acceptance criteria:
+- AC-D.7 "Also:" in the footer (sidebar, mobile menu, landing page) lists at most 3 of the developer's other sites, newest first, never CloudPrep, each in a new tab, then "All projects" linking to the portfolio (`PrivacyPage.test.tsx`).
+- AC-O.1 The code holds only the token's SHA-256; a browser without the token is counted (`ownerDevice.test.ts`).
+- AC-O.2 Opening the site with `#<token>` saves the token, removes it from the address (path and query kept) and says the browser won't be counted.
+- AC-O.3 `#<token>.on` deletes the saved token and says analytics is back on.
+- AC-O.4 A wrong token or a hand-made stored value (`true`) doesn't count, and the address is left alone.
+- `<Analytics />` and `<SpeedInsights />` mount only in production builds and only after the check says "not the owner" (`src/app/Root.tsx`); a check that throws counts the visit; pre-rendered pages still match (`prerender.test.tsx`).
+- Checked by hand after deploying: with the secret link, the live site shows the alert and loads no `/_vercel/insights/script.js` or `/_vercel/speed-insights/script.js`, also after a reload; with `.on` they load again.
 
 ## Questions kept private (D-072)
 

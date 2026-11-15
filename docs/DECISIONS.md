@@ -78,6 +78,7 @@
 | D-070 | SAA-C03 and DVA-C03 grow to 800 questions each (200 more per exam, following the domain weights); version 4.2.0 | Accepted (live, PR #30) |
 | D-071 | SAA-C03 and DVA-C03 reach 1,000 questions each (the remaining 200 per exam, to the D-066 domain splits); version 4.3.0 | Accepted (live; shipped with D-072, PR #31 closed) |
 | D-072 | Questions kept private: the banks move to the private repo `CloudPrep-questions`, checked out at `src/content/`; a public sample bank for tests, E2E and development; a fresh public app repo, the old one made private; questions all rights reserved; version 4.4.0 | Accepted (live) |
+| D-073 | Shubham Works footer update: "Also:" lists at most 3 other sites, newest first (Git, Drawn Out, Frontend Interview Prep), then "All projects"; the owner's own browsers are left out of Web Analytics and Speed Insights; version 4.5.0 | Accepted (live, PR #1) |
 
 ---
 
@@ -578,3 +579,11 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **History (user's choice, option 3 of 3):** moving the files hides only future versions; every earlier commit, the `v2.4.0` tag, `archive/ui-v2` and PR #31 (GitHub keeps `refs/pull/31/head`) still held the questions. Rewriting the history would change `v2.4.0` and `archive/ui-v2`, which must never change, and leave clones and forks as they were. Instead the old repo is made private as the archive (history, PRs, tag and branch kept there), and a fresh public repo starts from one commit of this tree. Copies made while the repo was public can't be recalled.
 - **Licence:** the questions are now all rights reserved (`LICENSE` in the private repo; `LICENSE-CONTENT.md` here says so). Copies obtained earlier under CC BY-NC-SA 4.0 (D-061) keep that licence; CC licences can't be withdrawn. The code stays MIT, and so does the sample bank. The Privacy page and README say the questions are written with AI assistance and checked, as before (D-061), and that they aren't openly licensed.
 - **Version:** 4.4.0, with the 4.3.0 questions (D-071), which ship in the same release because PR #31 was closed.
+
+## D-073 — Shubham Works footer update and the owner's visits
+
+- **Context (2026-11-15):** the user updated `docs/SHUBHAM_WORKS.md` (both copies) and asked CloudPrep to follow it: a new site, Git, Drawn Out, and a cap on the "Also:" list so it doesn't grow into a paragraph; and every Shubham Works site with analytics must leave out the owner's own browsers, the same way on every site.
+- **Footer:** "Also:" lists at most 3 of the developer's other sites, newest first, never CloudPrep, then "All projects" linking to the portfolio. Today: Git, Drawn Out, Frontend Interview Prep · All projects. The list is `OTHER_SITES` in `src/app/developer.ts`; a new site goes first and the oldest drops off past 3. The Privacy page's sentence about Frontend Interview Prep (D-059) stays.
+- **Owner's visits:** `src/lib/ownerDevice.ts` follows the shared recipe: opening the site with the owner's secret token after `#` saves the token in `localStorage` (`cloudprep-owner-device`) and analytics stays off in that browser; `#<token>.on` turns it back on. The code holds only the token's SHA-256 (shared by every site); the token is never written down. `Telemetry` in `src/app/Root.tsx` mounts `<Analytics />` and `<SpeedInsights />` only after the check says "not the owner" (also on `hashchange`); if the check throws, the visit is counted. The check runs in an effect, so pre-rendered pages still match the browser's first render (D-068).
+- **Exceptions:** the token is a device mark, not user data, so it skips the store's versioned envelope (D-005) and sync, like the reload guard (D-053); it is read through the storage driver (`createLocalStorageDriver`), and without storage the visit is counted. As the shared page asks, neither the README nor the site mentions it.
+- **Version:** 4.5.0.

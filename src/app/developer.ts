@@ -12,3 +12,15 @@ export const FRONTEND_PREP = {
   name: 'Frontend Interview Prep',
   url: 'https://frontend-interview-prepare.vercel.app/',
 } as const;
+
+/** The developer's Git guide (D-073). */
+export const GIT_DRAWN_OUT = {
+  name: 'Git, Drawn Out',
+  url: 'https://git-drawn-out.vercel.app/',
+} as const;
+
+/**
+ * "Also:" in the footer (D-073, `docs/SHUBHAM_WORKS.md`): at most 3 of the developer's other
+ * sites, newest first, never CloudPrep itself. A new site goes first; past 3 the oldest drops off.
+ */
+export const OTHER_SITES: readonly { name: string; url: string }[] = [GIT_DRAWN_OUT, FRONTEND_PREP];

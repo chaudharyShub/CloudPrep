@@ -1,6 +1,6 @@
 # CloudPrep — Architecture
 
-> Status: **Describes the code as built** (version 4.4.0) · Last updated: 2026-11-14
+> Status: **Describes the code as built** (version 4.5.0) · Last updated: 2026-11-15
 > This replaces the first draft of 2026-10-21. Reasons for each choice are in DECISIONS.md.
 
 ## 1. Overview
@@ -47,7 +47,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 | Validation | Hand-written parsers (D-005); no schema library |
 | Backend | `@supabase/supabase-js` (loaded in its own chunk), Supabase CLI for migrations |
 | AI proctor | `@mediapipe/tasks-vision` with self-hosted models (D-043) |
-| Analytics | `@vercel/analytics` (page views, D-048) and `@vercel/speed-insights` (Core Web Vitals, D-065), production builds only |
+| Analytics | `@vercel/analytics` (page views, D-048) and `@vercel/speed-insights` (Core Web Vitals, D-065), production builds only, never in the owner's own browsers (D-073) |
 | Tests | Vitest + jsdom + Testing Library; PGlite for the database schema; Playwright + axe |
 | Lint / format | ESLint 9 (typescript-eslint, react-hooks, jsx-a11y) + Prettier |
 
@@ -77,7 +77,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │  ├─ hydration.ts         # canTakeOver: when the browser takes a pre-rendered page over (D-068)
 │  │  ├─ browserServices.ts   # The browser's router, sign-in, stores and question loading, made before React starts
 │  │  ├─ Root.tsx             # StrictMode and analytics, shared by the browser and pre-rendering
-│  │  ├─ developer.ts         # Developer credit (D-056), Frontend Interview Prep link (D-059), Shubham Works name (D-062)
+│  │  ├─ developer.ts         # Developer credit (D-056), the footer's other sites (`OTHER_SITES`, D-059, D-073), Shubham Works name (D-062)
 │  │  └─ layouts/             # RootLayout (watchers, theme), AppLayout (sidebar / drawer), ExamLayout
 │  ├─ backend/                # Supabase adapters behind interfaces, row types and mappers, fakes
 │  │                          # auth.ts, supabaseAuth.ts, questionSource.ts, contentRows.ts,
@@ -111,7 +111,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │                          # settings, privacy, admin (D-054), landing (D-057), errors, dev (/__ui),
 │  │                          # shared (question rendering)
 │  ├─ hooks/                  # useNow, useTheme, useDocumentTitle (adds the exam code on exam pages)
-│  ├─ lib/                    # theme, format, download, ids, cn, reloadAfterUpdate (D-053), documentTitle (D-068)
+│  ├─ lib/                    # theme, format, download, ids, cn, reloadAfterUpdate (D-053), documentTitle (D-068), ownerDevice (D-073)
 │  ├─ state/                  # Providers and hooks (§6)
 │  ├─ storage/                # driver, envelope, areas, store, sync, account, transfer, questionCache
 │  ├─ styles/index.css        # Tailwind import, design tokens (both themes), base styles
@@ -279,7 +279,7 @@ Guest data uses the `cloudprep:` prefix; a signed-in account's copy uses the sam
 
 Adding `examId` (D-066) didn't change the schema versions: each parser reads an item without `examId` as CLF-C02 and drops items of unknown exams, so browser data, import files and server rows from before 4.0.0 all read the same way. Progress, bookmarks and the archive are keyed by question id, which carries the exam.
 
-Also: `cloudprep-account:owner`, `cloudprep-account:sync:pending`, `cloudprep-import-asked` (accounts already asked about guest data), and `cloudprep-e2e-auth` (E2E builds only). The question bank is in IndexedDB, not `localStorage`.
+Also: `cloudprep-account:owner`, `cloudprep-account:sync:pending`, `cloudprep-import-asked` (accounts already asked about guest data), `cloudprep-e2e-auth` (E2E builds only), and `cloudprep-owner-device` (the owner's token that keeps analytics off in their browsers, D-073; raw, no envelope, not synced). The question bank is in IndexedDB, not `localStorage`.
 
 ### 8.2 Envelope and versioning
 
