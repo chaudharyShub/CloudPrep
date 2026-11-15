@@ -166,6 +166,18 @@ Saved attempts keep the exact wording you answered (question archive), so editin
 - `docs/SHUBHAM_WORKS.md`: the shared Shubham Works footer and mark, for the developer's other sites
 - `docs/KNOWN_LIMITATIONS.md`: what it can't do
 
+## Made by
+
+CloudPrep is a **Shubham Works** project, made by [Shubham Chaudhary](https://shubhamworks.vercel.app/).
+
+Also:
+
+- [Git, Drawn Out](https://git-drawn-out.vercel.app/): a visual field guide to Git
+- [Frontend Interview Prep](https://frontend-interview-prepare.vercel.app/): frontend interview questions with answers
+- [All projects](https://shubhamworks.vercel.app/)
+
+In the app, the same credit is in the sidebar, the mobile menu and the landing page footer ([docs/SHUBHAM_WORKS.md](docs/SHUBHAM_WORKS.md)). The Privacy page says who runs the site.
+
 ## License
 
 - **Code:** [MIT](LICENSE).
@@ -173,9 +185,3 @@ Saved attempts keep the exact wording you answered (question archive), so editin
 - **Sample bank** (`src/sample-content/`, used for tests and development): MIT, with the code.
 
 The questions were written with AI assistance from public AWS documentation and the official exam guide, then edited and checked against the pages they cite. They aren't copied from the real exam or other question banks.
-
-## Made by
-
-- **Credit:** CloudPrep is a **Shubham Works** project. The sidebar, mobile menu and landing page footer show the Shubham Works mark and "A Shubham Works project", then "Made by Shubham Chaudhary", linking to [his portfolio](https://shubhamworks.vercel.app/), then "Also: [Git, Drawn Out](https://git-drawn-out.vercel.app/), [Frontend Interview Prep](https://frontend-interview-prepare.vercel.app/) · All projects" (at most three of the developer's other sites, newest first). The same footer goes on all the developer's sites ([docs/SHUBHAM_WORKS.md](docs/SHUBHAM_WORKS.md)). The Privacy page says who runs the site.
-
-Preparing for frontend interviews too? **[Frontend Interview Prep](https://frontend-interview-prepare.vercel.app/)** has React and JavaScript interview questions with answers.
