@@ -2,6 +2,8 @@
 export const DEVELOPER = {
   name: 'Shubham Chaudhary',
   url: 'https://shubhamworks.vercel.app/',
+  /** "All projects": the portfolio's plain project list (no startup screen). */
+  projectsUrl: 'https://shubhamworks.vercel.app/projects',
 } as const;
 
 /** The umbrella name shared by all the developer's sites (D-062). */
