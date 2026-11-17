@@ -1,7 +1,7 @@
 # Shubham Works: shared rules for every site (D-062)
 
 "Shubham Works" is the umbrella name for the developer's sites: the portfolio
-(https://shubhamworks.vercel.app/), Git, Drawn Out, CloudPrep and Frontend Interview Prep. Each site keeps
+(https://shubhamworks.vercel.app/), React, Drawn Out, Git, Drawn Out, CloudPrep and Frontend Interview Prep. Each site keeps
 its own logo and URL. What ties them together is the same small footer block on every site,
 the same owner-aware analytics and the same mark.
 
@@ -17,7 +17,7 @@ same script. The portfolio's block is `components/desktop/MadeBy.tsx`, CloudPrep
 ```
 [SW] A Shubham Works project
 Made by Shubham Chaudhary ↗       (links to the portfolio)
-Also: Git, Drawn Out ↗, Frontend Interview Prep ↗ · All projects ↗
+Also: React, Drawn Out ↗, Git, Drawn Out ↗, Frontend Interview Prep ↗ · All projects ↗
                                   (the newest other sites, then the portfolio's project list)
 ```
 
@@ -34,9 +34,9 @@ Rules, so it reads the same everywhere:
   stays on the site); the /projects page itself leaves "All projects" out.
   The cap was the user's call on 2026-11-15: a list of every site would grow into a paragraph
   as projects are added.
-- Current order, newest first: Git, Drawn Out (https://git-drawn-out.vercel.app/), CloudPrep,
-  Frontend Interview Prep. With 3 sites, each other site lists the 2 that aren't itself; the
-  portfolio lists all 3.
+- Current order, newest first: React, Drawn Out (https://react-drawn-out.vercel.app/), Git,
+  Drawn Out (https://git-drawn-out.vercel.app/), CloudPrep, Frontend Interview Prep. With 4
+  sites, each site lists the 3 that aren't itself; the portfolio lists the newest 3.
 - Keep it in one column (the mark beside the first line only), so it fits a narrow sidebar.
 - On the portfolio, the "Made by" line can link to the About section or be plain text.
 - Small, quiet text in the site's own muted colour; only the mark is orange. It never
@@ -66,7 +66,7 @@ Also:
 A site may add one short paragraph after the list (CloudPrep says where the credit shows in
 the app). The portfolio's README lists the other sites at the end of "Contact" instead
 (no "All projects", it is the portfolio). When "Also:" changes on the sites, change the READMEs
-too. Descriptions: Git, Drawn Out "a visual field guide to Git"; CloudPrep "practice exams for
+too. Descriptions: React, Drawn Out "a visual field guide to React"; Git, Drawn Out "a visual field guide to Git"; CloudPrep "practice exams for
 three AWS certifications"; Frontend Interview Prep "frontend interview questions with answers".
 
 ## Every site: keep the owner's visits out of analytics

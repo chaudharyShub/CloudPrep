@@ -2,7 +2,7 @@
 
 > Lightweight ADRs. Status: **Accepted** · **Superseded** (replaced by a later decision; the entry is kept for history).
 > Early entries were written as proposals before the app existed; on 2026-10-26 every status was checked against the code (D-051). Entries keep their original text, with updates noted.
-> Last updated: 2026-11-05
+> Last updated: 2026-11-18
 
 | ID | Decision | Status |
 |---|---|---|
@@ -69,7 +69,7 @@
 | D-061 | Open source: MIT for the code, CC BY-NC-SA 4.0 for the questions, with an AI-assistance note; version 3.3.0 | Partly superseded by D-072 (questions no longer public) |
 | D-062 | "Shubham Works" umbrella: a shared footer (maker mark, umbrella line, credit, projects) for all the developer's sites; version 3.4.0 | Accepted (live, PR #23) |
 | D-063 | Search engine basics: `robots.txt` and `sitemap.xml` from the build, a descriptive page title, no trailing slashes; version 3.4.1 | Accepted (live, PR #24) |
-| D-064 | New live address https://aws-cloud-prepare.vercel.app, written in `SITE_ORIGIN`; icons for search results; version 3.4.2 | Accepted |
+| D-064 | New live address https://aws-cloud-prepare.vercel.app, written in `SITE_ORIGIN`; icons for search results; version 3.4.2 | Accepted (live) |
 | D-065 | Vercel Speed Insights for Core Web Vitals, production builds only; version 3.5.0 | Accepted (live, PR #25) |
 | D-066 | More exams: Solutions Architect – Associate (SAA-C03) and Developer – Associate (DVA-C03) with everything CLF-C02 has; exam in the address; one store with data tagged by exam; version 4.0.0 | Accepted (merged in PRs #26 and #27 and live; SAA-C03 and DVA-C03 launched with 600 checked questions each) |
 | D-067 | Site name for Google: `WebSite` structured data in `index.html` naming the site "CloudPrep"; version 4.0.3 | Accepted (live) |
@@ -79,6 +79,7 @@
 | D-071 | SAA-C03 and DVA-C03 reach 1,000 questions each (the remaining 200 per exam, to the D-066 domain splits); version 4.3.0 | Accepted (live; shipped with D-072, PR #31 closed) |
 | D-072 | Questions kept private: the banks move to the private repo `CloudPrep-questions`, checked out at `src/content/`; a public sample bank for tests, E2E and development; a fresh public app repo, the old one made private; questions all rights reserved; version 4.4.0 | Accepted (live) |
 | D-073 | Shubham Works footer update: "Also:" lists at most 3 other sites, newest first (Git, Drawn Out, Frontend Interview Prep), then "All projects"; the owner's own browsers are left out of Web Analytics and Speed Insights; version 4.5.0 | Accepted (live, PR #1) |
+| D-074 | Docs and in-app texts brought in line with the app; account deletion goes through the developer; React, Drawn Out in "Also:"; "All projects" opens the portfolio's project list; version 4.5.1 | Accepted (live) |
 
 ---
 
@@ -587,3 +588,12 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Owner's visits:** `src/lib/ownerDevice.ts` follows the shared recipe: opening the site with the owner's secret token after `#` saves the token in `localStorage` (`cloudprep-owner-device`) and analytics stays off in that browser; `#<token>.on` turns it back on. The code holds only the token's SHA-256 (shared by every site); the token is never written down. `Telemetry` in `src/app/Root.tsx` mounts `<Analytics />` and `<SpeedInsights />` only after the check says "not the owner" (also on `hashchange`); if the check throws, the visit is counted. The check runs in an effect, so pre-rendered pages still match the browser's first render (D-068).
 - **Exceptions:** the token is a device mark, not user data, so it skips the store's versioned envelope (D-005) and sync, like the reload guard (D-053); it is read through the storage driver (`createLocalStorageDriver`), and without storage the visit is counted. As the shared page asks, neither the README nor the site mentions it.
 - **Version:** 4.5.0.
+
+## D-074 — Docs and texts refresh, React, Drawn Out
+
+- **Context (2026-11-18):** the user asked for a pass over the app and docs for text that wasn't updated. Several places still described the app as it was before D-057 (guests landing on the sign-in page), D-068 (a fallback to `index.html`), D-072 (questions in this repo, the archive branches on GitHub) or D-066 (one exam), or as a tool shared with friends.
+- **Account deletion:** the Privacy page and KNOWN_LIMITATIONS said to ask "the person who shared CloudPrep" to remove an account, which doesn't work for a public site. They now say to contact the developer through the portfolio site (`DEVELOPER.url`), which has contact details. There is still no in-app account deletion (PRODUCT_SPEC §4.3).
+- **Footer:** React, Drawn Out (https://react-drawn-out.vercel.app/) is the developer's newest site, so it goes first in `OTHER_SITES`; with 3 sites the cap from D-073 is reached. "All projects" opens https://shubhamworks.vercel.app/projects (`DEVELOPER.projectsUrl`, PR #3), the portfolio's project list without its startup screen.
+- **Docs:** corrected PRODUCT_SPEC, KNOWN_LIMITATIONS, DEPLOYMENT, ARCHITECTURE, TEST_PLAN, IMPLEMENTATION_PLAN, README, `.env.example`, the `package.json` description and a stale code comment; see the IMPLEMENTATION_PLAN section for the list.
+- **Published bank fixed (2026-11-18):** `npm run check:published` showed the live database still had SAA-C03 and DVA-C03 at 800 questions (bank `2026-11-09.1`): the 4.3.0 publish (D-071) had been missed when it shipped with 4.4.0, while the site and docs said 1,000. Published with the user's go-ahead; `check:published` now matches the repo for all three exams (2,000 / 1,000 / 1,000).
+- **Version:** 4.5.1 (a patch: wording and links, no new feature).

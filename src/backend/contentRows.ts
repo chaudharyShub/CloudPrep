@@ -185,7 +185,7 @@ export function rowsToQuestion(row: QuestionRow, key: QuestionKeyRow): Question 
     options,
     correctOptionIds: key.correct_option_ids,
     explanation: key.explanation,
-    // CLF-C02 is the only exam; the app's types are still specific to it.
+    // Every exam uses D1–D4; validation checks the domain against the exam's own guide.
     domain: row.domain_id as DomainId,
     taskStatement: row.topic_id,
     difficulty: row.difficulty,

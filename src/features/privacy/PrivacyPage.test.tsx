@@ -25,6 +25,18 @@ describe('Developer credit', () => {
     expect(within(main).getByRole('link', { name: CREDIT })).toHaveAttribute('href', DEVELOPER.url);
   });
 
+  it('AC-D.8 the Privacy page says whom to contact to delete an account, with a link', async () => {
+    renderApp('/privacy', { auth: createFakeAuthClient() });
+    expect(await screen.findByRole('heading', { name: 'How to delete records' })).toBeVisible();
+    const main = screen.getByRole('main');
+    expect(main).toHaveTextContent(`delete the account itself`);
+    expect(main).not.toHaveTextContent(/shared CloudPrep/);
+    expect(within(main).getByRole('link', { name: /^portfolio site/ })).toHaveAttribute(
+      'href',
+      DEVELOPER.url,
+    );
+  });
+
   it('AC-D.3 the navigation footer links Frontend Interview Prep in a new tab, under the credit', async () => {
     renderApp('/clf-c02/dashboard', { auth: createFakeAuthClient() });
     await screen.findByRole('heading', { level: 1 });

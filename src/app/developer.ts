@@ -15,6 +15,12 @@ export const FRONTEND_PREP = {
   url: 'https://frontend-interview-prepare.vercel.app/',
 } as const;
 
+/** The developer's React guide (newest site, see docs/SHUBHAM_WORKS.md). */
+export const REACT_DRAWN_OUT = {
+  name: 'React, Drawn Out',
+  url: 'https://react-drawn-out.vercel.app/',
+} as const;
+
 /** The developer's Git guide (D-073). */
 export const GIT_DRAWN_OUT = {
   name: 'Git, Drawn Out',
@@ -25,4 +31,8 @@ export const GIT_DRAWN_OUT = {
  * "Also:" in the footer (D-073, `docs/SHUBHAM_WORKS.md`): at most 3 of the developer's other
  * sites, newest first, never CloudPrep itself. A new site goes first; past 3 the oldest drops off.
  */
-export const OTHER_SITES: readonly { name: string; url: string }[] = [GIT_DRAWN_OUT, FRONTEND_PREP];
+export const OTHER_SITES: readonly { name: string; url: string }[] = [
+  REACT_DRAWN_OUT,
+  GIT_DRAWN_OUT,
+  FRONTEND_PREP,
+];

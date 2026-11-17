@@ -1,10 +1,10 @@
 # Known limitations
 
-CloudPrep is a personal practice tool. Please read this before relying on it.
+CloudPrep is a free, unofficial practice site run by one developer. Please read this before relying on it.
 
 ## Practice scores
 
-- **Not an official score.** CloudPrep shows the percentage of questions answered correctly, with unanswered questions counted as incorrect. AWS reports a scaled score from 100 to 1,000 (700 to pass) using a method it doesn't publish. CloudPrep never estimates that number, and a practice result can't guarantee an exam result.
+- **Not an official score.** CloudPrep shows the percentage of questions answered correctly, with unanswered questions counted as incorrect. AWS reports a scaled score from 100 to 1,000 (700 to pass CLF-C02, 720 for SAA-C03 and DVA-C03) using a method it doesn't publish. CloudPrep never estimates that number, and a practice result can't guarantee an exam result.
 - **Unscored questions.** The real exam has 15 unscored questions among its 65. CloudPrep scores all 65 because there's no way to know which ones AWS doesn't score.
 - **Readiness guidance** is based on simple, published criteria (three or more recent exams at or above your benchmark, in every domain). It never says you are "ready".
 - **Question difficulty and style** are CloudPrep's own. Questions are original and written from public AWS documentation, so they may be easier or harder than the real exam.
@@ -33,9 +33,9 @@ CloudPrep is a personal practice tool. Please read this before relying on it.
 - If you use the same account on two devices at the same time, the most recent change to each item wins (for example, answering the same question on both).
 - Progress from before you signed in stays in the browser as guest data. You're asked once whether to add it to your account; you can also do it later in Settings.
 - On a new device, a past exam taken with an older version of a question is reviewed with the current version (with a note), because the old wording is only kept in the browser where you took it.
-- There's no button to delete your account itself; "Reset everything" deletes all its data. Ask the person who shared CloudPrep to remove the account.
+- There's no button to delete your account itself; "Reset everything" deletes all its data. To remove the account itself, contact the developer (the Privacy page links the portfolio site).
 - The landing page (`/`, D-057) is shown to guests only; signed-in users go straight to the dashboard and can't open it. Its "2,000 questions" figure is fixed text per exam (`src/features/landing/landingContent.ts`), updated by hand when a bank grows; exams without a figure leave it out.
-- The admin page (`/admin`, D-054) lists signed-in accounts only. Guests are counted only as anonymous totals in Vercel Analytics. Admins are added with `npm run admin:add` (from `ADMIN_EMAIL` in `.env.local`) or the Supabase SQL editor; there's no page for it, and the script never removes admins. After becoming an admin, reload the site to see the Admin link. The list loads all accounts at once, which is fine for a site shared with friends.
+- The admin page (`/admin`, D-054) lists signed-in accounts only. Guests are counted only as anonymous totals in Vercel Analytics. Admins are added with `npm run admin:add` (from `ADMIN_EMAIL` in `.env.local`) or the Supabase SQL editor; there's no page for it, and the script never removes admins. After becoming an admin, reload the site to see the Admin link. The list loads all accounts at once, with no paging or search; that is fine for today's number of accounts but will get slow if the site grows to thousands.
 - Mock exams, the dashboard, exam history and progress need an account; Learning mode, bookmarks and settings don't.
 
 ## Review schedule

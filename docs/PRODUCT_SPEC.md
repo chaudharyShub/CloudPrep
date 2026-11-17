@@ -1,6 +1,6 @@
 # CloudPrep — Product Specification
 
-> Status: **Describes the app as built** (version 4.5.0) · Last updated: 2026-11-15
+> Status: **Describes the app as built** (version 4.5.1) · Last updated: 2026-11-18
 > CloudPrep is an unofficial practice tool. It is not affiliated with, endorsed by, or sponsored by Amazon Web Services.
 >
 > This replaces the first draft of 2026-10-21. What changed from that plan is in IMPLEMENTATION_PLAN.md ("Changes from the original plan") and the reasons are in DECISIONS.md.
@@ -105,13 +105,13 @@ Pages that belong to an exam have its id in the address: `/clf-c02/practice`, `/
 | Progress (`/:exam/progress`) | Practice readiness (D-033), recent exam scores, domain strengths and weaknesses, frequently missed topics, questions you keep missing, practice coverage |
 | Bookmarks (`/:exam/bookmarks`) | Bookmarked questions of the exam, with practice from the list |
 | Settings (`/settings`) | Preferences, account, data management (§8) |
-| Privacy (`/privacy`) | What is stored, what is monitored, analytics and page-speed measurement (D-065), how to delete records, who runs CloudPrep (D-056; a Shubham Works project, D-062) and a link to Frontend Interview Prep (D-059), the licences (questions all rights reserved, D-072) and how the questions were made (D-061) |
+| Privacy (`/privacy`) | What is stored, what is monitored, analytics and page-speed measurement (D-065), how to delete records (and whom to contact to delete the account, D-074), who runs CloudPrep (D-056; a Shubham Works project, D-062) and a link to Frontend Interview Prep (D-059), the licences (questions all rights reserved, D-072) and how the questions were made (D-061) |
 | Sign-in (`/sign-in`, `/auth/callback`) | Google sign-in (and email links when enabled), return to the requested page |
 | Admin (`/admin`) | Admins only (D-054); admins get an **Admin** link in the navigation, nobody else sees it (D-055): totals (users, active in the last 7 days, questions answered, exams taken) and every signed-in account with name, email, sign-in method, sign-up date, last activity, questions answered, practice sessions, exams and best score. Others see "No admin access"; guests go to sign-in |
 
 ### 4.3 Not built
 
-- An onboarding flow and an About page. The landing page at `/` introduces CloudPrep to guests (D-057); signed-in users can't open it. The unofficial-tool note and the shared Shubham Works footer (D-062: the maker mark, "A Shubham Works project", the developer credit "Made by Shubham Chaudhary" linking to his portfolio, D-056, and "Also:" with at most 3 of the developer's other sites, newest first, then "All projects" linking to the portfolio, D-073: today Git, Drawn Out, https://git-drawn-out.vercel.app/, and Frontend Interview Prep, https://frontend-interview-prepare.vercel.app/, D-059) are in the sidebar, the mobile menu and the landing page footer; the scoring explanation is on the exam and results pages.
+- An onboarding flow and an About page. The landing page at `/` introduces CloudPrep to guests (D-057); signed-in users can't open it. The unofficial-tool note and the shared Shubham Works footer (D-062: the maker mark, "A Shubham Works project", the developer credit "Made by Shubham Chaudhary" linking to the portfolio, D-056, and "Also:" with at most 3 of the developer's other sites, newest first, then "All projects" linking to the portfolio's project list, D-073, D-074: today React, Drawn Out, https://react-drawn-out.vercel.app/, Git, Drawn Out, https://git-drawn-out.vercel.app/, and Frontend Interview Prep, https://frontend-interview-prepare.vercel.app/, D-059) are in the sidebar, the mobile menu and the landing page footer; the scoring explanation is on the exam and results pages.
 - Comparing two attempts side by side.
 - Exam time accommodation (+30 minutes), keyboard shortcuts, custom-length quizzes.
 - Installable offline app (PWA): icons and "Add to Home Screen" exist, but there's no service worker.
@@ -199,7 +199,7 @@ Only `{type, at}` events are stored, never frames, audio or images. The results 
 
 | # | Journey | Main path | States handled |
 |---|---|---|---|
-| J1 | First visit | Link → sign-in page → "Continue as a guest" (Learning mode) or "Continue with Google" | Sign-in not set up; storage unavailable (works, nothing saved); questions downloading or failed ("Try again") |
+| J1 | First visit | Link → landing page → "Start practising" (Learning mode as a guest) or "Sign in" → "Continue with Google" | Sign-in not set up; storage unavailable (works, nothing saved); questions downloading or failed ("Try again") |
 | J2 | Start mock | Mock exam → rules and integrity mode → start (or check-in for proctored) | Exam in progress (resume / abandon); browser can't proctor (mode disabled) |
 | J3 | Take exam | Answer → flag → grid → review → finish dialog (unanswered count) → submit | Save failure notice; offline (saved locally, synced later) |
 | J4 | Time expires | Timer hits 0 → submitted → results with "Time ran out" | Expired while closed (submitted on next load) |
@@ -233,7 +233,7 @@ TEST_PLAN.md says which tests cover these.
 - Every question has an overall explanation and an explanation for every option, correct ones included (D-022).
 - Single answer = exactly 4 options; multiple response = 5 or more options with 2 or more correct. No "all of the above" or "none of the above".
 - Statuses: `draft` (never shown) → `unverified` (written from the cited pages, not yet re-checked) → `checked` (verified against the cited pages) → `approved` (human sign-off; only the owner sets it) → `retired` (ID never reused). Learning and Exam modes show `unverified`, `checked` and `approved`, and Learning mode notes with the feedback when a question is `unverified` or only `checked`.
-- Questions live in the repo and are published to Supabase; the live app only sees published questions.
+- Questions live in the private `CloudPrep-questions` repo (D-072) and are published to Supabase; the live app only sees published questions.
 
 ## Look and feel (D-057)
 

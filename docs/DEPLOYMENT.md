@@ -27,7 +27,7 @@ The repository includes `vercel.json`:
 | Build command | `npm run build` (prepares the proctor files, type check, then `vite build`) |
 | Output directory | `dist` |
 | Node.js | 22 or newer (Vercel's default is fine) |
-| Rewrites | Every path except `/assets/*` and Vercel's own `/_vercel/*` falls back to `/index.html`, so links like `/results/<id>/review` work when opened directly or refreshed |
+| Rewrites | Each public page (`/privacy`, each launched exam's page and its Learning mode) goes to its own `<path>/index.html` (D-068); every other path except `/assets/*` and Vercel's own `/_vercel/*` falls back to `/spa.html` (the app page), so links like `/clf-c02/results/<id>/review` work when opened directly or refreshed. `/` is the pre-rendered home page, `index.html` itself |
 | Headers | `/assets/*` files have content hashes in their names, so they are cached for a year (`immutable`) |
 
 Vercel serves real files first, so `/favicon.svg`, the icons and the files in `/assets/` are never rewritten. A missing `/assets/` file returns a 404 instead of the HTML page.
@@ -44,7 +44,7 @@ Vercel serves real files first, so `/favicon.svg`, the icons and the files in `/
 2. **Link the project:** `npx supabase login`, then `npx supabase link --project-ref <project-ref>` (it asks for the database password).
 3. **Create the tables:** `npm run db:push` applies `supabase/migrations/`.
 4. **Publish the questions:** they are in the private repo (D-072), so first `git clone https://github.com/chaudharyShub/CloudPrep-questions.git src/content` (needs access). Then `npm run publish:questions -- --dry-run` to check, then `npm run publish:questions`, then `npm run check:published` to confirm the app receives exactly the checked-out questions. Without `src/content/` both scripts stop with a message; the sample bank is never published.
-5. **Check:** in the dashboard's Table Editor, `exams` has one row (`clf-c02`, `is_published` true, `bank_version` set) and `questions` has every non-draft question.
+5. **Check:** in the dashboard's Table Editor, `exams` has one row per exam (`clf-c02`, `saa-c03`, `dva-c03`; each with questions has `is_published` true and `bank_version` set) and `questions` has every non-draft question of every exam.
 
 Note: free-tier projects pause after about a week without activity; resume them from the dashboard.
 
@@ -82,9 +82,9 @@ Reload the site: admins get an **Admin** link in the navigation, which opens `/a
 
 - **App changes:** work on a branch, open a pull request and merge it into `master`. Vercel builds and deploys `master` automatically; pull requests get preview deployments.
 - **Question changes:** in `src/content/` (the private repo, D-072): bump the exam's `BANK_VERSION`, commit and push there, then run `npm run publish:questions` and `npm run check:published` (both handle every exam, D-066). **The live site only shows published questions**, and visitors get the new set on their next visit (it's cached in their browser by version).
-- **More exams (4.0.0, D-066):** run `npm run publish:questions` and `npm run check:published` before or right after merging 4.0.0. They publish the SAA-C03 and DVA-C03 catalogue rows (exam, domains, topics) and their 600 questions each; 4.0.0 marks both exams `launched`, so their pages need the published questions. The live 3.5.0 app reads only CLF-C02 rows, so publishing first is safe. No migration is needed. A new exam appears on the live site when its guide in `src/domain/exam-guide/` has `launched: true`; set that only once its bank is published, then add its landing figure in `src/features/landing/landingContent.ts`.
+- **Adding an exam (D-066):** add its guide in `src/domain/exam-guide/` and its bank in the private repo, then run `npm run publish:questions` and `npm run check:published`; they publish the exam's catalogue rows (exam, domains, topics) and its questions. No migration is needed. The exam appears on the live site when its guide has `launched: true`; set that only once its bank is published, then add its landing figure in `src/features/landing/landingContent.ts`. (SAA-C03 and DVA-C03 were added this way in 4.0.0.)
 - **Vercel and the private questions (D-072):** Vercel builds the public repo without `src/content/` (it is git-ignored, not a submodule, so there is nothing private to fetch). The production build never bundles questions; the live site reads the published ones from Supabase.
-- **Moving to the fresh public repo (D-072, once):** rename the old repo to `CloudPrep-archive` and make it private (Settings → General), create a new public `CloudPrep` and push this tree to it as its first commit, then in Vercel → Project → Settings → Git disconnect the old repository and connect the new one (production branch `master`). The domains, environment variables, Analytics and Speed Insights stay on the Vercel project. Check that the next deploy builds from the new repo.
+- **Moving to the fresh public repo (D-072, done in 4.4.0):** the old repo was renamed `CloudPrep-archive` and made private (Settings → General), a new public `CloudPrep` got this tree as its first commit, and Vercel → Project → Settings → Git was switched to the new repository (production branch `master`). The domains, environment variables, Analytics and Speed Insights stayed on the Vercel project. Repeat these steps only if the repo ever has to move again.
 - **Database changes:** add a new migration in `supabase/migrations/` and run `npm run db:push` before deploying app code that needs it.
 - **User data is kept:** signed-in users' data is in Supabase with a copy in the browser, and guests' data is in their browser. Every stored shape is versioned and migrated (see `src/storage/`).
 
@@ -96,11 +96,11 @@ Every pushed branch and pull request gets its own Vercel **preview deployment** 
 
 - Previews use the same Supabase project and the same `VITE_` variables as production (set them for the *Preview* environment in Vercel if you scoped them to *Production* only). Data written on a preview is real account data.
 - **Google sign-in on previews:** in Supabase, *Authentication → URL Configuration → Redirect URLs*, add `https://*-<your-vercel-team>.vercel.app/**` (the wildcard that matches your preview URLs; copy the pattern from a preview link). Without it, signing in on a preview returns to the live site instead. Guests can use a preview without this.
-- To go back to the previous interface after a merge, redeploy the `archive/ui-v2` branch or tag `v2.4.0` (Vercel: *Deployments → Promote*, or *Instant Rollback* to the last 2.4.0 deployment). Both are kept on GitHub.
+- The previous interface (before 3.0.0) is kept on the `archive/ui-v2` branch and tag `v2.4.0`, which since D-072 live only in the private `CloudPrep-archive` repo. Vercel now builds the new public repo, so they can't be redeployed from its Git connection; an old 2.4.0 deployment can still be promoted from Vercel's *Deployments* list while Vercel keeps it.
 
 ## Smoke test after each deployment
 
-1. Open the site signed out: you land on the sign-in page, with no errors in the browser console. "Continue as a guest" opens Learning mode.
+1. Open the site signed out: you land on the landing page ("Sit the exam before you sit the exam."), with no errors in the browser console. "Start practising" opens Learning mode, and "Sign in" the sign-in page.
 2. Open `<your-url>/clf-c02/practice` and `<your-url>/settings` directly in a new tab, then refresh. Both must load (this checks the route fallback). Open `<your-url>/practice`: it moves to `/clf-c02/practice` (old addresses, D-066).
 3. Open `<your-url>/does-not-exist`. You should see CloudPrep's "Page not found" page, not a Vercel 404.
 4. As a guest, start a short practice session and check an answer. Reload: progress is kept, and the Review due card in Learning mode shows when the question comes back.
@@ -132,7 +132,7 @@ The production build writes `robots.txt` and `sitemap.xml` (from `src/app/seo.ts
 
 **Public pages (D-068), check after deploying:** `curl -s https://aws-cloud-prepare.vercel.app/saa-c03 | grep "<title>"` should print the SAA-C03 page's title, not the shared one, and `curl -s https://aws-cloud-prepare.vercel.app/saa-c03 | grep -c "data-prerendered"` should print 1 (the page's content is in the HTML). `/settings` should come back with an empty `<div id="root"></div>` (the app page, `spa.html`). To see what a shared link looks like, paste a page address into LinkedIn's Post Inspector (https://www.linkedin.com/post-inspector/); it also refreshes LinkedIn's saved preview.
 
-**Check after deploying:** open `/robots.txt` and `/sitemap.xml` on the live site. Each should show plain text or XML, not the CloudPrep app. Opening `/practice/` should land on `/practice` (`vercel.json` sets `"trailingSlash": false`, so each page has one address).
+**Check after deploying:** open `/robots.txt` and `/sitemap.xml` on the live site. Each should show plain text or XML, not the CloudPrep app. Opening `/privacy/` should land on `/privacy` (`vercel.json` sets `"trailingSlash": false`, so each page has one address).
 
 **Google Search Console (once):**
 1. Go to https://search.google.com/search-console and sign in with Google.
@@ -150,9 +150,9 @@ Google takes a few days to a few weeks to list a new site. *Performance* then sh
 
 ## Other static hosts
 
-Any static host works if it can serve `index.html` for unknown paths and set the two `VITE_SUPABASE_*` variables at build time. Web Analytics and Speed Insights only work on Vercel.
-- **Netlify:** build `npm run build`, publish `dist`, and add `public/_redirects` containing `/*  /index.html  200`.
-- **Cloudflare Pages:** build `npm run build`, output `dist`. Single-page-app fallback is automatic when there is no `404.html`.
+Any static host works if it can serve each public page's `<path>/index.html` at `<path>`, `spa.html` for every other unknown path (D-068), and set the two `VITE_SUPABASE_*` variables at build time. Web Analytics and Speed Insights only work on Vercel.
+- **Netlify:** build `npm run build`, publish `dist`, and add `public/_redirects` with one `<path>  <path>/index.html  200` line per public page (as in `vercel.json`), then `/*  /spa.html  200`.
+- **Cloudflare Pages:** build `npm run build`, output `dist`. It serves `<path>/index.html` at `<path>`, but its automatic fallback serves `index.html` (the pre-rendered home page) for other paths, so add a `_redirects` file with `/*  /spa.html  200`.
 - **GitHub Pages:** it has no fallback, so deep links would 404. It would need a hash router (D-004 option B); that isn't set up.
 
 The site must be served from the domain root (`/`). Serving it from a sub-path would need Vite's `base` option and the router's `basename`. Any new address also needs adding to Supabase's redirect URLs.
