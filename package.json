@@ -1,8 +1,8 @@
 {
   "name": "cloudprep",
   "private": true,
-  "version": "4.5.0",
-  "description": "Unofficial AWS Certified Cloud Practitioner (CLF-C02) practice exam simulator.",
+  "version": "4.5.1",
+  "description": "Unofficial practice exam simulator for three AWS certifications: Cloud Practitioner (CLF-C02), Solutions Architect – Associate (SAA-C03) and Developer – Associate (DVA-C03).",
   "type": "module",
   "engines": {
     "node": ">=22"

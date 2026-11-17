@@ -123,8 +123,9 @@ const SECTIONS: { title: string; body: React.ReactNode }[] = [
           Settings
         </Link>
         . When you&apos;re signed in, these delete the data from your account on every device. To
-        delete the account itself (your sign-in details and everything saved with it), ask the
-        person who shared CloudPrep with you.
+        delete the account itself (your sign-in details and everything saved with it), contact{' '}
+        {DEVELOPER.name} through the{' '}
+        <ExternalLink href={DEVELOPER.url}>portfolio site</ExternalLink>.
       </>
     ),
   },

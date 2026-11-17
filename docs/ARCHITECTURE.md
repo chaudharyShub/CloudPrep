@@ -1,6 +1,6 @@
 # CloudPrep — Architecture
 
-> Status: **Describes the code as built** (version 4.5.0) · Last updated: 2026-11-15
+> Status: **Describes the code as built** (version 4.5.1) · Last updated: 2026-11-18
 > This replaces the first draft of 2026-10-21. Reasons for each choice are in DECISIONS.md.
 
 ## 1. Overview
@@ -60,10 +60,12 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 ├─ docs/                      # This folder; images/ holds the README screenshots (D-060)
 ├─ public/                    # favicon, app icons, manifest, og-image; proctor/ is generated (git-ignored)
 ├─ scripts/                   # validate-questions, publish-questions, check-published, check-references,
-│                             # check-duplicates, setup-proctor-assets, generate-brand-assets (.mjs)
+│                             # check-duplicates, question-banks (private or sample banks, D-072),
+│                             # add-admin (D-055), setup-proctor-assets, generate-brand-assets (.mjs)
 ├─ supabase/                  # config.toml, migrations/ (the schema), seed.sql
 ├─ src/
-│  ├─ main.tsx                # Mounts <App>, global CSS, Vercel Analytics in production
+│  ├─ main.tsx                # Global CSS; hydrates a pre-rendered page or renders <App> afresh (D-068);
+│  │                          # reload after a deploy (D-053)
 │  ├─ app/
 │  │  ├─ App.tsx              # Creates the auth client, question loader, stores; composes providers
 │  │  ├─ routes.tsx           # Route table and guards
@@ -76,7 +78,8 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │  ├─ prerender.tsx        # Renders a public page to HTML at build time, as a guest (D-068)
 │  │  ├─ hydration.ts         # canTakeOver: when the browser takes a pre-rendered page over (D-068)
 │  │  ├─ browserServices.ts   # The browser's router, sign-in, stores and question loading, made before React starts
-│  │  ├─ Root.tsx             # StrictMode and analytics, shared by the browser and pre-rendering
+│  │  ├─ Root.tsx             # StrictMode and analytics (`Telemetry`: production only, never the owner, D-073),
+│  │  │                       # shared by the browser and pre-rendering
 │  │  ├─ developer.ts         # Developer credit (D-056), the footer's other sites (`OTHER_SITES`, D-059, D-073), Shubham Works name (D-062)
 │  │  └─ layouts/             # RootLayout (watchers, theme), AppLayout (sidebar / drawer), ExamLayout
 │  ├─ backend/                # Supabase adapters behind interfaces, row types and mappers, fakes
@@ -85,7 +88,8 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 │  │                          # fakeUserTables.ts, schema.test.ts
 │  ├─ components/
 │  │  ├─ ui/                  # Design-system primitives: Button, Card, Badge, Dialog, ConfirmDialog,
-│  │  │                       # FormControls, Notice, ProgressBar, Skeleton, Toast, EmptyState, ExternalLink
+│  │  │                       # FormControls, Notice, ProgressBar, Skeleton, Toast, EmptyState, ExternalLink,
+│  │  │                       # InfoTip (D-058), buttonStyles
 │  │  ├─ layout/              # Sidebar, MobileNav, NavList, ExamSwitcher (+ examSwitch.ts, D-066), PageHeader, Brand
 │  │  └─ brand/               # LogoMark, LogoTile, logoPaths, BrandLoading, MakerMark (D-062)
 │  ├─ content/                # PRIVATE, git-ignored: a checkout of CloudPrep-questions (D-072).
@@ -121,7 +125,7 @@ Exact versions are pinned in `package.json` (see also CLAUDE.md and D-020).
 
 ## 4. Routing
 
-`createBrowserRouter` with a host fallback to `index.html` (D-004, D-038). The public pages in `PAGE_HEADS` (Privacy, each exam's page and Learning mode) are served from their own copy, `<path>/index.html`, with their own head (title, description, link-preview tags; D-068); `vercel.json` rewrites each to its file, and every other address to `spa.html` (the app page with an empty `#root`). The home page, Privacy and each exam's own page also have their content pre-rendered into `#root` by the build (`src/app/prerender.tsx`); `main.tsx` takes it over with `hydrateRoot` for a guest whose first render will match (`canTakeOver`), and otherwise renders afresh with `createRoot`. `App.tsx` holds `AppShell` (providers and router, shared with pre-rendering) and `App`; the browser's services come from `browserServices.ts`. Pages are lazy-loaded.
+`createBrowserRouter` with a host fallback to the app page (D-004, D-038; `spa.html` since D-068). The public pages in `PAGE_HEADS` (Privacy, each exam's page and Learning mode) are served from their own copy, `<path>/index.html`, with their own head (title, description, link-preview tags; D-068); `vercel.json` rewrites each to its file, and every other address to `spa.html` (the app page with an empty `#root`). The home page, Privacy and each exam's own page also have their content pre-rendered into `#root` by the build (`src/app/prerender.tsx`); `main.tsx` takes it over with `hydrateRoot` for a guest whose first render will match (`canTakeOver`), and otherwise renders afresh with `createRoot`. `App.tsx` holds `AppShell` (providers and router, shared with pre-rendering) and `App`; the browser's services come from `browserServices.ts`. Pages are lazy-loaded.
 
 Pages of one exam live under its id (D-066): `:exam` below is `clf-c02`, `saa-c03` or `dva-c03` (only launched exams in production builds). `ExamScope` checks the id (unknown → not found) and saves it as the `exam` preference. Every page reads its exam from the address with `useCurrentExam()` (shared pages fall back to the preference), and builds links with `useExamPath()` / `examPath()`.
 

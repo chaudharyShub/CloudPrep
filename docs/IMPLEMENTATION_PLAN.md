@@ -1,6 +1,6 @@
 # CloudPrep — Implementation Plan
 
-> Status: **In progress** · Last updated: 2026-11-05
+> Status: **In progress** · Last updated: 2026-11-18
 >
 > The phase sections below (P0–P10, C1–C3) are the original plan from 2026-10-21, kept for history; the Progress table and "Changes from the original plan" say what was actually built. For how the app works today, see PRODUCT_SPEC.md and ARCHITECTURE.md.
 
@@ -21,19 +21,19 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Phase 7: AI proctoring | Strict AI-proctored exam mode replacing the built-in FaceDetector webcam option (D-043); acceptance criteria below | Done, merged and live |
 | Phase 8: backend (Supabase, D-044–D-047) | Step 1: schema, RLS, publish script. Step 2: sign-in. Step 3: questions from the database, cached in IndexedDB. Step 4: signed-in users' data synced to the database. Step 5 (server scoring) not started | Steps 1–4 done, merged and live |
 | Extras (2026-10-24 and 25) | Vercel Web Analytics (D-048), reliable test runs (D-049), logo, icons and link preview (D-050), sign-out confirmation (AC-B.25) | Done, merged and live |
-| Content review | All 2,000 questions checked against their cited AWS pages (CONTENT_REVIEW.md); the last 5 `unverified` ones rewritten and checked on 2026-11-09 (D-069); published as bank `2026-11-09.1` | Done; `approved` needs the user's sign-off |
+| Content review | All 2,000 questions checked against their cited AWS pages (the review log, now `REVIEW.md` in the private questions repo, D-072); the last 5 `unverified` ones rewritten and checked on 2026-11-09 (D-069); published as bank `2026-11-09.1` | Done; `approved` needs the user's sign-off |
 | Docs audit (D-051) | Docs brought in line with the app; version 2.0.0 | Done, merged and live |
 | Review due (D-052) | Spaced-repetition review schedule in Learning mode and on the dashboard; version 2.1.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-26) |
 | Reload after a deploy (D-053) | A tab opened before a deploy reloads once instead of showing "Something went wrong"; version 2.1.1; acceptance criteria below | Done, merged and live |
 | Admin page (D-054) | Hidden `/admin` page listing signed-in accounts and their activity, for admins only (checked in the database); version 2.2.0; acceptance criteria below | Done, merged and live (database migration applied 2026-10-29) |
-| Admin link and `admin:add` (D-055) | Admin link in the navigation for admins only (checked with `is_admin()` in the database); `npm run admin:add` adds the accounts in `ADMIN_EMAIL` from `.env.local`; version 2.3.0; acceptance criteria below | Done and merged (PR #13) |
+| Admin link and `admin:add` (D-055) | Admin link in the navigation for admins only (checked with `is_admin()` in the database); `npm run admin:add` adds the accounts in `ADMIN_EMAIL` from `.env.local`; version 2.3.0; acceptance criteria below | Done, merged (PR #13) and live |
 | UI redesign (D-057) | "Study notes in aubergine" with an exam-paper answer sheet and a true-black dark mode; landing page at `/`; old UI kept on `archive/ui-v2` (tag `v2.4.0`); version 3.0.0 | Done, merged (PR #15) and live; old UI kept on `archive/ui-v2` / `v2.4.0` |
 | Headline highlight and light default (D-057) | "sit the exam." on the theme's selection tint; Light is the default theme; version 3.0.1 | Done, merged and live (PR #18) |
 | Review due "i" explanation (D-058) | An "i" button beside Review due that explains the schedule; version 3.1.0 | Done, merged and live (PR #19) |
 | Search engine basics (D-063) | `robots.txt` and `sitemap.xml` written by the production build (`src/app/seo.ts`); one address per page (no trailing slash); a page title that names the exam; Google Search Console steps in DEPLOYMENT.md; version 3.4.1; acceptance criteria below | Done, merged and live (PR #24); Search Console verification file is live, verify and submit the sitemap there |
-| New live address (D-064) | https://aws-cloud-prepare.vercel.app (the old address 308-redirects to it) in `SITE_ORIGIN` for link previews, `robots.txt` and `sitemap.xml`; README links; address-change steps in DEPLOYMENT.md; a PNG icon link and `favicon.ico` for the icon in search results; version 3.4.2; acceptance criteria below | Done, pushed to `master` (user's choice, approved 2026-11-02); Supabase URLs and Search Console by hand |
+| New live address (D-064) | https://aws-cloud-prepare.vercel.app (the old address 308-redirects to it) in `SITE_ORIGIN` for link previews, `robots.txt` and `sitemap.xml`; README links; address-change steps in DEPLOYMENT.md; a PNG icon link and `favicon.ico` for the icon in search results; version 3.4.2; acceptance criteria below | Done, pushed to `master` (user's choice, approved 2026-11-02) and live; Supabase URLs and Search Console by hand |
 | More exams (D-066) | SAA-C03 and DVA-C03 with everything CLF-C02 has. Step 1: multi-exam app (exam guides as data, exam in the address, data tagged by exam, sync, publish), version 4.0.0. Step 2: SAA-C03 bank. Step 3: DVA-C03 bank. Acceptance criteria below | Done, merged (PRs #26 and #27) and live: 600 questions each for SAA-C03 and DVA-C03, every question checked against its cited pages on 2026-11-08, published as bank `2026-11-08.1`; both exams launched (user's decision, 2026-11-08) |
-| Themed dropdowns (D-066) | The exam switcher is a pill like the navigation items and fits every exam's name; dropdown lists use the theme's colours (a rounded, themed list in browsers with customizable selects, Chromium 135+; theme colours elsewhere); version 4.0.1 | Done, pushed to `master` (user's choice, 2026-11-08) |
+| Themed dropdowns (D-066) | The exam switcher is a pill like the navigation items and fits every exam's name; dropdown lists use the theme's colours (a rounded, themed list in browsers with customizable selects, Chromium 135+; theme colours elsewhere); version 4.0.1 | Done, pushed to `master` (user's choice, 2026-11-08) and live |
 | Dropdown cursor (D-066) | Dropdowns (the exam switcher at the top of the navigation, settings lists) show a pointer cursor, and a pointer over their options; disabled ones keep the not-allowed cursor; version 4.0.2 | Done, pushed to `master` (user's choice, 2026-11-09) and live |
 | Site name for Google (D-067) | `WebSite` structured data in `index.html` so Google names the site "CloudPrep" instead of "Vercel"; version 4.0.3; acceptance criteria below | Done, pushed to `master` (user's choice, 2026-11-09) and live |
 | Public pages at build time (D-068) | A: each public page (Privacy, each exam's page and Learning mode) gets its own HTML file with its title, description and link-preview tags. B: the home page, Privacy and each exam's page are pre-rendered with their content, which the browser takes over (hydration). Link previews and Google's first look see the right page; version 4.1.0; acceptance criteria below | Done, merged (PR #28) and live |
@@ -47,12 +47,13 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Open source licences (D-061) | `LICENSE` (MIT, code) and `LICENSE-CONTENT.md` (CC BY-NC-SA 4.0, questions); README License section; a Privacy page section on the licences and how the questions were made (AI-assisted, checked against AWS pages); `license` in package.json; version 3.3.0; acceptance criteria below | Done, merged and live (PR #22) |
 | README refresh (D-060) | Centered header with the logo, live-site link and badges, an at-a-glance strip, three screenshots (`docs/images/`), "What it does" grouped under headings, a "Made by" section; tech stack fonts corrected (Inter → Newsreader, Source Sans 3, IBM Plex Mono). No app change, no version bump | Done, pushed to `master` |
 | Frontend Interview Prep link (D-059) | "Also by me: Frontend Interview Prep" under the credit (sidebar, mobile menu, landing footer) and a sentence on the Privacy page; version 3.2.0; acceptance criteria below | Done, merged and live (PR #21) |
-| Developer credit (D-056) | "Made by Shubham Chaudhary" with a portfolio link in the sidebar and mobile menu, and a "Who runs CloudPrep" section on the Privacy page; version 2.4.0; acceptance criteria below | Done and merged (PR #14) |
-| Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring, then multi-exam UI) | — |
+| Developer credit (D-056) | "Made by Shubham Chaudhary" with a portfolio link in the sidebar and mobile menu, and a "Who runs CloudPrep" section on the Privacy page; version 2.4.0; acceptance criteria below | Done, merged (PR #14) and live |
+| Docs and texts refresh, React, Drawn Out (D-074) | Docs and in-app texts brought in line with the app after D-057 to D-073 (landing page, `spa.html`, private questions, three exams); the Privacy page and KNOWN_LIMITATIONS say to contact the developer to delete an account (no longer "the person who shared CloudPrep"); React, Drawn Out first in the footer's "Also:"; "All projects" opens the portfolio's project list (PR #3); version 4.5.1; acceptance criteria below | Done, merged and live |
+| Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring) | — |
 
 Changes from the original plan:
 - **No backend was planned;** one was added in Phase 8 (D-044–D-047). Guests keep Learning mode, bookmarks and settings in the browser; the dashboard, mock exams, results, history and progress need sign-in.
-- **No welcome page, onboarding or About page** (P4). `/` opens the dashboard (or sign-in for guests); the unofficial-tool note is in the sidebar and mobile menu, and the scoring explanation is on the exam and results pages.
+- **No welcome page, onboarding or About page** (P4). Since D-057, `/` is a landing page for guests and opens the dashboard for signed-in users; the unofficial-tool note is in the sidebar and mobile menu, and the scoring explanation is on the exam and results pages.
 - **No Mistakes page:** the Learning mode page has a Mistakes card ("Practise mistakes"), and Progress lists the questions you keep missing.
 - **No attempt comparison** (AC-6.4): exam history is a list, and Progress shows recent scores and per-domain results.
 - No tablet icon rail: the sidebar shows from 1024px; below that a drawer is used.
@@ -466,10 +467,20 @@ Acceptance criteria (`src/app/pageHeads.test.ts`, `src/app/pageHeadTitles.test.t
 Requested by the user on 2026-11-15: follow the updated `docs/SHUBHAM_WORKS.md`. Version 4.5.0.
 
 Acceptance criteria:
-- AC-D.7 "Also:" in the footer (sidebar, mobile menu, landing page) lists at most 3 of the developer's other sites, newest first, never CloudPrep, each in a new tab, then "All projects" linking to the portfolio (`PrivacyPage.test.tsx`).
+- AC-D.7 "Also:" in the footer (sidebar, mobile menu, landing page) lists at most 3 of the developer's other sites, newest first, never CloudPrep, each in a new tab, then "All projects" linking to the portfolio's project list (`DEVELOPER.projectsUrl`, since PR #3; `PrivacyPage.test.tsx`).
 - AC-O.1 The code holds only the token's SHA-256; a browser without the token is counted (`ownerDevice.test.ts`).
 - AC-O.2 Opening the site with `#<token>` saves the token, removes it from the address (path and query kept) and says the browser won't be counted.
 - AC-O.3 `#<token>.on` deletes the saved token and says analytics is back on.
+
+## Docs and texts refresh, React, Drawn Out (D-074)
+
+Requested by the user on 2026-11-18: go through the app and docs for text that wasn't updated. Version 4.5.1.
+
+Acceptance criteria:
+- AC-D.7 (unchanged test) "Also:" lists React, Drawn Out, Git, Drawn Out and Frontend Interview Prep, then "All projects" (`OTHER_SITES`, `docs/SHUBHAM_WORKS.md`).
+- The published banks match the repo (`npm run check:published`: CLF-C02 2,000, SAA-C03 and DVA-C03 1,000 each); the missed 4.3.0 publish was done on 2026-11-18.
+- AC-D.8 The Privacy page says to contact the developer, through the linked portfolio site, to delete an account; it no longer says "the person who shared CloudPrep" (`PrivacyPage.test.tsx`).
+- The docs match the app: PRODUCT_SPEC (first-visit journey via the landing page, private questions, the footer), KNOWN_LIMITATIONS (public site, both passing scores, account removal, admin list), DEPLOYMENT (`spa.html` fallback, three exam rows, the landing page in the smoke test, other hosts, the archive repo), ARCHITECTURE (folder map, `Root.tsx` analytics), README (deployment, env variables), `.env.example` and the `package.json` description.
 - AC-O.4 A wrong token or a hand-made stored value (`true`) doesn't count, and the address is left alone.
 - `<Analytics />` and `<SpeedInsights />` mount only in production builds and only after the check says "not the owner" (`src/app/Root.tsx`); a check that throws counts the visit; pre-rendered pages still match (`prerender.test.tsx`).
 - Checked by hand after deploying: with the secret link, the live site shows the alert and loads no `/_vercel/insights/script.js` or `/_vercel/speed-insights/script.js`, also after a reload; with `.on` they load again.

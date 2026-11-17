@@ -88,11 +88,12 @@ The first `npm run dev` or `npm run build` also prepares the AI proctor's files 
 
 **Without Supabase settings**, the dev server uses the bundled questions (the public sample bank in `src/sample-content/`, or the real ones if you have the private checkout) and runs in guest mode (sign-in shows as not set up). To use your own Supabase project, copy `.env.example` to `.env.local` and fill it in:
 
-| Variable                                             | Used by                     | Notes                                                                               |
-| ---------------------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------- |
-| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | The app                     | Public values, safe in the browser                                                  |
-| `SUPABASE_URL`, `SUPABASE_SECRET_KEY`                | `npm run publish:questions` | The secret key bypasses security rules: never commit it or give it a `VITE_` prefix |
-| `VITE_EMAIL_SIGN_IN=true`                            | The app (optional)          | Shows email sign-in links; only once custom SMTP is set up in Supabase              |
+| Variable                                             | Used by                                          | Notes                                                                               |
+| ---------------------------------------------------- | ------------------------------------------------ | ----------------------------------------------------------------------------------- |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` | The app                                          | Public values, safe in the browser                                                  |
+| `SUPABASE_URL`, `SUPABASE_SECRET_KEY`                | `npm run publish:questions`, `npm run admin:add` | The secret key bypasses security rules: never commit it or give it a `VITE_` prefix |
+| `ADMIN_EMAIL`                                        | `npm run admin:add`                              | The account(s) to make admins, comma-separated; never with a `VITE_` prefix         |
+| `VITE_EMAIL_SIGN_IN=true`                            | The app (optional)                               | Shows email sign-in links; only once custom SMTP is set up in Supabase              |
 
 Setting up the database, Google sign-in and redirect URLs is covered step by step in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
@@ -125,7 +126,7 @@ First-time setup for end-to-end tests: `npx playwright install chromium webkit`.
 
 ## Deployment
 
-CloudPrep is a static site on Vercel, deployed automatically from `master`. `vercel.json` sets the build (`npm run build`), the output (`dist`), a fallback to `index.html` so deep links work, no trailing slashes (each page has one address), and asset caching. The production build also writes `robots.txt` and `sitemap.xml` for search engines. Vercel needs `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; Web Analytics and Speed Insights each have to be enabled once in the Vercel project (Analytics → Enable, Speed Insights → Enable). Supabase setup, Google sign-in, analytics and link-preview checks are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+CloudPrep is a static site on Vercel, deployed automatically from `master`. `vercel.json` sets the build (`npm run build`), the output (`dist`), a rewrite for each public page to its own HTML file and a fallback to the app page (`spa.html`) for every other address so deep links work, no trailing slashes (each page has one address), and asset caching. The production build also writes `robots.txt` and `sitemap.xml` for search engines, and each public page's own HTML file with its title and link preview (the home page, Privacy and each exam's page with their content pre-rendered). Vercel needs `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`; Web Analytics and Speed Insights each have to be enabled once in the Vercel project (Analytics → Enable, Speed Insights → Enable). Supabase setup, Google sign-in, analytics and link-preview checks are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Updating the question bank
 
@@ -172,6 +173,7 @@ CloudPrep is a **Shubham Works** project, made by [Shubham Chaudhary](https://sh
 
 Also:
 
+- [React, Drawn Out](https://react-drawn-out.vercel.app/): a visual field guide to React
 - [Git, Drawn Out](https://git-drawn-out.vercel.app/): a visual field guide to Git
 - [Frontend Interview Prep](https://frontend-interview-prepare.vercel.app/): frontend interview questions with answers
 - [All projects](https://shubhamworks.vercel.app/projects)
