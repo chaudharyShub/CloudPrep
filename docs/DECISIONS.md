@@ -79,7 +79,7 @@
 | D-071 | SAA-C03 and DVA-C03 reach 1,000 questions each (the remaining 200 per exam, to the D-066 domain splits); version 4.3.0 | Accepted (live; shipped with D-072, PR #31 closed) |
 | D-072 | Questions kept private: the banks move to the private repo `CloudPrep-questions`, checked out at `src/content/`; a public sample bank for tests, E2E and development; a fresh public app repo, the old one made private; questions all rights reserved; version 4.4.0 | Accepted (live) |
 | D-073 | Shubham Works footer update: "Also:" lists at most 3 other sites, newest first (Git, Drawn Out, Frontend Interview Prep), then "All projects"; the owner's own browsers are left out of Web Analytics and Speed Insights; version 4.5.0 | Accepted (live, PR #1) |
-| D-074 | Docs and in-app texts brought in line with the app; account deletion goes through the developer; React, Drawn Out in "Also:"; "All projects" opens the portfolio's project list; version 4.5.1 | Accepted (live) |
+| D-074 | Docs and in-app texts brought in line with the app; account deletion goes through the developer; "All projects" opens the portfolio's project list; version 4.5.1 | Accepted (live) |
 
 ---
 
@@ -589,11 +589,11 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Exceptions:** the token is a device mark, not user data, so it skips the store's versioned envelope (D-005) and sync, like the reload guard (D-053); it is read through the storage driver (`createLocalStorageDriver`), and without storage the visit is counted. As the shared page asks, neither the README nor the site mentions it.
 - **Version:** 4.5.0.
 
-## D-074 — Docs and texts refresh, React, Drawn Out
+## D-074 — Docs and texts refresh
 
 - **Context (2026-11-18):** the user asked for a pass over the app and docs for text that wasn't updated. Several places still described the app as it was before D-057 (guests landing on the sign-in page), D-068 (a fallback to `index.html`), D-072 (questions in this repo, the archive branches on GitHub) or D-066 (one exam), or as a tool shared with friends.
 - **Account deletion:** the Privacy page and KNOWN_LIMITATIONS said to ask "the person who shared CloudPrep" to remove an account, which doesn't work for a public site. They now say to contact the developer through the portfolio site (`DEVELOPER.url`), which has contact details. There is still no in-app account deletion (PRODUCT_SPEC §4.3).
-- **Footer:** React, Drawn Out (https://react-drawn-out.vercel.app/) is the developer's newest site, so it goes first in `OTHER_SITES`; with 3 sites the cap from D-073 is reached. "All projects" opens https://shubhamworks.vercel.app/projects (`DEVELOPER.projectsUrl`, PR #3), the portfolio's project list without its startup screen.
+- **Footer:** "Also:" stays Git, Drawn Out and Frontend Interview Prep. React, Drawn Out was briefly added and then removed (2026-11-18): the user decides which sites are linked, so a new site is added only when they ask. "All projects" opens https://shubhamworks.vercel.app/projects (`DEVELOPER.projectsUrl`, PR #3), the portfolio's project list without its startup screen.
 - **Docs:** corrected PRODUCT_SPEC, KNOWN_LIMITATIONS, DEPLOYMENT, ARCHITECTURE, TEST_PLAN, IMPLEMENTATION_PLAN, README, `.env.example`, the `package.json` description and a stale code comment; see the IMPLEMENTATION_PLAN section for the list.
 - **Published bank fixed (2026-11-18):** `npm run check:published` showed the live database still had SAA-C03 and DVA-C03 at 800 questions (bank `2026-11-09.1`): the 4.3.0 publish (D-071) had been missed when it shipped with 4.4.0, while the site and docs said 1,000. Published with the user's go-ahead; `check:published` now matches the repo for all three exams (2,000 / 1,000 / 1,000).
 - **Version:** 4.5.1 (a patch: wording and links, no new feature).

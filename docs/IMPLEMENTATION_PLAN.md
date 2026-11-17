@@ -48,7 +48,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | README refresh (D-060) | Centered header with the logo, live-site link and badges, an at-a-glance strip, three screenshots (`docs/images/`), "What it does" grouped under headings, a "Made by" section; tech stack fonts corrected (Inter → Newsreader, Source Sans 3, IBM Plex Mono). No app change, no version bump | Done, pushed to `master` |
 | Frontend Interview Prep link (D-059) | "Also by me: Frontend Interview Prep" under the credit (sidebar, mobile menu, landing footer) and a sentence on the Privacy page; version 3.2.0; acceptance criteria below | Done, merged and live (PR #21) |
 | Developer credit (D-056) | "Made by Shubham Chaudhary" with a portfolio link in the sidebar and mobile menu, and a "Who runs CloudPrep" section on the Privacy page; version 2.4.0; acceptance criteria below | Done, merged (PR #14) and live |
-| Docs and texts refresh, React, Drawn Out (D-074) | Docs and in-app texts brought in line with the app after D-057 to D-073 (landing page, `spa.html`, private questions, three exams); the Privacy page and KNOWN_LIMITATIONS say to contact the developer to delete an account (no longer "the person who shared CloudPrep"); React, Drawn Out first in the footer's "Also:"; "All projects" opens the portfolio's project list (PR #3); version 4.5.1; acceptance criteria below | Done, merged and live |
+| Docs and texts refresh (D-074) | Docs and in-app texts brought in line with the app after D-057 to D-073 (landing page, `spa.html`, private questions, three exams); the Privacy page and KNOWN_LIMITATIONS say to contact the developer to delete an account (no longer "the person who shared CloudPrep"); "All projects" opens the portfolio's project list (PR #3); version 4.5.1; acceptance criteria below | Done, merged and live |
 | Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring) | — |
 
 Changes from the original plan:
@@ -472,12 +472,12 @@ Acceptance criteria:
 - AC-O.2 Opening the site with `#<token>` saves the token, removes it from the address (path and query kept) and says the browser won't be counted.
 - AC-O.3 `#<token>.on` deletes the saved token and says analytics is back on.
 
-## Docs and texts refresh, React, Drawn Out (D-074)
+## Docs and texts refresh (D-074)
 
 Requested by the user on 2026-11-18: go through the app and docs for text that wasn't updated. Version 4.5.1.
 
 Acceptance criteria:
-- AC-D.7 (unchanged test) "Also:" lists React, Drawn Out, Git, Drawn Out and Frontend Interview Prep, then "All projects" (`OTHER_SITES`, `docs/SHUBHAM_WORKS.md`).
+- AC-D.7 (unchanged test) "Also:" lists Git, Drawn Out and Frontend Interview Prep, then "All projects" (`OTHER_SITES`, `docs/SHUBHAM_WORKS.md`).
 - The published banks match the repo (`npm run check:published`: CLF-C02 2,000, SAA-C03 and DVA-C03 1,000 each); the missed 4.3.0 publish was done on 2026-11-18.
 - AC-D.8 The Privacy page says to contact the developer, through the linked portfolio site, to delete an account; it no longer says "the person who shared CloudPrep" (`PrivacyPage.test.tsx`).
 - The docs match the app: PRODUCT_SPEC (first-visit journey via the landing page, private questions, the footer), KNOWN_LIMITATIONS (public site, both passing scores, account removal, admin list), DEPLOYMENT (`spa.html` fallback, three exam rows, the landing page in the smoke test, other hosts, the archive repo), ARCHITECTURE (folder map, `Root.tsx` analytics), README (deployment, env variables), `.env.example` and the `package.json` description.

@@ -173,7 +173,6 @@ CloudPrep is a **Shubham Works** project, made by [Shubham Chaudhary](https://sh
 
 Also:
 
-- [React, Drawn Out](https://react-drawn-out.vercel.app/): a visual field guide to React
 - [Git, Drawn Out](https://git-drawn-out.vercel.app/): a visual field guide to Git
 - [Frontend Interview Prep](https://frontend-interview-prepare.vercel.app/): frontend interview questions with answers
 - [All projects](https://shubhamworks.vercel.app/projects)
