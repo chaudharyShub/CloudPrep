@@ -46,6 +46,7 @@ export const INTEGRITY_EVENT_TYPES = [
   'mouth-moving',
   'voice-detected',
   'phone-detected',
+  'face-blocked',
   'person-detected',
   'item-detected',
   'pointer-left',
@@ -260,6 +261,13 @@ export const EVENT_DESCRIPTIONS: Record<IntegrityEventType, EventDescription> = 
     label: 'Phone detected',
     explanation: 'A mobile phone was visible to the camera.',
     action: 'Keep phones out of the room, or at least out of reach.',
+  },
+  'face-blocked': {
+    category: 'Camera',
+    label: 'Face hidden',
+    explanation:
+      'You were in view, but your face was hidden for more than 2 seconds, for example behind a phone, a hand or another object, or turned fully away.',
+    action: 'Keep your whole face visible and facing the screen.',
   },
   'person-detected': {
     category: 'Objects',

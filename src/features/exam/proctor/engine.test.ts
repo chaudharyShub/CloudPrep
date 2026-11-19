@@ -35,7 +35,7 @@ function fakeEnv(
   } as unknown as MediaStream;
 
   let frame: FrameSignals = { faces: 1, face: FACE, brightness: 120 };
-  let objects: ObjectSignals = { phone: false, persons: 1, items: 0 };
+  let objects: ObjectSignals = { phone: false, persons: 1, items: 0, bodyVisible: true };
   let db = -60;
   const analyzer: ProctorAnalyzer = {
     analyzeFrame: () => frame,

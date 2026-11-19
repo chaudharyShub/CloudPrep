@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { faceReading, headAngles, levelDb, meanBrightness, objectSignals } from './signals';
+import {
+  faceReading,
+  headAngles,
+  levelDb,
+  meanBrightness,
+  mergeObjectSignals,
+  objectSignals,
+} from './signals';
 
 /** Column-major 4×4 rotation matrix about the vertical axis (yaw) or the side axis (pitch). */
 function rotation(axis: 'yaw' | 'pitch', degrees: number): number[] {
@@ -56,21 +63,49 @@ describe('MediaPipe result conversion', () => {
     expect(reading.blink).toBeCloseTo(0.75);
   });
 
+  const det = (categoryName: string, score: number) => ({
+    categories: [{ categoryName, score }],
+  });
+
   it('AC-7.2 counts phones at lower confidence than people and items', () => {
-    const det = (categoryName: string, score: number) => ({
-      categories: [{ categoryName, score }],
-    });
     expect(
       objectSignals([
         det('person', 0.9),
         det('person', 0.4),
-        det('cell phone', 0.36),
+        det('cell phone', 0.26),
         det('book', 0.6),
         det('tv', 0.45),
         { categories: [] },
       ]),
-    ).toEqual({ phone: true, persons: 1, items: 1 });
-    expect(objectSignals([det('cell phone', 0.3)])).toEqual({ phone: false, persons: 0, items: 0 });
+    ).toEqual({ phone: true, persons: 1, items: 1, bodyVisible: true });
+    expect(objectSignals([det('cell phone', 0.24)])).toEqual({
+      phone: false,
+      persons: 0,
+      items: 0,
+      bodyVisible: false,
+    });
+  });
+
+  it('AC-7.2 counts a remote as a phone, and a faint person as a body in view', () => {
+    expect(objectSignals([det('remote', 0.3)]).phone).toBe(true);
+    expect(objectSignals([det('person', 0.35)])).toEqual({
+      phone: false,
+      persons: 0,
+      items: 0,
+      bodyVisible: true,
+    });
+    expect(objectSignals([det('person', 0.25)]).bodyVisible).toBe(false);
+  });
+
+  it('AC-7.2 takes a phone or body from the zoomed-out copy, but counts people once', () => {
+    const full = { phone: false, persons: 1, items: 1, bodyVisible: false };
+    const zoomed = { phone: true, persons: 3, items: 0, bodyVisible: true };
+    expect(mergeObjectSignals(full, zoomed)).toEqual({
+      phone: true,
+      persons: 1,
+      items: 1,
+      bodyVisible: true,
+    });
   });
 
   it('measures brightness and loudness', () => {

@@ -49,6 +49,7 @@ The user's phase prompts group the plan's phases differently (docs/DECISIONS.md 
 | Frontend Interview Prep link (D-059) | "Also by me: Frontend Interview Prep" under the credit (sidebar, mobile menu, landing footer) and a sentence on the Privacy page; version 3.2.0; acceptance criteria below | Done, merged and live (PR #21) |
 | Developer credit (D-056) | "Made by Shubham Chaudhary" with a portfolio link in the sidebar and mobile menu, and a "Who runs CloudPrep" section on the Privacy page; version 2.4.0; acceptance criteria below | Done, merged (PR #14) and live |
 | Docs and texts refresh (D-074) | Docs and in-app texts brought in line with the app after D-057 to D-073 (landing page, `spa.html`, private questions, three exams); the Privacy page and KNOWN_LIMITATIONS say to contact the developer to delete an account (no longer "the person who shared CloudPrep"); "All projects" opens the portfolio's project list (PR #3); version 4.5.1; acceptance criteria below | Done, merged and live |
+| Phone held close to the camera (D-075) | The AI proctor ends the exam when the face is hidden for 2 s while the body is in view (`face-blocked`); phones count from a score of 0.25, "remote" counts as a phone, and each object check also looks at a zoomed-out copy of the frame; check-in and exam-mode texts updated; version 4.5.2; acceptance criteria below | Done, merged and live |
 | Not started | P4 welcome/onboarding and About page, attempt-to-attempt comparison view, Phase 8 step 5 (server scoring) | — |
 
 Changes from the original plan:
@@ -308,9 +309,9 @@ Each batch covers **every** task statement, includes about 15% multiple-response
 Acceptance criteria (tests are tagged with these IDs):
 
 - **AC-7.1 Check-in.** Choosing "AI-proctored exam" leads to a check-in: agree to every rule, allow the camera and microphone (with clear errors for denial, busy devices and failed model loads), load the models, pass a live room check for 3 seconds (lighting, one face, eyes open, no phone, other person, books or screens, quiet room, single display, no virtual camera), and calibrate. Only then can the exam start, in fullscreen. The mode is disabled where the browser lacks camera, fullscreen or WebAssembly support.
-- **AC-7.2 Camera and microphone rules.** Sustained conditions become violations: no face (2 s), more than one face (1 s), camera covered (1.5 s), head turned (2 s), eyes off the screen (2 s), eyes closed (3 s), lips moving, voice or noise above the check-in level, and a phone, extra person or book/screen in 2 of 3 object checks. Each episode counts once and must clear before it counts again. Head and eye rules are relative to calibration.
+- **AC-7.2 Camera and microphone rules.** Sustained conditions become violations: no face (2 s), more than one face (1 s), camera covered (1.5 s), head turned (2 s), eyes off the screen (2 s), eyes closed (3 s), lips moving, voice or noise above the check-in level, and a phone, extra person or book/screen in 2 of 3 object checks. A face hidden for 2 s while the body is in view is `face-blocked` (D-075). Each episode counts once and must clear before it counts again. Head and eye rules are relative to calibration.
 - **AC-7.3 Browser rules.** Tab hidden, window blur, fullscreen exit, the pointer leaving the page, blocked shortcuts (copy, cut, paste, context menu, print, save, find, developer tools, screenshots; logged at most once a second) and a second display are recorded. Blocked shortcuts are prevented; ordinary keys are not.
-- **AC-7.4 Verdict.** Strikes within 3 s count as one incident. Strikes 1 and 2 show warnings (the second is the final warning); the third ends the exam. A phone, another person or face, a second display, or a lost camera or microphone ends it at once. The verdict is derived from the saved log, so it survives reloads, and the exam is submitted with reason `proctor_ended` on any page.
+- **AC-7.4 Verdict.** Strikes within 3 s count as one incident. Strikes 1 and 2 show warnings (the second is the final warning); the third ends the exam. A phone, a hidden face (D-075), another person or face, a second display, or a lost camera or microphone ends it at once. The verdict is derived from the saved log, so it survives reloads, and the exam is submitted with reason `proctor_ended` on any page.
 - **AC-7.5 Interruptions.** Reopening a proctored exam logs "Exam interrupted" (a strike) and hides the questions until the learner restarts the proctor (camera, microphone, 2-second calibration, fullscreen). Outside fullscreen, the questions are hidden until fullscreen returns. The timer keeps running.
 - **AC-7.6 Results.** A proctor-ended attempt is void: it never meets the benchmark, is marked "Ended by proctor" in history, is left out of readiness, and its results page explains why. The proctor report shows each event and what the proctor did (warning, final warning, same incident, exam ended).
 - **AC-7.7 Privacy.** Only `{type, at}` is stored. Frames and audio are analysed in memory. Every camera and microphone track, timer and model is released when the exam ends, check-in is left, or loading fails. The privacy page describes the proctor.
@@ -471,6 +472,18 @@ Acceptance criteria:
 - AC-O.1 The code holds only the token's SHA-256; a browser without the token is counted (`ownerDevice.test.ts`).
 - AC-O.2 Opening the site with `#<token>` saves the token, removes it from the address (path and query kept) and says the browser won't be counted.
 - AC-O.3 `#<token>.on` deletes the saved token and says analytics is back on.
+
+## Phone held close to the camera (D-075)
+
+Reported by the user on 2026-11-18: a proctored exam kept going while they held a phone in front of their face and the camera. Version 4.5.2.
+
+Acceptance criteria:
+- AC-7.2 No face for 2 s while an object check from the last 2.5 s sees a body is `face-blocked`; without a fresh body reading it stays `face-not-detected`; a dark frame stays `camera-covered` (`proctor.test.ts`).
+- AC-7.4 `face-blocked` ends the exam at once, like a phone (`proctor.test.ts`).
+- AC-7.2 A phone counts from a score of 0.25, a "remote" counts as a phone, a person from 0.3 counts as a body in view; a phone or body found in the zoomed-out copy counts, people are counted once (`signals.test.ts`).
+- The check-in rules and the exam-mode description name the hidden face as ending the exam.
+- Checked with the real models on photos (scratch harness, not committed): every covered face with the person still detected becomes `face-blocked`; two more phones found; no phone on the photos without one.
+- To check by hand after deploying: a proctored exam with a real camera ends within a few seconds of holding a phone in front of the face.
 
 ## Docs and texts refresh (D-074)
 
