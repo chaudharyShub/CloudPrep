@@ -188,12 +188,13 @@ export function CheckInPage() {
             <div className="mt-4 rounded-md border border-border bg-surface-2 p-3 text-xs text-fg-muted">
               <p className="font-medium text-fg">Stricter than a real exam</p>
               <p className="mt-1">
-                Ends immediately: a phone, another person or face, a second display, or losing the
-                camera or microphone. Counts as a violation: no face, head turned or eyes off the
-                screen for 2 seconds, eyes closed for 3 seconds, lips moving, voice or noise, books
-                or other screens, leaving the tab, window or fullscreen, the mouse leaving the page,
-                blocked shortcuts (copy, paste, print, screenshots, developer tools), and reloading
-                the page. Detection is approximate.
+                Ends immediately: a phone, your face hidden for 2 seconds while you’re in view
+                (behind a phone or a hand, or turned fully away), another person or face, a second
+                display, or losing the camera or microphone. Counts as a violation: no face, head
+                turned or eyes off the screen for 2 seconds, eyes closed for 3 seconds, lips moving,
+                voice or noise, books or other screens, leaving the tab, window or fullscreen, the
+                mouse leaving the page, blocked shortcuts (copy, paste, print, screenshots,
+                developer tools), and reloading the page. Detection is approximate.
               </p>
             </div>
             {!engine && (

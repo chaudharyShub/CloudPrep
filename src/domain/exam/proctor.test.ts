@@ -82,6 +82,47 @@ describe('proctor detection rules', () => {
     expect(long.events).toEqual([{ type: 'face-not-detected', at: 2000 }]);
   });
 
+  it('AC-7.2 counts a hidden face while the body stays in view as face-blocked, not a missing face', () => {
+    const body = (visible: boolean) => (at: number) =>
+      at % 1000 === 0
+        ? ({
+            kind: 'objects',
+            at,
+            signals: { phone: false, persons: visible ? 1 : 0, items: 0, bodyVisible: visible },
+          } as const)
+        : ({ kind: 'frame', at, signals: frame({ faces: 0, face: null }) } as const);
+    // A phone held up to the face: the object model still sees the candidate.
+    expect(run(body(true), 10_000).events).toEqual([{ type: 'face-blocked', at: 2250 }]);
+    // An empty seat stays a missing face.
+    expect(run(body(false), 10_000).events).toEqual([{ type: 'face-not-detected', at: 2250 }]);
+    // An old body reading doesn't count: the object checks stopped arriving.
+    const stale = (at: number) =>
+      at === 0
+        ? ({
+            kind: 'objects',
+            at,
+            signals: { phone: false, persons: 1, items: 0, bodyVisible: true },
+          } as const)
+        : at < 3000
+          ? null
+          : ({ kind: 'frame', at, signals: frame({ faces: 0, face: null }) } as const);
+    expect(run(stale, 10_000).events.map((e) => e.type)).toEqual(['face-not-detected']);
+    // A dark frame is a covered camera, never a blocked face.
+    const dark = (at: number) =>
+      at % 1000 === 0
+        ? ({
+            kind: 'objects',
+            at,
+            signals: { phone: false, persons: 1, items: 0, bodyVisible: true },
+          } as const)
+        : ({
+            kind: 'frame',
+            at,
+            signals: frame({ faces: 0, face: null, brightness: 5 }),
+          } as const);
+    expect(run(dark, 10_000).events.map((e) => e.type)).toEqual(['camera-covered']);
+  });
+
   it('AC-7.2 counts the same condition again only after it has cleared', () => {
     const away = (at: number) =>
       frame({}, { yaw: at < 3000 || (at >= 3000 + CLEAR_MS + 500 && at < 8000) ? 40 : 0 });
@@ -174,6 +215,7 @@ describe('proctor detection rules', () => {
           phone: key === 'phone' && hit,
           persons: key === 'persons' && hit ? 2 : 1,
           items: key === 'items' && hit ? 1 : 0,
+          bodyVisible: true,
         },
       } as const;
     };
@@ -222,9 +264,10 @@ describe('proctor verdict', () => {
     expect(status.endedBy).toBeNull();
   });
 
-  it('AC-7.4 ends the exam at once for a phone, another person, a second display or a lost device', () => {
+  it('AC-7.4 ends the exam at once for a phone, a hidden face, another person, a second display or a lost device', () => {
     for (const type of [
       'phone-detected',
+      'face-blocked',
       'person-detected',
       'multiple-faces',
       'extra-display',
@@ -272,13 +315,13 @@ describe('check-in', () => {
   });
 
   it('AC-7.1 lists what blocks the room check', () => {
-    const objects = { phone: false, persons: 1, items: 0 };
+    const objects = { phone: false, persons: 1, items: 0, bodyVisible: true };
     expect(checkInIssues({ frame: frame(), objects, noiseDb: -60 })).toEqual([]);
     expect(checkInIssues({ frame: null, objects: null, noiseDb: null })).toEqual(['dark']);
     expect(
       checkInIssues({
         frame: frame({ faces: 0, face: null }),
-        objects: { phone: true, persons: 2, items: 1 },
+        objects: { phone: true, persons: 2, items: 1, bodyVisible: true },
         noiseDb: -20,
       }),
     ).toEqual(['no-face', 'phone', 'person', 'item', 'noisy']);

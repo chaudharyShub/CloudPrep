@@ -1,6 +1,6 @@
 # CloudPrep — Product Specification
 
-> Status: **Describes the app as built** (version 4.5.1) · Last updated: 2026-11-18
+> Status: **Describes the app as built** (version 4.5.2) · Last updated: 2026-11-18
 > CloudPrep is an unofficial practice tool. It is not affiliated with, endorsed by, or sponsored by Amazon Web Services.
 >
 > This replaces the first draft of 2026-10-21. What changed from that plan is in IMPLEMENTATION_PLAN.md ("Changes from the original plan") and the reasons are in DECISIONS.md.
@@ -191,7 +191,7 @@ Chosen per exam on the exam page (D-036, D-043):
 
 - **Standard:** nothing is monitored.
 - **Strict practice:** asks for fullscreen and logs tab, focus and fullscreen changes. It never judges and can be stopped at any time.
-- **AI-proctored:** a check-in like an online proctored exam, then an on-device proctor (MediaPipe face and object models, microphone loudness) watching the face, head, eyes and mouth, phones, other people, books and screens, the pointer, shortcuts and extra displays. Two warnings, then the third strike ends the exam; a phone, another person, a second display or a lost camera or microphone ends it at once.
+- **AI-proctored:** a check-in like an online proctored exam, then an on-device proctor (MediaPipe face and object models, microphone loudness) watching the face, head, eyes and mouth, phones, other people, books and screens, the pointer, shortcuts and extra displays. Two warnings, then the third strike ends the exam; a phone, a face hidden for 2 seconds while the body is in view (behind a phone held up to the camera, a hand, or turned fully away; D-075), another person, a second display or a lost camera or microphone ends it at once.
 
 Only `{type, at}` events are stored, never frames, audio or images. The results page shows the log.
 

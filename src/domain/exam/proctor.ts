@@ -21,6 +21,7 @@ export const STRIKE_MERGE_MS = 3000;
 /** End the exam immediately. */
 export const ZERO_TOLERANCE_EVENTS: ReadonlySet<IntegrityEventType> = new Set<IntegrityEventType>([
   'phone-detected',
+  'face-blocked',
   'person-detected',
   'multiple-faces',
   'camera-lost',
@@ -119,6 +120,11 @@ export interface ObjectSignals {
   persons: number;
   /** Books, laptops and screens found. */
   items: number;
+  /**
+   * Someone's body is in view, even at low confidence. With no face, that means the face is
+   * hidden (a phone held up to it, a hand) or turned fully away, rather than the seat empty.
+   */
+  bodyVisible: boolean;
 }
 
 export type ProctorInput =
@@ -176,11 +182,14 @@ export const PROCTOR_THRESHOLDS = {
   /** Objects must appear in this many of the last few object checks. */
   objectChecks: 3,
   objectHits: 2,
+  /** An object check this recent tells whether a body is in view. */
+  bodyFreshMs: 2500,
 } as const;
 
 /** How long a condition must last before it counts. */
 export const SUSTAIN_MS = {
   'face-not-detected': 2000,
+  'face-blocked': 2000,
   'multiple-faces': 1000,
   'camera-covered': 1500,
   'looking-away': 2000,
@@ -219,6 +228,8 @@ export interface ProctorTrackerState {
   phone: readonly boolean[];
   person: readonly boolean[];
   item: readonly boolean[];
+  /** The latest object check's body reading. */
+  body: { at: number; visible: boolean } | null;
 }
 
 export function createProctorTracker(
@@ -228,7 +239,16 @@ export function createProctorTracker(
   for (const condition of CONDITIONS) {
     conditions[condition] = { since: null, fired: false, clearSince: null };
   }
-  return { calibration, conditions, mouth: [], voice: [], phone: [], person: [], item: [] };
+  return {
+    calibration,
+    conditions,
+    mouth: [],
+    voice: [],
+    phone: [],
+    person: [],
+    item: [],
+    body: null,
+  };
 }
 
 function updateCondition(
@@ -298,7 +318,12 @@ export function stepProctor(
     const { faces, face, brightness } = input.signals;
     const covered = brightness < t.darkBrightness;
     raw['camera-covered'] = covered;
-    raw['face-not-detected'] = !covered && faces === 0;
+    // A phone held close to the camera is too big for the object model to call a phone,
+    // but it hides the face while the body stays in view (D-075).
+    const bodyVisible =
+      state.body !== null && state.body.visible && input.at - state.body.at <= t.bodyFreshMs;
+    raw['face-blocked'] = !covered && faces === 0 && bodyVisible;
+    raw['face-not-detected'] = !covered && faces === 0 && !bodyVisible;
     raw['multiple-faces'] = faces >= 2;
     const checks = face && faces >= 1 ? faceConditions(face, state.calibration) : null;
     raw['looking-away'] = checks?.lookingAway ?? false;
@@ -314,7 +339,13 @@ export function stepProctor(
     const phone = lastChecks(state.phone, input.signals.phone);
     const person = lastChecks(state.person, input.signals.persons >= 2);
     const item = lastChecks(state.item, input.signals.items > 0);
-    next = { ...next, phone, person, item };
+    next = {
+      ...next,
+      phone,
+      person,
+      item,
+      body: { at: input.at, visible: input.signals.bodyVisible },
+    };
     const hits = (history: boolean[]) => history.filter(Boolean).length >= t.objectHits;
     raw['phone-detected'] = hits(phone);
     raw['person-detected'] = hits(person);

@@ -51,24 +51,48 @@ export function faceReading(
 }
 
 /** COCO labels the object model is asked about. */
-export const OBJECT_LABELS = ['cell phone', 'person', 'book', 'laptop', 'tv'] as const;
-/** Phones are small and the most serious, so they count at a lower confidence. */
-export const PHONE_MIN_SCORE = 0.35;
+export const OBJECT_LABELS = ['cell phone', 'remote', 'person', 'book', 'laptop', 'tv'] as const;
+/** The model often calls a phone in a hand a remote; on an exam desk both count as a phone. */
+const PHONE_LABELS: ReadonlySet<string> = new Set(['cell phone', 'remote']);
+/** Phones are small and the most serious, so they count at a lower confidence (D-075). */
+export const PHONE_MIN_SCORE = 0.25;
 export const OTHER_MIN_SCORE = 0.5;
+/** A body counts as in view at this confidence (a hidden face lowers the person score). */
+export const BODY_MIN_SCORE = 0.3;
+/** The object model's own cut-off: the lowest of the scores above. */
+export const DETECTOR_MIN_SCORE = Math.min(PHONE_MIN_SCORE, BODY_MIN_SCORE);
 
 export function objectSignals(detections: readonly Detection[]): ObjectSignals {
   let phone = false;
   let persons = 0;
   let items = 0;
+  let bodyVisible = false;
   for (const detection of detections) {
     const best = detection.categories[0];
     if (!best) continue;
-    if (best.categoryName === 'cell phone' && best.score >= PHONE_MIN_SCORE) phone = true;
-    else if (best.score < OTHER_MIN_SCORE) continue;
-    else if (best.categoryName === 'person') persons++;
-    else if (best.categoryName !== 'cell phone') items++;
+    if (PHONE_LABELS.has(best.categoryName)) {
+      if (best.score >= PHONE_MIN_SCORE) phone = true;
+      continue;
+    }
+    if (best.categoryName === 'person' && best.score >= BODY_MIN_SCORE) bodyVisible = true;
+    if (best.score < OTHER_MIN_SCORE) continue;
+    if (best.categoryName === 'person') persons++;
+    else items++;
   }
-  return { phone, persons, items };
+  return { phone, persons, items, bodyVisible };
+}
+
+/**
+ * Combines the full frame with a zoomed-out copy of it. A phone held close to the camera
+ * is often only recognised once it looks smaller. People and items are counted from the
+ * full frame only, so nobody is counted twice.
+ */
+export function mergeObjectSignals(full: ObjectSignals, zoomedOut: ObjectSignals): ObjectSignals {
+  return {
+    ...full,
+    phone: full.phone || zoomedOut.phone,
+    bodyVisible: full.bodyVisible || zoomedOut.bodyVisible,
+  };
 }
 
 /** Mean brightness (0–255) of RGBA pixel data. */

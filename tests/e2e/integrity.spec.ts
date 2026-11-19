@@ -100,7 +100,12 @@ async function installScriptedProctor(page: Page) {
       },
       detectObjects: () => {
         const s = w.__scenario;
-        return { phone: s.phone, persons: s.persons, items: s.items };
+        return {
+          phone: s.phone,
+          persons: s.persons,
+          items: s.items,
+          bodyVisible: s.persons > 0,
+        };
       },
       close: () => undefined,
     });

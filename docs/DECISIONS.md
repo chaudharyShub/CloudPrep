@@ -80,6 +80,7 @@
 | D-072 | Questions kept private: the banks move to the private repo `CloudPrep-questions`, checked out at `src/content/`; a public sample bank for tests, E2E and development; a fresh public app repo, the old one made private; questions all rights reserved; version 4.4.0 | Accepted (live) |
 | D-073 | Shubham Works footer update: "Also:" lists at most 3 other sites, newest first (Git, Drawn Out, Frontend Interview Prep), then "All projects"; the owner's own browsers are left out of Web Analytics and Speed Insights; version 4.5.0 | Accepted (live, PR #1) |
 | D-074 | Docs and in-app texts brought in line with the app; account deletion goes through the developer; "All projects" opens the portfolio's project list; version 4.5.1 | Accepted (live) |
+| D-075 | AI proctor: a face hidden while the body is in view ends the exam at once (a phone held close to the camera); phones counted more readily (lower score, "remote" counts, a zoomed-out second look); version 4.5.2 | Accepted (live) |
 
 ---
 
@@ -597,3 +598,12 @@ The user asked (2026-10-22) for questions to come from a backend, for sign-in so
 - **Docs:** corrected PRODUCT_SPEC, KNOWN_LIMITATIONS, DEPLOYMENT, ARCHITECTURE, TEST_PLAN, IMPLEMENTATION_PLAN, README, `.env.example`, the `package.json` description and a stale code comment; see the IMPLEMENTATION_PLAN section for the list.
 - **Published bank fixed (2026-11-18):** `npm run check:published` showed the live database still had SAA-C03 and DVA-C03 at 800 questions (bank `2026-11-09.1`): the 4.3.0 publish (D-071) had been missed when it shipped with 4.4.0, while the site and docs said 1,000. Published with the user's go-ahead; `check:published` now matches the repo for all three exams (2,000 / 1,000 / 1,000).
 - **Version:** 4.5.1 (a patch: wording and links, no new feature).
+
+## D-075 — Phone held close to the camera
+
+- **Context (2026-11-18):** the user reported that a proctored exam kept going while they held a phone straight in front of their face and the camera. The phone rule (zero tolerance, D-043) never fired.
+- **Cause, measured with the real models:** EfficientDet-Lite2 finds a phone that is small in the picture (a phone in a hand: scores 0.4–0.8), but a phone close to the camera fills the frame and is labelled "tv", "book", "refrigerator" or nothing, below every threshold. The covered face only produced "No face detected", a strike. This is a limit of the COCO model, not a broken check.
+- **Decision (user's choice):** a new zero-tolerance event, `face-blocked` ("Face hidden"): no face for 2 seconds, the frame not dark, while the latest object check (at most 2.5 s old) sees a person at a score of 0.3 or more. Without a body in view it stays `face-not-detected` (a strike), so an empty seat is still a warning. On photos with the face covered, the face model lost the face every time and the object model still saw the person in 7 of 8.
+- **Phones counted more readily (user's choice):** the phone score drops from 0.35 to 0.25; "remote" counts as a phone (the model often calls a phone in a hand a remote); each object check also looks at a copy of the frame zoomed out to 60% on grey, and a phone or body found there counts (people and items are counted from the full frame only). On the test photos this caught two more phones and raised no phone on the photos without one. The object model does twice the work once a second.
+- **Trade-off accepted:** turning fully away from the camera, or the face model losing the face in very poor light while the body is visible, now ends the exam instead of giving a strike. A phone that fills the whole picture with no body visible is still only a "no face" strike.
+- **Version:** 4.5.2 (a fix).

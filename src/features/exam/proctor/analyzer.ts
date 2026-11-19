@@ -1,11 +1,21 @@
 import type { FrameSignals, ObjectSignals } from '@/domain/exam/proctor';
-import { faceReading, meanBrightness, OBJECT_LABELS, objectSignals } from './signals';
+import {
+  DETECTOR_MIN_SCORE,
+  faceReading,
+  meanBrightness,
+  mergeObjectSignals,
+  OBJECT_LABELS,
+  objectSignals,
+} from './signals';
 
 /** Runs the AI models on the current camera frame. Frames are analysed in memory only. */
 export interface ProctorAnalyzer {
   /** Faces, head pose, eyes and mouth, plus brightness. Null if no frame is ready yet. */
   analyzeFrame: (video: HTMLVideoElement, now: number) => FrameSignals | null;
-  /** Phones, people, books and screens. Null if no frame is ready yet. */
+  /**
+   * Phones, people, books and screens, from the frame and a zoomed-out copy of it.
+   * Null if no frame is ready yet.
+   */
   detectObjects: (video: HTMLVideoElement, now: number) => ObjectSignals | null;
   close: () => void;
 }
@@ -38,6 +48,32 @@ function brightnessReader(): (video: HTMLVideoElement) => number {
     if (!context) return 255; // can't measure: don't report a covered camera
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     return meanBrightness(context.getImageData(0, 0, canvas.width, canvas.height).data);
+  };
+}
+
+/** How big the zoomed-out copy of the frame is, relative to the frame. */
+export const ZOOMED_OUT_SCALE = 0.6;
+
+/**
+ * Draws the frame smaller, centred on grey, into a reused canvas (never kept). Returns null
+ * if the browser can't draw it.
+ */
+function zoomedOutReader(): (video: HTMLVideoElement) => HTMLCanvasElement | null {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  return (video) => {
+    if (!context) return null;
+    const { videoWidth: width, videoHeight: height } = video;
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+    context.fillStyle = 'rgb(128 128 128)';
+    context.fillRect(0, 0, width, height);
+    const w = width * ZOOMED_OUT_SCALE;
+    const h = height * ZOOMED_OUT_SCALE;
+    context.drawImage(video, (width - w) / 2, (height - h) / 2, w, h);
+    return canvas;
   };
 }
 
@@ -80,12 +116,13 @@ export async function loadProctorAnalyzer(): Promise<ProctorAnalyzer> {
     vision.ObjectDetector.createFromOptions(fileset, {
       baseOptions: { modelAssetPath: OBJECT_MODEL_URL, delegate },
       runningMode: 'VIDEO',
-      scoreThreshold: 0.3,
+      scoreThreshold: DETECTOR_MIN_SCORE,
       maxResults: 10,
       categoryAllowlist: [...OBJECT_LABELS],
     }),
   );
   const brightness = brightnessReader();
+  const zoomedOut = zoomedOutReader();
   const faceTime = timestamps();
   const objectTime = timestamps();
 
@@ -103,7 +140,13 @@ export async function loadProctorAnalyzer(): Promise<ProctorAnalyzer> {
     },
     detectObjects(video, now) {
       if (!frameReady(video)) return null;
-      return objectSignals(objects.detectForVideo(video, objectTime(now)).detections);
+      const full = objectSignals(objects.detectForVideo(video, objectTime(now)).detections);
+      const small = zoomedOut(video);
+      if (!small) return full;
+      return mergeObjectSignals(
+        full,
+        objectSignals(objects.detectForVideo(small, objectTime(now)).detections),
+      );
     },
     close() {
       faces.close();

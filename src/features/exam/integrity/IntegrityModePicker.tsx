@@ -31,7 +31,7 @@ const OPTIONS: { value: SelectableMode; title: string; detail: string }[] = [
   {
     value: 'proctored',
     title: 'AI-proctored exam (strictest)',
-    detail: `Like an online proctored exam, but stricter. After a check-in, an AI proctor on this device watches your face, eyes, mouth and room (phones, other people, books, screens), listens for voices, and blocks shortcuts. ${String(MAX_STRIKES - 1)} warnings, then the exam ends; a phone or another person ends it at once. Needs a camera, microphone and fullscreen. Nothing is recorded or uploaded.`,
+    detail: `Like an online proctored exam, but stricter. After a check-in, an AI proctor on this device watches your face, eyes, mouth and room (phones, other people, books, screens), listens for voices, and blocks shortcuts. ${String(MAX_STRIKES - 1)} warnings, then the exam ends; a phone, a hidden face or another person ends it at once. Needs a camera, microphone and fullscreen. Nothing is recorded or uploaded.`,
   },
 ];
 
